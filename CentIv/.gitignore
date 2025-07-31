@@ -1,0 +1,11 @@
+**/*.pyc
+**/*.pyo
+*.pyc
+*.pyo
+*.xlsx
+*.xlsx#
+*.csv
+.dccache
+*.mat
+output_jo/
+cascades_invest/

@@ -1,0 +1,11 @@
+# Ignore everything in this directory
+*
+# Except this file
+!.gitignore
+# Except these default playlists
+!centiv_2020_2030_2040_2050.toml
+!centiv_2020_2050.toml
+!centiv_2050.toml
+!nothing.toml
+!postprocess_only.toml
+!upload_scenario.toml

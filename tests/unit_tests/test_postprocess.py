@@ -1,0 +1,313 @@
+import json
+import os
+import pandas as pd
+import pytest
+import shutil
+
+import nexus_e.postprocess as postprocess
+
+class TestSimulationResults():
+
+
+    @pytest.mark.parametrize(("results_folder", "simulation_name"),
+        [
+            ("any_results", "any_simulation"),
+            ("another_results", "another_simulation"),
+        ]
+    )
+    def test_create_postprocess_folder_for_simulation(
+        self,
+        results_folder: str,
+        simulation_name: str
+    ):
+        # Arrange
+        sut = postprocess.SimulationResults(
+            results_folder = results_folder,
+            simulation_name = simulation_name
+        )
+        expected_simulation_folder = os.path.join(
+            results_folder,
+            simulation_name
+        )
+        expected_postprocess_folder = os.path.join(
+            "Shared",
+            "resultPostProcess",
+            "Outputs",
+            simulation_name
+        )
+        if (
+            os.path.exists(expected_simulation_folder) 
+            and os.path.isdir(expected_simulation_folder)
+        ):
+            shutil.rmtree(expected_simulation_folder)
+
+        try:
+            # Act
+            sut.create_postprocess_folder()
+
+            # Assert
+            assert os.path.exists(expected_postprocess_folder)
+        finally:
+            shutil.rmtree(os.path.join(
+                "Shared",
+                "resultPostProcess",
+                "Outputs",
+                simulation_name)
+            )
+
+
+    @pytest.mark.parametrize("results_file_name",
+        [
+            "any_results.csv",
+            "another_results.csv",
+        ]
+    )
+    def test_write_a_file_in_postprocess_folder(self, results_file_name: str):
+        # Arrange
+        results_folder = "any_results"
+        simulation_name = "any_simulation"
+        sut = postprocess.SimulationResults(
+            results_folder=results_folder,
+            simulation_name=simulation_name
+        )
+        results_file_path = os.path.join(
+            "Shared",
+            "resultPostProcess",
+            "Outputs",
+            simulation_name,
+            results_file_name
+        )
+        if os.path.exists(results_file_path):
+            os.remove(results_file_path)
+        any_results = pd.DataFrame({"any_column": ["any_value"]})
+
+        try:
+            # Act
+            sut.write_csv_in_postprocess(any_results, results_file_name)
+
+            # Assert
+            assert os.path.exists(results_file_path)
+        finally:
+            shutil.rmtree(os.path.join(
+                "Shared",
+                "resultPostProcess",
+                "Outputs",
+                simulation_name)
+            )
+
+
+    @pytest.mark.parametrize("results",
+        [
+            pd.DataFrame(
+                {
+                    "A": [1, 2, 3], "B": [4, 5, 6]
+                }
+            ),
+            pd.DataFrame(
+                {
+                    "A": [1, 2, 3], "B": [4, 5, 6], "C": [7, 8, 9]
+                }
+            )
+        ]
+    )
+    def test_retrieve_data_from_saved_postprocess_results(
+        self,
+        results: pd.DataFrame
+    ):
+        # Arrange
+        results_folder = "any_results"
+        simulation_name = "any_simulation"
+        sut = postprocess.SimulationResults(
+            results_folder=results_folder,
+            simulation_name=simulation_name
+        )
+        results_file_name = "any_results.csv"
+        path_to_csv_file = os.path.join(
+            "Shared",
+            "resultPostProcess",
+            "Outputs",
+            simulation_name,
+            results_file_name
+        )
+
+        try:
+            # Act
+            sut.write_csv_in_postprocess(results, results_file_name)
+            expected_result = pd.read_csv(path_to_csv_file, index_col=0)
+
+            # Assert
+            pd.testing.assert_frame_equal(results, expected_result)
+        finally:
+            shutil.rmtree(os.path.join(
+                "Shared",
+                "resultPostProcess",
+                "Outputs",
+                simulation_name)
+            )
+
+
+    @pytest.mark.parametrize(("modules_folders", "expected_simulated_years"),
+        [
+            (
+                ["any_module_2020", "another_module_2030"],
+                [2020, 2030]
+            ),
+            (
+                ["any_module_2020", "any_module_2030", "any_module_2040"],
+                [2020, 2030, 2040]
+            ),
+        ]
+    )
+    def test_retrieve_simulated_years_from_results_folders(
+        self,
+        modules_folders: list[str],
+        expected_simulated_years: list[int]
+    ):
+        try:
+            # Arrange
+            results_folder = "any_results"
+            simulation_name = "any_simulation"
+            sut = postprocess.SimulationResults(
+                results_folder=results_folder,
+                simulation_name=simulation_name
+            )
+            sut.create_postprocess_folder()
+            modules_folders_path = [
+                os.path.join(results_folder, simulation_name, folder)
+                for folder in modules_folders
+            ]
+            for folder_path in modules_folders_path:
+                os.makedirs(folder_path, exist_ok=True)
+
+            # Act
+            result = sut.get_simulated_years()
+
+            # Assert
+            assert result == expected_simulated_years
+
+        finally:
+            shutil.rmtree(results_folder)
+
+
+    def test_retrieve_empty_list_of_years_when_no_results_folders(self):
+        # Arrange
+        results_folder = "any_results"
+        simulation_name = "any_simulation"
+        sut = postprocess.SimulationResults(
+            results_folder=results_folder,
+            simulation_name=simulation_name
+        )
+
+        # Act
+        result = sut.get_simulated_years()
+
+        # Assert
+        assert result == []
+
+
+    @pytest.mark.parametrize(("simulation_name", "simulated_years", "scenario_description"),
+        [
+            (
+                "any_simulation", [2020, 2030], "any_description"
+            ),
+            (
+                "another_simulation", [2020, 2030, 2040], "another_description"
+            ),
+        ]
+    )
+    def test_retrieve_metadata_from_simulation_results(
+        self,
+        simulation_name,
+        simulated_years,
+        scenario_description
+    ):
+        try:
+            # Arrange
+            results_folder = "any_results"
+            for year in simulated_years:
+                os.makedirs(
+                    os.path.join(
+                        results_folder,
+                        simulation_name,
+                        f"module_{year}")
+                )
+            sut = postprocess.SimulationResults(
+                results_folder=results_folder,
+                simulation_name=simulation_name
+            )
+            formatted_simulated_years = ",".join(map(str, simulated_years))
+            expected_results = pd.DataFrame(
+                {
+                    "info": [
+                        "2015",
+                        formatted_simulated_years,
+                        scenario_description,
+                        simulation_name
+                    ]
+                },
+                index=[
+                    "reference_year",
+                    "simulated_years",
+                    "scenario_description",
+                    "scenario_short_name"
+                ]
+            )
+            expected_results.index.name = "name"
+
+            # Act
+            result = sut.get_metadata(scenario_description)
+
+            # Assert
+            pd.testing.assert_frame_equal(result, expected_results)
+
+        finally:
+            shutil.rmtree(results_folder)
+
+    @pytest.mark.parametrize(("plot_config_test_file"),
+        [
+            "any_plot_config.json",
+            "another_plot_config.json",
+        ]
+    )
+    def test_copy_plot_config(self, plot_config_test_file):
+        try:
+            # Arrange
+            results_folder = "any_results"
+            simulation_name = "any_simulation"
+            if os.path.exists(plot_config_test_file):
+                os.remove(plot_config_test_file)
+            any_config = {
+                "any_key": "any_value",
+                "another_key": "another_value"
+            }
+            with open(plot_config_test_file, "w") as file:
+                json.dump(any_config, file)
+            sut = postprocess.SimulationResults(
+                results_folder=results_folder,
+                simulation_name="any_simulation"
+            )
+
+            # Act
+            sut.copy_plot_config(plot_config_test_file)
+
+            # Assert
+            assert os.path.exists(
+                os.path.join(
+                    "Shared",
+                    "resultPostProcess",
+                    "Outputs",
+                    simulation_name,
+                    plot_config_test_file
+                )
+            )
+
+        finally:
+            os.remove(plot_config_test_file)
+            shutil.rmtree(
+                os.path.join(
+                    "Shared",
+                    "resultPostProcess",
+                    "Outputs",
+                    simulation_name
+                ),
+                ignore_errors=True)

@@ -1,0 +1,35 @@
+# Upload one scenario from Excel file to MySQL database
+[[modules]]
+name = "scenario_upload"
+[modules.parameters]
+excel_file_path = "scenario_data/source_excel/input.xlsx"
+push_to_mysql = true
+database_name = "project_date_version"
+database_author = "FirstName LastName"
+dump_file_path = "Shared/DBcreation/schema_structure/Dump_STRUC_clean_v9.sql"
+
+include_flex_params = false
+demand_profiles_path = "scenario_data/source_excel/Nexuse_DB-Input_v47_TYNDP22-GA08_CentIvPV_base_DemandProfiles"
+
+include_tyndp24 = false
+tyndp24_data_path = "scenario_data/TYNDP24_datasets/TYNDP24_nbc"
+tyndp24_scope = "nbc"
+tyndp24_policy = "DE"
+tyndp24_climate_year = 2009
+
+ntc_type = "modelResults"
+
+use_new_line_types = true
+preset_line_types = true
+new_line_types = "AC"
+
+config_years = ["2018", "2020", "2030", "2040", "2050"]
+config_years_int = [2018, 2020, 2030, 2040, 2050]
+
+create_excel = false
+excel_file_target_path = "output.xlsx"
+
+include_branch_sheet = true
+
+update_only_specific_columns = false
+columns_to_update = { branch = ["line_id", "start_year", "S_max_win (MVA)"] }

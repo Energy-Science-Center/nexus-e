@@ -1,0 +1,22 @@
+image: python:3.11
+workflow:
+    rules:
+        - if: $CI_COMMIT_BRANCH == "main"
+        - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+run_tests:
+    tags:
+        - gitlab-org-docker
+    before_script:
+        - wget -qO- https://astral.sh/uv/install.sh | sh
+        - source $HOME/.local/bin/env
+        - apt-get update -y
+        - apt-get install -y mariadb-server
+        - apt-get install -y clang
+    script:
+        - uv remove matlabengine
+        - uv run pytest --junitxml=report.xml
+    artifacts:
+        when: always
+        reports:
+            junit: report.xml

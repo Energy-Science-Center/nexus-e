@@ -1,0 +1,7 @@
+# Placeholder
+#
+# Without this file, uv fails to execute on Euler due to an incompatibility of 
+# Cargo with an automounter script.
+# See https://github.com/rust-lang/cargo/issues/15327
+#
+# This file can be modified a priori.

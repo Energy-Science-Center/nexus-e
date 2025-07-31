@@ -1,0 +1,3 @@
+# Run simulation postprocess
+[[modules]]
+name = "postprocess"

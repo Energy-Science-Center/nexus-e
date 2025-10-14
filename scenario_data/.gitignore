@@ -1,3 +1,28 @@
-.DS_Store
-*~$
+# Ignore everything in this directory
+*
 
+# Except this file
+!.gitignore
+
+# Except these open datasets
+!nodal_demand_profiles
+
+!nodal_demand_profiles/Nexuse_DB-Input_v48_TYNDP24-DE09_NoEVflex_NoHeatPumps
+!nodal_demand_profiles/Nexuse_DB-Input_v48_TYNDP24-DE09_NoEVflex_NoHeatPumps/*
+
+!nodal_demand_profiles/Nexuse_DB-Input_v48_TYNDP24-DE09_WithEVflex_NoHeatPumps
+!nodal_demand_profiles/Nexuse_DB-Input_v48_TYNDP24-DE09_WithEVflex_NoHeatPumps/*
+
+!source_excel
+!source_excel/Nexuse_DB-Input_v48_TYNDP24-DE09_CentIvPV_xbNTC_NoSwissGrid.xlsx
+
+!TYNDP24_datasets
+
+!TYNDP24_datasets/TYNDP24_data_cleaned
+!TYNDP24_datasets/TYNDP24_data_cleaned/*
+
+!TYNDP24_datasets/TYNDP24_EU
+!TYNDP24_datasets/TYNDP24_EU/*
+
+!TYNDP24_datasets/TYNDP24_nbc
+!TYNDP24_datasets/TYNDP24_nbc/*

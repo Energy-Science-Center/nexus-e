@@ -1,0 +1,2 @@
+scenario_data/source_excel/Nexuse_DB-Input_v48_TYNDP24-DE09_CentIvPV_xbNTC_NoSwissGrid.xlsx filter=lfs diff=lfs merge=lfs -text
+scenario_data/**/*.csv filter=lfs diff=lfs merge=lfs -text

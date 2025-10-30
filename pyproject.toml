@@ -1,5 +1,5 @@
 [project]
-name = "nexus-e-framework"
+name = "nexus-e"
 version = "0.1.0"
 description = ""
 readme = "README.md"
@@ -25,6 +25,13 @@ dependencies = [
     "xlsxwriter==3.2.0",
 ]
 
+[project.scripts]
+nexus-e = "nexus_e.app:main"
+
+[build-system]
+requires = ["uv_build>=0.8.8,<0.9.0"]
+build-backend = "uv_build"
+
 [project.optional-dependencies]
 matlab = [
     "matlabengine<=24.0.0",
@@ -37,7 +44,6 @@ dev = [
 
 [tool.pytest.ini_options]
 testpaths = ["tests/unit_tests/"]
-pythonpath = ["Shared/resultPostProcess", "nexus-e", "CentIv/cgep", "."]
 log_cli = true
 log_cli_level = "DEBUG"
 log_cli_format = "%(asctime)s %(levelname)s %(message)s"

@@ -3,6 +3,7 @@
 name = "centiv"
 [modules.parameters]
 idScenario = 2
+timeperiods = 48
 # Update investments from CentIv 2020
 [[modules]]
 name = "update_investments"
@@ -17,6 +18,7 @@ scenYear = 2020
 name = "centiv"
 [modules.parameters]
 idScenario = 5
+timeperiods = 48
 # Update investments from CentIv 2050
 [[modules]]
 name = "update_investments"

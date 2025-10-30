@@ -2,7 +2,7 @@ import pytest
 import pandas as pd
 import numpy as np
 
-from cross_country_flow import CrossCountryFlows, DataframeManager
+from src.plugins.postprocess.legacy.cross_country_flow import CrossCountryFlows, DataframeManager
 
 @pytest.fixture
 def setup_cross_country_flow():

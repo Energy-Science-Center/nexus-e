@@ -4,7 +4,7 @@ import pandas as pd
 import pytest
 import shutil
 
-import nexus_e.postprocess as postprocess
+import src.plugins.postprocess.postprocess as postprocess
 
 class TestSimulationResults():
 

@@ -1,5 +1,5 @@
 
-<img src="Shared/src/logo.png" width="180"> 
+<img src="logo.png" width="180"> 
 
 **An integrated energy systems modelling platform** | [nexus-e.org](https://nexus-e.org/)
 

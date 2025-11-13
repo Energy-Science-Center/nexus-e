@@ -4,15 +4,60 @@ import pandas as pd
 import pytest
 import shutil
 
-import nexus_e.postprocess as postprocess
+import src.plugins.postprocess.postprocess as postprocess
+
+TEMP_FOLDER: str = os.path.join("tests", "temp")
 
 class TestSimulationResults():
+
+    @pytest.mark.parametrize(("results_folder", "simulation_name"),
+        [
+            (
+                os.path.join(TEMP_FOLDER, "any_results"),
+                "any_simulation"
+            ),
+            (
+                os.path.join(TEMP_FOLDER, "another_results"),
+                "another_simulation"
+            ),
+        ]
+    )
+    def test_get_simulation_postprocess_folder_path(
+        self,
+        results_folder: str,
+        simulation_name: str
+    ):
+        # Arrange
+        sut = postprocess.SimulationResults(
+            results_folder = results_folder,
+            simulation_name = simulation_name
+        )
+        expected_postprocess_folder = os.path.join(
+            results_folder,
+            simulation_name,
+            "postprocess"
+        )
+
+        # Act
+        results = sut.postprocess_path
+
+        # Assert
+        assert (
+            os.path.realpath(results) 
+            == os.path.realpath(expected_postprocess_folder)
+        )
 
 
     @pytest.mark.parametrize(("results_folder", "simulation_name"),
         [
-            ("any_results", "any_simulation"),
-            ("another_results", "another_simulation"),
+            (
+                os.path.join(TEMP_FOLDER, "any_results"),
+                "any_simulation"
+            ),
+            (
+                os.path.join(TEMP_FOLDER, "another_results"),
+                "another_simulation"
+            ),
         ]
     )
     def test_create_postprocess_folder_for_simulation(
@@ -25,16 +70,8 @@ class TestSimulationResults():
             results_folder = results_folder,
             simulation_name = simulation_name
         )
-        expected_simulation_folder = os.path.join(
-            results_folder,
-            simulation_name
-        )
-        expected_postprocess_folder = os.path.join(
-            "Shared",
-            "resultPostProcess",
-            "Outputs",
-            simulation_name
-        )
+        expected_simulation_folder = sut.path
+        expected_postprocess_folder = sut.postprocess_path
         if (
             os.path.exists(expected_simulation_folder) 
             and os.path.isdir(expected_simulation_folder)
@@ -48,12 +85,7 @@ class TestSimulationResults():
             # Assert
             assert os.path.exists(expected_postprocess_folder)
         finally:
-            shutil.rmtree(os.path.join(
-                "Shared",
-                "resultPostProcess",
-                "Outputs",
-                simulation_name)
-            )
+            shutil.rmtree(results_folder)
 
 
     @pytest.mark.parametrize("results_file_name",
@@ -64,17 +96,14 @@ class TestSimulationResults():
     )
     def test_write_a_file_in_postprocess_folder(self, results_file_name: str):
         # Arrange
-        results_folder = "any_results"
+        results_folder = TEMP_FOLDER
         simulation_name = "any_simulation"
         sut = postprocess.SimulationResults(
             results_folder=results_folder,
             simulation_name=simulation_name
         )
         results_file_path = os.path.join(
-            "Shared",
-            "resultPostProcess",
-            "Outputs",
-            simulation_name,
+            sut.postprocess_path,
             results_file_name
         )
         if os.path.exists(results_file_path):
@@ -88,12 +117,7 @@ class TestSimulationResults():
             # Assert
             assert os.path.exists(results_file_path)
         finally:
-            shutil.rmtree(os.path.join(
-                "Shared",
-                "resultPostProcess",
-                "Outputs",
-                simulation_name)
-            )
+            shutil.rmtree(results_folder)
 
 
     @pytest.mark.parametrize("results",
@@ -115,7 +139,7 @@ class TestSimulationResults():
         results: pd.DataFrame
     ):
         # Arrange
-        results_folder = "any_results"
+        results_folder = TEMP_FOLDER
         simulation_name = "any_simulation"
         sut = postprocess.SimulationResults(
             results_folder=results_folder,
@@ -123,10 +147,7 @@ class TestSimulationResults():
         )
         results_file_name = "any_results.csv"
         path_to_csv_file = os.path.join(
-            "Shared",
-            "resultPostProcess",
-            "Outputs",
-            simulation_name,
+            sut.postprocess_path,
             results_file_name
         )
 
@@ -138,12 +159,7 @@ class TestSimulationResults():
             # Assert
             pd.testing.assert_frame_equal(results, expected_result)
         finally:
-            shutil.rmtree(os.path.join(
-                "Shared",
-                "resultPostProcess",
-                "Outputs",
-                simulation_name)
-            )
+            shutil.rmtree(results_folder)
 
 
     @pytest.mark.parametrize(("modules_folders", "expected_simulated_years"),
@@ -165,7 +181,7 @@ class TestSimulationResults():
     ):
         try:
             # Arrange
-            results_folder = "any_results"
+            results_folder = TEMP_FOLDER
             simulation_name = "any_simulation"
             sut = postprocess.SimulationResults(
                 results_folder=results_folder,
@@ -191,7 +207,7 @@ class TestSimulationResults():
 
     def test_retrieve_empty_list_of_years_when_no_results_folders(self):
         # Arrange
-        results_folder = "any_results"
+        results_folder = TEMP_FOLDER
         simulation_name = "any_simulation"
         sut = postprocess.SimulationResults(
             results_folder=results_folder,
@@ -223,7 +239,7 @@ class TestSimulationResults():
     ):
         try:
             # Arrange
-            results_folder = "any_results"
+            results_folder = os.path.join(TEMP_FOLDER, "any_results")
             for year in simulated_years:
                 os.makedirs(
                     os.path.join(
@@ -269,10 +285,13 @@ class TestSimulationResults():
             "another_plot_config.json",
         ]
     )
-    def test_copy_plot_config(self, plot_config_test_file):
+    def test_copy_plot_config_in_simulation_postprocess_folder(
+        self,
+        plot_config_test_file
+    ):
         try:
             # Arrange
-            results_folder = "any_results"
+            results_folder = TEMP_FOLDER
             simulation_name = "any_simulation"
             if os.path.exists(plot_config_test_file):
                 os.remove(plot_config_test_file)
@@ -284,7 +303,7 @@ class TestSimulationResults():
                 json.dump(any_config, file)
             sut = postprocess.SimulationResults(
                 results_folder=results_folder,
-                simulation_name="any_simulation"
+                simulation_name=simulation_name
             )
 
             # Act
@@ -293,21 +312,13 @@ class TestSimulationResults():
             # Assert
             assert os.path.exists(
                 os.path.join(
-                    "Shared",
-                    "resultPostProcess",
-                    "Outputs",
+                    results_folder,
                     simulation_name,
+                    "postprocess",
                     plot_config_test_file
                 )
             )
 
         finally:
             os.remove(plot_config_test_file)
-            shutil.rmtree(
-                os.path.join(
-                    "Shared",
-                    "resultPostProcess",
-                    "Outputs",
-                    simulation_name
-                ),
-                ignore_errors=True)
+            shutil.rmtree(results_folder)

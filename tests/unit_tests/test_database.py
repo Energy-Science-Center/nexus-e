@@ -1,4 +1,4 @@
-from nexus_e.database import DatabaseCopyNamer
+from src.nexus_e.database import DatabaseCopyNamer
 
 
 class TestDatabase:

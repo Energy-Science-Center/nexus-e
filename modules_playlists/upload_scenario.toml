@@ -1,18 +1,18 @@
 # Upload one scenario from Excel file to MySQL database
 [[modules]]
-name = "scenario_upload"
+name = "upload_scenario"
 [modules.parameters]
-excel_file_path = "scenario_data/source_excel/input.xlsx"
+excel_file_path = "src/data/source_excel/Nexuse_DB-Input_v48_TYNDP24-DE09_CentIvPV_xbNTC_NoSwissGrid.xlsx"
 push_to_mysql = true
-database_name = "project_date_version"
+database_name = "test_restructure"
 database_author = "FirstName LastName"
-dump_file_path = "Shared/DBcreation/schema_structure/Dump_STRUC_clean_v9.sql"
+dump_file_path = "src/plugins/upload_scenario/schemas/Dump_STRUC_clean_v9.sql"
 
 include_flex_params = false
-demand_profiles_path = "scenario_data/source_excel/Nexuse_DB-Input_v47_TYNDP22-GA08_CentIvPV_base_DemandProfiles"
+demand_profiles_path = "src/data/source_excel/Nexuse_DB-Input_v47_TYNDP22-GA08_CentIvPV_base_DemandProfiles"
 
 include_tyndp24 = false
-tyndp24_data_path = "scenario_data/TYNDP24_datasets/TYNDP24_nbc"
+tyndp24_data_path = "src/data/TYNDP24_datasets/TYNDP24_nbc"
 tyndp24_scope = "nbc"
 tyndp24_policy = "DE"
 tyndp24_climate_year = 2009

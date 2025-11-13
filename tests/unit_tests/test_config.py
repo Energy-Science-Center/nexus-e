@@ -1,6 +1,6 @@
 import os
 import tomli
-import nexus_e.config
+import src.nexus_e.config as config
 
 
 class TestConfig:
@@ -21,7 +21,7 @@ class TestConfig:
                 "another_key": "another_value",
             }
         }
-        sut = nexus_e.config.TomlFile(file_path=test_file_name)
+        sut = config.TomlFile(file_path=test_file_name)
 
         # Act
         try:
@@ -43,7 +43,7 @@ class TestConfig:
             }
         }
         test_file_name = "test_to_delete.toml"
-        sut = nexus_e.config.TomlFile(file_path=test_file_name)
+        sut = config.TomlFile(file_path=test_file_name)
         expected_result = [
             "[any_dict]\n",
             'any_key = "any_value"\n',
@@ -74,9 +74,9 @@ class TestConfig:
                     'format = "any format"\n',
                 ]
             )
-        config_file = nexus_e.config.TomlFile(test_file_name)
-        expected_result = nexus_e.config.Config(
-            logging=nexus_e.config.Logging(
+        config_file = config.TomlFile(test_file_name)
+        expected_result = config.Config(
+            logging= config.Logging(
                 filename="any filename",
                 format="any format",
             )
@@ -84,7 +84,7 @@ class TestConfig:
 
         # Act
         try:
-            result = nexus_e.config.load(config_file)
+            result = config.load(config_file)
         except Exception as e:
             raise e
         finally:
@@ -95,15 +95,15 @@ class TestConfig:
 
     def test_write_config_in_toml_file(self):
         # Arrange
-        any_config = nexus_e.config.Config()
+        any_config = config.Config()
         any_config.logging.filename = "any filename"
         any_config.logging.format = "any format"
         test_file_name = "test_to_delete.toml"
 
         # Act
         try:
-            nexus_e.config.write(
-                any_config, nexus_e.config.TomlFile(test_file_name)
+            config.write(
+                any_config, config.TomlFile(test_file_name)
             )
             with open(test_file_name, "rb") as fid:
                 result = tomli.load(fid)

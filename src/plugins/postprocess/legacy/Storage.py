@@ -1,9 +1,11 @@
 import os
+from pathlib import Path
 import pandas as pd
 import argparse
 import pymysql
 
-from .Generation import get_folders_with_prefix, group_n_rename,filter_by_country_and_format,read_generator_file,get_data
+from .Generation import group_n_rename,filter_by_country_and_format,read_generator_file,get_data
+from ..results_context import get_years_simulated_by_centiv
 
 from nexus_e import config
 
@@ -15,52 +17,58 @@ year_dic = {
     2050: 5
 }
 
-def __get_h2_balance(year,CentIvDirectory,parentDirectory,simulation):
+def export_h2_balance(
+    year,
+    CentIvDirectory,
+    simulation_postprocess_path,
+) -> None:
         # get the H2 balance of Switzerland
-        # read all sheets into a dictionary with dataframes
-        # TODO: add other countries if required
+    # read all sheets into a dictionary with dataframes
+    # TODO: add other countries if required
 
-        # sheet names
-        sheet_names = {
-            'H2byEL_hourly_all': 'P2G2P (Load)',
-            'H2meth_hourly_all': 'Methanation (Load)',
-            'H2market_hourly_all': 'Imports',
-            'H2recon_hourly_all': 'P2G2P'
-        }
+    # sheet names
+    sheet_names = {
+        'H2byEL_hourly_all': 'P2G2P (Load)',
+        'H2meth_hourly_all': 'Methanation (Load)',
+        'H2market_hourly_all': 'Imports',
+        'H2recon_hourly_all': 'P2G2P'
+    }
 
-        # prepare output file
-        h2balance_file = pd.DataFrame()
-        # filepath
-        fn_h2balance = os.path.join(CentIvDirectory, 'P2G2P_H2vars_hourly_LP.xlsx')
-        if os.path.exists(fn_h2balance):
-            all_sheets = pd.read_excel(fn_h2balance, sheet_name=None, index_col=0)
-            # read file for market exports
-            fn_h2export = os.path.join(CentIvDirectory, 'P2G2P_H2Market_hourly_CH_LP.xlsx')
-            h2exports = filter_by_country_and_format(pd.read_excel(fn_h2export), 'CH')
+    # prepare output file
+    h2balance_file = pd.DataFrame()
+    # filepath
+    fn_h2balance = os.path.join(CentIvDirectory, 'P2G2P_H2vars_hourly_LP.xlsx')
+    if os.path.exists(fn_h2balance):
+        all_sheets = pd.read_excel(fn_h2balance, sheet_name=None, index_col=0)
+        # read file for market exports
+        fn_h2export = os.path.join(CentIvDirectory, 'P2G2P_H2Market_hourly_CH_LP.xlsx')
+        h2exports = filter_by_country_and_format(pd.read_excel(fn_h2export), 'CH')
 
-            for sheet in all_sheets:
-                # sum of all units
-                h2balance_file[sheet_names[sheet]] = all_sheets[sheet].sum(axis=1)
-            if 'P2G2P' in h2exports.columns:
-                h2balance_file['Exports'] = h2exports['P2G2P'] * -1
-            else:
-                h2balance_file['Exports'] = 0
+        for sheet in all_sheets:
+            # sum of all units
+            h2balance_file[sheet_names[sheet]] = all_sheets[sheet].sum(axis=1)
+        if 'P2G2P' in h2exports.columns:
+            h2balance_file['Exports'] = h2exports['P2G2P'] * -1
         else:
-            # empty dataframe
-            for sheet in sheet_names:
-                h2balance_file[sheet_names[sheet]] = [0] * 8760
-            h2balance_file['Exports'] = [0] * 8760
+            h2balance_file['Exports'] = 0
+    else:
+        # empty dataframe
+        for sheet in sheet_names:
+            h2balance_file[sheet_names[sheet]] = [0] * 8760
+        h2balance_file['Exports'] = [0] * 8760
 
-        # H2 PP hydrogen consumption & Methanation is negative
-        h2balance_file['P2G2P'] = h2balance_file['P2G2P'] * -1
-        h2balance_file['Methanation (Load)'] = h2balance_file['Methanation (Load)'] * -1
-        h2balance_file.index.name = 'Hour'
+    # H2 PP hydrogen consumption & Methanation is negative
+    h2balance_file['P2G2P'] = h2balance_file['P2G2P'] * -1
+    h2balance_file['Methanation (Load)'] = h2balance_file['Methanation (Load)'] * -1
+    h2balance_file.index.name = 'Hour'
 
-        h2balance_file.to_csv(f"{parentDirectory}/Outputs/{simulation}/national_generation_and_capacity"
-                            f"/h2_balance_ch_{year}.csv")
-        return
-
-
+    h2balance_file.to_csv(
+        os.path.join(
+            simulation_postprocess_path,
+            "national_generation_and_capacity",
+            f"h2_balance_ch_{year}.csv"
+        )
+    )
 
 def get_storage_levels(
     country,
@@ -183,14 +191,14 @@ def get_storage_levels(
 
 def get_storage_capacities(
     centiv_years,
-    parentDirectory,
+    simulation_postprocess_path,
     simulation,
     database,
     year_dic,
     host: str,
     user: str,
     password: str
-):
+) -> pd.DataFrame:
         # get the maximum storage capacity for country for every year
 
         # store dataframes for each country
@@ -203,7 +211,7 @@ def get_storage_capacities(
         }
 
         for year in centiv_years:
-            CentIvDirectory = f"{parentDirectory}/../../Results/{simulation}/CentIv_{year}"
+            CentIvDirectory = f"CentIv_{year}"
 
             # get max storage capacities from input DB
             conn = pymysql.connect(host=host, database=database, user=user, password=password)
@@ -233,8 +241,7 @@ def get_storage_capacities(
             else:
                 # check if units were built
                 # in Switzerland not all units listed in the Input DB are actually built
-                fn_cap_p2g2p = os.path.join(f"{parentDirectory}/../../Results/{simulation}/CentIv_{year}",
-                                            "NewUnits_P2G2P.xlsx")
+                fn_cap_p2g2p = os.path.join(CentIvDirectory, "NewUnits_P2G2P.xlsx")
                 if os.path.exists(fn_cap_p2g2p):
                     newunits_p2g2p = pd.read_excel(fn_cap_p2g2p, index_col=1)
                     if not newunits_p2g2p.empty:
@@ -269,7 +276,7 @@ def get_storage_capacities(
 
                     else:
                         # in Switzerland not all units listed in the Input DB are actually built
-                        fn_cap_p2g2p = os.path.join(f"{parentDirectory}/../../Results/{simulation}/CentIv_{year}", "NewUnits_P2G2P.xlsx")
+                        fn_cap_p2g2p = os.path.join(CentIvDirectory, "NewUnits_P2G2P.xlsx")
                         if os.path.exists(fn_cap_p2g2p):
                             newunits_p2g2p = pd.read_excel(fn_cap_p2g2p, index_col=1)
 
@@ -320,8 +327,11 @@ def get_storage_capacities(
                 else:
                     data_storage_lvl = pd.DataFrame()
 
-                # get H2 balance
-                __get_h2_balance(year,CentIvDirectory,parentDirectory,simulation)
+                export_h2_balance(
+                    year,
+                    CentIvDirectory,
+                    simulation_postprocess_path
+                )
 
                 for country in ['CH', 'DE', 'AT', 'IT', 'FR']:
                     # loop over countries
@@ -337,20 +347,35 @@ def get_storage_capacities(
                     )
                     if not storage_level_country.empty:
                         # export only dataframes that are not empty
-                        group_n_rename(storage_level_country, index_name='Hour', add_columns=['H2']).to_csv(
-                            f"{parentDirectory}/Outputs/{simulation}/national_generation_and_capacity/storage_levels_c_{country.lower()}_{year}.csv")
+                        group_n_rename(
+                            storage_level_country,
+                            index_name='Hour',
+                            add_columns=['H2']
+                        ).to_csv(
+                            os.path.join(
+                                simulation_postprocess_path,
+                                "national_generation_and_capacity",
+                                f"storage_levels_c_{country.lower()}_{year}.csv"
+                            )
+                        )
 
         # export dataframe
         for country in df_dic:
             if country != 'CH':
                 df_grouped = group_n_rename(df_dic[country], transposed=True, index_name='Row', add_columns=['H2'])
-                df_grouped.to_csv(f"{parentDirectory}/Outputs/{simulation}/national_generation_and_capacity/national_capacity_storage_{country.lower()}.csv")
+                df_grouped.to_csv(
+                    os.path.join(
+                        simulation_postprocess_path,
+                        "national_generation_and_capacity",
+                        f"national_capacity_storage_{country.lower()}.csv"
+                    )
+                )
             else:
                 Storage_Cap_CH_centiv = df_dic[country]
         return Storage_Cap_CH_centiv
 
 
-def __get_battery_parameters():
+def __get_battery_parameters() -> tuple[int, int, int]:
         try:
             df = pd.read_csv('battery_parameters.csv')
             # Extract the variables
@@ -363,9 +388,12 @@ def __get_battery_parameters():
             e_max = 0
         return bat_inv, e_max, p_max
 
-def get_storage_cap_CH(parentDirectory, centIv_listyears, simu_name,DistIV,Storage_Cap_CH_centiv):
+def get_storage_cap_CH(simulation_postprocess_path, centIv_listyears, simu_name,DistIV,Storage_Cap_CH_centiv):
 
-    output_path = f"{parentDirectory}/Outputs/{simu_name}/national_generation_and_capacity"
+    output_path = os.path.join(
+        simulation_postprocess_path,
+        "national_generation_and_capacity",
+    )
     if DistIV:
         bat_inv, e_max, p_max = __get_battery_parameters()
 
@@ -395,20 +423,22 @@ def get_storage_cap_CH(parentDirectory, centIv_listyears, simu_name,DistIV,Stora
     annual_storage_cap_cap_CH = group_n_rename(annual_storage_cap_cap_CH, transposed=True, index_name='Row')
     # group technologies and write csv
     annual_storage_cap_cap_CH.to_csv(
-        f"{parentDirectory}/Outputs/{simu_name}/national_generation_and_capacity/national_capacity_storage_ch.csv")
-
-
-
+        os.path.join(
+            simulation_postprocess_path,
+            "national_generation_and_capacity",
+            "national_capacity_storage_ch.csv"
+        )
+    )
 
 def main(simulation: str, database: str, host: str, user: str, password: str):
     os.path.abspath(os.curdir)
-    parentDirectory = os.getcwd()
+    simulation_postprocess_path = "postprocess"
 
-    centiv_years = get_folders_with_prefix(f"{parentDirectory}/../../Results/{simulation}", 'CentIv')
+    centiv_years = get_years_simulated_by_centiv(Path())
     # check if DistIv results exist:
-    fn1 = f"{parentDirectory}/../../Results/{simulation}/DistIv_2030.mat"
-    fn2 = f"{parentDirectory}/../../Results/{simulation}/DistIv_2040.mat"
-    fn3 = f"{parentDirectory}/../../Results/{simulation}/DistIv_2050.mat"
+    fn1 = "DistIv_2030.mat"
+    fn2 = "DistIv_2040.mat"
+    fn3 = "DistIv_2050.mat"
 
     if os.path.exists(fn1) or os.path.exists(fn2) or os.path.exists(fn3):
         DistIV = True
@@ -417,7 +447,7 @@ def main(simulation: str, database: str, host: str, user: str, password: str):
 
     Storage_Cap_CH_centiv = get_storage_capacities(
         centiv_years,
-        parentDirectory,
+        simulation_postprocess_path,
         simulation,
         database,
         year_dic,
@@ -425,7 +455,13 @@ def main(simulation: str, database: str, host: str, user: str, password: str):
         user=user,
         password=password
     )    
-    get_storage_cap_CH(parentDirectory, centiv_years, simulation, DistIV, Storage_Cap_CH_centiv)
+    get_storage_cap_CH(
+        simulation_postprocess_path,
+        centiv_years,
+        simulation,
+        DistIV,
+        Storage_Cap_CH_centiv
+    )
 
 if __name__ == "__main__":
     config_file_path = os.path.join(os.path.dirname(__file__), '..', '..', 'config.toml')

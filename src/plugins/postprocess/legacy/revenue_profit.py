@@ -1,19 +1,19 @@
 import os
+from pathlib import Path
 import pandas as pd
 import numpy as np
 import pymysql
 import argparse
 
-from .Generation import group_n_rename, get_folders_with_prefix
+from .Generation import group_n_rename
+from ..results_context import get_years_simulated_by_centiv
 
 from nexus_e import config as config
 
 def create_revenue(
     years,
     model,
-    dir_new,
-    parentDirectory,
-    simulation,
+    simulation_postprocess_path,
     database,
     host: str,
     user :str,
@@ -36,11 +36,15 @@ def create_revenue(
         2050: 5
     }
 
-    # calculate revenue and profit
-
+    output_directory = os.path.join(
+        simulation_postprocess_path,
+        "national_generation_and_capacity"
+    )
     # read annual prices as reference for the plot
-    annual_elprices_filepath = f"{parentDirectory}/Outputs/{simulation}/national_generation_and_capacity" \
-                               f"/national_elecprice_annual_{model}.csv"
+    annual_elprices_filepath = os.path.join(
+        output_directory,
+        f"/national_elecprice_annual_{model}.csv"
+    )
 
     if os.path.isfile(annual_elprices_filepath):
         elec_prices = pd.read_csv(annual_elprices_filepath, low_memory=False)
@@ -50,8 +54,14 @@ def create_revenue(
 
         for country in country_names:
             # read grouped capacity file
-            capacity_grouped = pd.read_csv(os.path.join(dir_new, f"national_capacity_gw_{country.lower()}.csv"),
-                                           index_col=0, low_memory=False)
+            capacity_grouped = pd.read_csv(
+                os.path.join(
+                    output_directory,
+                    f"national_capacity_gw_{country.lower()}.csv"
+                ),
+                index_col=0, 
+                low_memory=False
+            )
             capacity_grouped.columns = [int(x) for x in capacity_grouped.columns]
             revenue_all_years = pd.DataFrame()
             revenue_per_gen_all_years = pd.DataFrame()
@@ -65,11 +75,17 @@ def create_revenue(
             years_list = []
             for year in years:
                 # check if and electricity price file exist
-                price_file = os.path.join(dir_new, f"national_elecprice_hourly_{model}_{year}.csv")
+                price_file = os.path.join(
+                    output_directory,
+                    f"national_elecprice_hourly_{model}_{year}.csv"
+                )
                 if os.path.exists(price_file):
                     # read price file
                     price_h = pd.read_csv(price_file, low_memory=False)
-                    gen_file = f"Gen_{country}_{year}_{model}.csv"
+                    gen_file = os.path.join(
+                        simulation_postprocess_path,
+                        f"Gen_{country}_{year}_{model}.csv"
+                    )
                     # check if generation file exists
                     if os.path.exists(gen_file):
                         # REVENUE
@@ -99,7 +115,11 @@ def create_revenue(
                         revenue_h.drop(columns=['Hour'] + tech_ignored, inplace=True, errors='ignore')
                         revenue_h.index.rename('Hour', inplace=True)
                         group_n_rename(revenue_h,index_name="Hour").to_csv(
-                            os.path.join(dir_new, f'generation_revenue_hourly_{model}_{country.lower()}_{year}.csv'))
+                            os.path.join(
+                                output_directory,
+                                f'generation_revenue_hourly_{model}_{country.lower()}_{year}.csv'
+                            )
+                        )
 
                       
                         # monthly revenue
@@ -112,7 +132,11 @@ def create_revenue(
                         revenue_m = revenue_m.set_index("Month")
                         # write to csv file
                         group_n_rename(revenue_m,index_name="Month").to_csv(
-                            os.path.join(dir_new, f'generation_revenue_monthly_{model}_{country.lower()}_{year}.csv'))
+                            os.path.join(
+                                output_directory,
+                                f'generation_revenue_monthly_{model}_{country.lower()}_{year}.csv'
+                            )
+                        )
 
                         # annual revenue
                         revenue_a = revenue_h.sum(axis=0)
@@ -224,7 +248,11 @@ def create_revenue(
 
                         profit_h.fillna(0, inplace=True)
                         group_n_rename(profit_h,index_name="Hour").to_csv(
-                            os.path.join(dir_new, f'generation_profit_hourly_{model}_{country.lower()}_{year}.csv'))
+                            os.path.join(
+                                output_directory,
+                                f'generation_profit_hourly_{model}_{country.lower()}_{year}.csv'
+                            )
+                        )
 
                         # monthly profit
                         profit_m = profit_h.copy()
@@ -239,7 +267,11 @@ def create_revenue(
                         profit_m = profit_m.set_index("Month")
                         # write to csv file
                         group_n_rename(profit_m,index_name="Month").to_csv(
-                            os.path.join(dir_new, f'generation_profit_monthly_{model}_{country.lower()}_{year}.csv'))
+                            os.path.join(
+                                output_directory,
+                                f'generation_profit_monthly_{model}_{country.lower()}_{year}.csv'
+                            )
+                        )
 
                         # annual revenue
                         profit_a = profit_h.sum(axis=0)
@@ -291,29 +323,53 @@ def create_revenue(
 
             # write annual revenue
             revenue_all_years.columns = years_list
-            group_n_rename(revenue_all_years, transposed=True, index_name='Row').to_csv(
-                os.path.join(dir_new, f'generation_revenue_annual_{model}_{country.lower()}.csv'))
+            group_n_rename(
+                revenue_all_years,
+                transposed=True,
+                index_name='Row'
+            ).to_csv(
+                os.path.join(
+                    output_directory,
+                    f'generation_revenue_annual_{model}_{country.lower()}.csv'
+                )
+            )
 
             # write annual revenue per gen
             revenue_per_gen_all_years = revenue_per_gen_all_years.T
             revenue_per_gen_all_years.index.rename('Row', inplace=True)
             revenue_per_gen_all_years.columns = years_list
             revenue_per_gen_all_years.to_csv(
-                os.path.join(dir_new, f'generation_revenuepergen_annual_{model}_{country.lower()}.csv'))
+                os.path.join(
+                    output_directory,
+                    f'generation_revenuepergen_annual_{model}_{country.lower()}.csv'
+                )
+            )
 
             # write annual revenue per cap
             revenue_per_cap_all_years = revenue_per_cap_all_years.T
             revenue_per_cap_all_years.index.rename('Row', inplace=True)
             revenue_per_cap_all_years.columns = years_list
             revenue_per_cap_all_years.to_csv(
-                os.path.join(dir_new, f'generation_revenuepercap_annual_{model}_{country.lower()}.csv'))
+                os.path.join(
+                    output_directory,
+                    f'generation_revenuepercap_annual_{model}_{country.lower()}.csv'
+                )
+            )
 
             # write annual profit
             profit_all_years.columns = years_list
             if country == 'CH' and model == 'e':
-                profit_all_years.to_csv(f'profit_ungrouped.csv')
-            group_n_rename(profit_all_years, transposed=True, index_name='Row').to_csv(
-                os.path.join(dir_new, f'generation_profit_annual_{model}_{country.lower()}.csv'))
+                profit_all_years.to_csv('profit_ungrouped.csv')
+            group_n_rename(
+                profit_all_years,
+                transposed=True,
+                index_name='Row'
+            ).to_csv(
+                os.path.join(
+                    output_directory,
+                    f'generation_profit_annual_{model}_{country.lower()}.csv'
+                )
+            )
 
             # write annual profit per gen
             # add wholesale electricity price as reference
@@ -322,7 +378,11 @@ def create_revenue(
             profit_per_gen_all_years.index.rename('Row', inplace=True)
             profit_per_gen_all_years.columns = years_list
             profit_per_gen_all_years.to_csv(
-                os.path.join(dir_new, f'generation_profitpergen_annual_{model}_{country.lower()}.csv'))
+                os.path.join(
+                    output_directory,
+                    f'generation_profitpergen_annual_{model}_{country.lower()}.csv'
+                )
+            )
 
             # write annual profit per cap
             # add wholesale electricity price as reference
@@ -331,17 +391,20 @@ def create_revenue(
             profit_per_cap_all_years.index.rename('Row', inplace=True)
             profit_per_cap_all_years.columns = years_list
             profit_per_cap_all_years.to_csv(
-                os.path.join(dir_new, f'generation_profitpercap_annual_{model}_{country.lower()}.csv'))
+                os.path.join(
+                    output_directory,
+                    f'generation_profitpercap_annual_{model}_{country.lower()}.csv'
+                )
+            )
 
     return
 
 def main(simulation: str, database: str, host: str, user: str, password: str):
     os.path.abspath(os.curdir)
-    parentDirectory = os.getcwd()
+    simulation_postprocess_path = os.getcwd()
 
-    dir_new = f"{parentDirectory}/Outputs/{simulation}/national_generation_and_capacity"
     # get CentIV years
-    centIv_listyears = get_folders_with_prefix(f"{parentDirectory}/../../Results/{simulation}", 'CentIv')
+    centIv_listyears = get_years_simulated_by_centiv(Path())
 
     # active models
     # CentIV: c
@@ -351,7 +414,10 @@ def main(simulation: str, database: str, host: str, user: str, password: str):
     # check if FlexEco results exist:
     for i in centIv_listyears:
         if 'e' not in models:
-            flexeco_file = os.path.join(parentDirectory, f"Gen_CH_{i}_e.csv")
+            flexeco_file = os.path.join(
+                simulation_postprocess_path,
+                f"Gen_CH_{i}_e.csv"
+            )
             if os.path.isfile(flexeco_file):
                 models.append('e')
 
@@ -361,9 +427,7 @@ def main(simulation: str, database: str, host: str, user: str, password: str):
         create_revenue(
             centIv_listyears,
             model,
-            dir_new,
-            parentDirectory,
-            simulation,
+            simulation_postprocess_path,
             database,
             host=host,
             user=user,

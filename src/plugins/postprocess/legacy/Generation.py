@@ -1,10 +1,12 @@
 import os
+from pathlib import Path
 import pandas as pd
 import numpy as np
 import argparse
 import h5py
 import re
-import pymysql
+
+from ..results_context import get_years_simulated_by_centiv
 
 year_dic = {
     2018: 1,
@@ -249,21 +251,30 @@ def get_data(data_df, df, gen_list):
             else:
                 df[fuel] = 0
         return df
+
 class Generation:
 
-    def __init__(self, parent_directory, simulation, models, centiv_years, distiv=True):
-        self.parent_directory = parent_directory
+    def __init__(
+        self,
+        postprocess_output_path,
+        simulation,
+        models,
+        centiv_years,
+        distiv=True
+    ):
+        self.postprocess_output_path = postprocess_output_path
         self.simulation = simulation
         self.models = models
         self.centiv_years = centiv_years
         self.distiv = distiv
+
     def load_data(self, year, model):
-            fn = os.path.join(self.parent_directory, f"Gen_CH_{year}_{model}.csv")
+            fn = os.path.join(self.postprocess_output_path, f"Gen_CH_{year}_{model}.csv")
             if os.path.isfile(fn):
                 return pd.read_csv(fn, low_memory=False)
             return None
     def load_distiv_data(self, year):
-        fn = f"{self.parent_directory}/../../Results/{self.simulation}/DistIv_{year}.mat"
+        fn = f"DistIv_{year}.mat"
         if os.path.isfile(fn):
             data = h5py.File(fn, 'r')
             contents = data['resDistIv']
@@ -393,15 +404,31 @@ class Generation:
             df_out['Imports'] = generation_df['Imports']
             df_out['Exports'] = consumption_df['Exports']
             demand_Ch = pd.read_csv(
-                        f"{self.parent_directory}/Outputs/{self.simulation}/national_generation_and_capacity/demand_hourly_{model}_{c.lower()}_{y}.csv", index_col=0)
+                os.path.join(
+                    self.postprocess_output_path,
+                    "national_generation_and_capacity",
+                    f"demand_hourly_{model}_{c.lower()}_{y}.csv"
+                ),
+                index_col=0
+            )
             df_out["Load (Total)"] = demand_Ch.sum(axis=1)
 
-            df_out["Load (Total)"].to_csv(f'Load_{c}_{y}_{model}.csv')
+            df_out["Load (Total)"].to_csv(
+                os.path.join(
+                    self.postprocess_output_path,
+                    f"Load_{c}_{y}_{model}.csv"
+                )
+            )
             
             # name index
             df_out.index.name = "Hour"
             #these files are used in revenue_profit.py
-            df_out.to_csv(f'Gen_{c}_{y}_{model}.csv')
+            df_out.to_csv(
+                os.path.join(
+                    self.postprocess_output_path,
+                    f"Gen_{c}_{y}_{model}.csv"
+                )
+            )
 
         else:
             # Swiss net load will be calculated in webviewcentiv_distiv
@@ -409,7 +436,12 @@ class Generation:
             # name index
             df_out.index.name = "Hour"
             #these files are used in revenue_profit.py
-            df_out.to_csv(f'Gen_{c}_{y}_{model}.csv')
+            df_out.to_csv(
+                os.path.join(
+                    self.postprocess_output_path,
+                    f"Gen_{c}_{y}_{model}.csv"
+                )
+            )
 
             # change number format
             df_out = df_out.fillna(0)
@@ -418,7 +450,15 @@ class Generation:
 
             # write dataframe to csv
             extra_columns = ['Exports', 'Imports', 'Imports (Net)', 'Load (Net)', 'Load (Total)']
-            group_n_rename(df_out, add_columns= extra_columns,index_name="Hour").to_csv(f"{parentDirectory}/Outputs/{self.simulation}/national_generation_and_capacity/national_generation_hourly_gwh_{model}_{c.lower()}_{y}.csv")
+            group_n_rename(
+                df_out, add_columns= extra_columns,index_name="Hour"
+            ).to_csv(
+                os.path.join(
+                    self.postprocess_output_path,
+                    "national_generation_and_capacity",
+                    f"national_generation_hourly_gwh_{model}_{c.lower()}_{y}.csv"
+                )
+            )
 
 
             # monthly generation
@@ -429,7 +469,15 @@ class Generation:
             df_m = df_m.reset_index()
             df_m["Month"] = range(1, 1 + len(df_m)) # to be able to run the model partially, e.g. for 168 hours, it is needed to define this flexibly 
             df_m = df_m.drop(["date"], axis=1)
-            group_n_rename(df_m, add_columns=extra_columns,index_name="Month").to_csv(f"{parentDirectory}/Outputs/{self.simulation}/national_generation_and_capacity/national_generation_monthly_twh_{model}_{c.lower()}_{y}.csv")
+            group_n_rename(
+                df_m, add_columns=extra_columns,index_name="Month"
+            ).to_csv(
+                os.path.join(
+                    self.postprocess_output_path,
+                    "national_generation_and_capacity",
+                    f"national_generation_monthly_twh_{model}_{c.lower()}_{y}.csv"
+                )
+            )
 
             # annual generation has to be done only once
             # annual in Twh
@@ -441,9 +489,7 @@ class Generation:
         return
     def process_year(self, year):
 
-        CentIvDirectory = f"{self.parent_directory}/../../Results/{self.simulation}/CentIv_{year}"
-
-        flexeco_dir = f"{self.parent_directory}/../../Results/{self.simulation}/FlexEco_{year}"
+        CentIvDirectory = f"CentIv_{year}"
 
         # CentIV
         # TODO: check if CentIV results exist
@@ -722,8 +768,18 @@ class Generation:
                     # rename index
                     # additional columns for Switzerland
                     extra_columns = ['Exports', 'Imports', 'Imports (Net)', 'Load (Net)', 'Load (Total)']
-                    group_n_rename(annual_gen_dfs[model][country], transposed=True, index_name='Row', add_columns=extra_columns).to_csv(
-                        f"{parentDirectory}/Outputs/{self.simulation}/national_generation_and_capacity/national_generation_annual_twh_{model}_{country.lower()}.csv")
+                    group_n_rename(
+                        annual_gen_dfs[model][country],
+                        transposed=True,
+                        index_name='Row',
+                        add_columns=extra_columns
+                    ).to_csv(
+                        os.path.join(
+                            self.postprocess_output_path,
+                            "national_generation_and_capacity",
+                            f"national_generation_annual_twh_{model}_{country.lower()}.csv"
+                        )
+                    )
     def combine_generation_data(self):
         for model in self.models:
             annual_gen_CH = pd.DataFrame([])
@@ -748,7 +804,7 @@ class Generation:
                             curtailments_dic[i] = curtailment
                         else:
                             # Load DistIV Results
-                            fn = f"{parentDirectory}/../../Results/{self.simulation}/DistIv_{i}.mat"
+                            fn = f"DistIv_{i}.mat"
                             data = h5py.File(fn)
                             contents = data['resDistIv']
 
@@ -859,8 +915,17 @@ class Generation:
                     cen_dis_combined["Load (Net)"] = gen["Load (Total)"] - gen["Wind-Total"] - gen["PV-Total"]
                     cen_dis_combined["Load (Total)"] = gen["Load (Total)"]
                     cen_dis_combined = cen_dis_combined/1000
-                    group_n_rename(cen_dis_combined, index_name="Hour", add_columns=extra_columns).to_csv(
-                        f"{self.parent_directory}/Outputs/{self.simulation}/national_generation_and_capacity/national_generation_hourly_gwh_{model}_ch_{i}.csv")
+                    group_n_rename(
+                        cen_dis_combined,
+                        index_name="Hour",
+                        add_columns=extra_columns
+                    ).to_csv(
+                        os.path.join(
+                            self.postprocess_output_path,
+                            "national_generation_and_capacity",
+                            f"national_generation_hourly_gwh_{model}_ch_{i}.csv"
+                        )
+                    )
 
                     cen_dis_m = cen_dis_combined / 1000
                     cen_dis_m['date'] = pd.date_range(start='1/1/2018', periods=len(cen_dis_m), freq='H')
@@ -868,17 +933,42 @@ class Generation:
                     cen_dis_m1.index = cen_dis_m1.index + 1
                     cen_dis_m1["Month"] = range(1, 1 + len(cen_dis_m1)) # to be able to run the model partially, e.g. for 168 hours, it is needed to define this flexibly 
                     cen_dis_m1 = cen_dis_m1.drop(["date"], axis=1)
-                    group_n_rename(cen_dis_m1, add_columns=extra_columns, index_name="Month").to_csv(
-                        f"{self.parent_directory}/Outputs/{self.simulation}/national_generation_and_capacity/national_generation_monthly_twh_{model}_ch_{i}.csv")
+                    group_n_rename(
+                        cen_dis_m1,
+                        add_columns=extra_columns,
+                        index_name="Month"
+                    ).to_csv(
+                        os.path.join(
+                            self.postprocess_output_path,
+                            "national_generation_and_capacity",
+                            f"national_generation_monthly_twh_{model}_ch_{i}.csv"
+                        )
+                    )
                     
                     cen_dis_annual = cen_dis_m1.sum(axis=0)
                     annual_gen_CH[i] = cen_dis_annual
 
-                    group_n_rename(annual_gen_CH, transposed=True, index_name='Row', add_columns=extra_columns).to_csv(
-                        f"{parentDirectory}/Outputs/{self.simulation}/national_generation_and_capacity/national_generation_annual_twh_{model}_ch.csv")
+                    group_n_rename(
+                        annual_gen_CH,
+                        transposed=True,
+                        index_name='Row',
+                        add_columns=extra_columns
+                    ).to_csv(
+                        os.path.join(
+                            self.postprocess_output_path,
+                            "national_generation_and_capacity",
+                            f"national_generation_annual_twh_{model}_ch.csv"
+                        )
+                    )
                     
                     annual_gen_CH_output = pd.read_csv(
-                        f"{self.parent_directory}/Outputs/{self.simulation}/national_generation_and_capacity/national_generation_annual_twh_{model}_ch.csv", index_col=0)
+                        os.path.join(
+                            self.postprocess_output_path,
+                            "national_generation_and_capacity",
+                            f"national_generation_annual_twh_{model}_ch.csv"
+                        ),
+                        index_col=0
+                    )
 
                     Demand = annual_gen_CH_output.loc['Load (Total)']
                     Exports = annual_gen_CH_output.loc['Exports']
@@ -898,14 +988,15 @@ class Generation:
                     print("")
 
 def main(simulation: str):
-    simulated_years = get_folders_with_prefix(
-        f"{os.getcwd()}/../../Results/{simulation}", "CentIv"
-    )
     os.path.abspath(os.curdir)
-    global parentDirectory
-    parentDirectory = os.getcwd()
-    dir_new = f"{parentDirectory}/Outputs/{simulation}/national_generation_and_capacity"
-    create_dir(dir_new)
+    global postprocess_output_directory
+    postprocess_output_directory = "postprocess"
+    create_dir(
+        os.path.join(
+            postprocess_output_directory,
+            "national_generation_and_capacity"
+        )
+    )
 
     # read generator file
     global generators
@@ -932,11 +1023,11 @@ def main(simulation: str):
     }
     # get CentIV years
     global centiv_years
-    centiv_years = get_folders_with_prefix(f"{parentDirectory}/../../Results/{simulation}", 'CentIv')
+    centiv_years = get_years_simulated_by_centiv(Path())
     # check if DistIc results exist:
-    fn1 = f"{parentDirectory}/../../Results/{simulation}/DistIv_2030.mat"
-    fn2 = f"{parentDirectory}/../../Results/{simulation}/DistIv_2040.mat"
-    fn3 = f"{parentDirectory}/../../Results/{simulation}/DistIv_2050.mat"
+    fn1 = "DistIv_2030.mat"
+    fn2 = "DistIv_2040.mat"
+    fn3 = "DistIv_2050.mat"
 
     if os.path.exists(fn1) or os.path.exists(fn2) or os.path.exists(fn3):
         DistIV = True
@@ -948,9 +1039,15 @@ def main(simulation: str):
     # FlexEco: e
     models = ['c']
 
-    generation = Generation(parentDirectory, simulation, models, simulated_years, distiv=DistIV)
+    generation = Generation(
+        postprocess_output_directory,
+        simulation,
+        models,
+        centiv_years,
+        distiv=DistIV
+    )
 
-    for year in simulated_years:
+    for year in centiv_years:
         generation.process_year(year)
         generation.write_annual_generation_values()
 

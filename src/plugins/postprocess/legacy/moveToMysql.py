@@ -12,7 +12,7 @@ from nexus_e import config
 from nexus_e.database import MYSQL_DATABASE_NAME_MAX_LENGTH
 
 def main(
-    simulation: str,
+    simulation_postprocess_path: str,
     simulation_execution_date: str,
     scenario: str,
     webviewer_version: str,
@@ -51,7 +51,10 @@ def main(
     #########################
     print("Move csv files...")
 
-    all_csv_files = glob.glob(f"Outputs/{simulation}/**/*.csv", recursive=True)
+    all_csv_files = glob.glob(
+        f"{simulation_postprocess_path}/**/*.csv",
+        recursive=True
+    )
 
     # Use regular expression to extract the file name. "(\\|\/)" means either "\" or "/" - different on unix and Windows.
     regex = r".*(\\|\/)(?P<tablename>.*)\.csv$"
@@ -70,7 +73,10 @@ def main(
     #########################
     print("Move json files...")
 
-    all_json_files = glob.glob(f"Outputs/{simulation}/**/*.json", recursive=True)
+    all_json_files = glob.glob(
+        f"{simulation_postprocess_path}/**/*.json",
+        recursive=True
+    )
     regex = r".*(\\|\/)(?P<json_filename>.*)\.json$"
 
     # if there is any json files
@@ -100,7 +106,10 @@ def main(
     #########################
     print("Move jpg files...")
 
-    all_jpg_files = glob.glob(f"Outputs/{simulation}/**/*.jpg", recursive=True)
+    all_jpg_files = glob.glob(
+        f"{simulation_postprocess_path}/**/*.jpg",
+        recursive=True
+    )
     regex = r".*(\\|\/)(?P<imagename>.*)\.jpg$"
 
     # if there is any jpg files
@@ -148,7 +157,14 @@ def main(
     #         write_file(row[1], "test.jpg")
 
 if __name__ == '__main__':
-    config_file_path = os.path.join(os.path.dirname(__file__), '..', '..', 'config.toml')
+    config_file_path = os.path.join(
+        os.path.dirname(__file__),
+        "..",
+        "..",
+        "..",
+        "..",
+        "config.toml"
+    )
     settings = config.load(config.TomlFile(config_file_path))
     parser = argparse.ArgumentParser(description='Move csv/json/jpg data to MySQL')
     # TODO: allow to select what data to move to MySQL (e.g. sometimes we don't want to process the image data because it
@@ -162,7 +178,10 @@ if __name__ == '__main__':
                         default='')
     args = parser.parse_args()
     main(
-        simulation=args.simu_name,
+        simulation_postprocess_path=os.path.join(
+            settings.results.simulation_folder,
+            "postprocess"
+        ),
         simulation_execution_date=datetime.now().strftime("%Y-%m-%dT%H-%M-%S"),
         scenario=args.scen_name,
         webviewer_version=args.version_wv,

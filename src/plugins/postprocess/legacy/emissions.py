@@ -1,11 +1,12 @@
 import os
+from pathlib import Path
 
-import numpy as np
 import pandas as pd
 import argparse
 import pymysql
 
-from .Generation import get_folders_with_prefix, group_n_rename, year_dic, read_generator_file
+from .Generation import group_n_rename, read_generator_file
+from ..results_context import get_years_simulated_by_centiv
 
 from nexus_e import config
 
@@ -54,11 +55,6 @@ class GenerationPerUnit:
     def __init__(self, year: int, simulation: str):
         self.__original_generation_per_unit = pd.read_excel(
             os.path.join(
-                os.getcwd(),
-                "..",
-                "..",
-                "Results",
-                simulation,
                 f"CentIv_{year}",
                 "GenerationConsumptionPerGenGenNames_hourly_ALL_LP.xlsx"
             )
@@ -111,41 +107,21 @@ class EmissionCreator:
         user: str,
         password: str
     ):
-        self.__parent_directory = os.getcwd()
         self.simulation = simulation
         self.database = database
         self.host = host
         self.user = user
         self.password = password
         self.generator_data = None
-        self.__get_path()
 
         # read generator file
         self.__read_generator_list()
 
         # get all CentIv years
-        self.centiv_years = get_folders_with_prefix(
-            os.path.join(
-                self.__parent_directory,
-                "..",
-                "..",
-                "Results",
-                self.simulation
-            ),
-            "CentIv"
-        )
+        self.centiv_years = get_years_simulated_by_centiv(Path())
 
         # create a dataframe for each country to store the emissions of each year
         self.annual_emission_countries = {}
-
-    def __get_path(self):
-        # results
-        self.path_results = os.path.join(
-            self.__parent_directory,
-            "Outputs",
-            self.simulation,
-            "national_generation_and_capacity"
-        )
 
     def __read_generator_list(self):
         self.generator_list = read_generator_file()
@@ -266,7 +242,11 @@ class EmissionCreator:
 
     def __export_file(self, df, filename):
         # write dataframe to csv file
-        df.to_csv(os.path.join(self.path_results, filename))
+        output_path = os.path.join(
+            "postprocess",
+            "national_generation_and_capacity"
+        )
+        df.to_csv(os.path.join(output_path, filename))
 
 def main(
     simulation: str,

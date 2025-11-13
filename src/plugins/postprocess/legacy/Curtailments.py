@@ -1,17 +1,18 @@
 import os
+from pathlib import Path
 import pandas as pd
-import numpy as np
 import argparse
 
-from .Generation import group_n_rename, read_generator_file, get_folders_with_prefix,filter_by_country_and_format,get_country_data
+from .Generation import group_n_rename, filter_by_country_and_format,get_country_data
+from ..results_context import get_years_simulated_by_centiv
 
 class Curtailments:
-    def __init__(self, parent_directory, simu_name, centIv_listyears):
-        self.parent_directory = parent_directory
+    def __init__(self, postprocess_output_directory, simu_name, centIv_listyears):
+        self.postprocess_output_directory = postprocess_output_directory
         self.simu_name = simu_name
         self.centIv_listyears = centIv_listyears
 
-    def get_curtailment_data(self,centIv_listyears,parentDirectory,simu_name):
+    def get_curtailment_data(self,centIv_listyears):
             # get curtailment data for all countries
             # only for CentIv at the moment
 
@@ -28,7 +29,7 @@ class Curtailments:
 
             for year in centIv_listyears:
 
-                CentIvDirectory = f"{parentDirectory}/../../Results/{simu_name}/CentIv_{year}"
+                CentIvDirectory = f"CentIv_{year}"
 
                 # curtailment data for CH   
                 fn6 = os.path.join(CentIvDirectory, "REScurtailmentDistIv_hourly_ALL_LP.csv")
@@ -38,7 +39,7 @@ class Curtailments:
 
 
                 # read curtailment data
-                df_curtailments = pd.read_excel(os.path.join(f"{parentDirectory}/../../Results/{simu_name}/CentIv_{year}", "CurtailmentPerGen_hourly_ALL_LP.xlsx"))
+                df_curtailments = pd.read_excel(os.path.join(CentIvDirectory, "CurtailmentPerGen_hourly_ALL_LP.xlsx"))
 
                 # iterate over all countries
                 for country in ['CH', 'DE', 'FR', 'IT', 'AT']:
@@ -66,7 +67,13 @@ class Curtailments:
                         # export files for all neighbour countries
                         # group technologies
                         df_h = group_n_rename(df_h, index_name='Hour')
-                        df_h.to_csv(f"{parentDirectory}/Outputs/{simu_name}/national_generation_and_capacity/national_curtailment_hourly_c_{country.lower()}_{year}.csv")
+                        df_h.to_csv(
+                            os.path.join(
+                                self.postprocess_output_directory,
+                                "national_generation_and_capacity",
+                                f"national_curtailment_hourly_c_{country.lower()}_{year}.csv"
+                            )
+                        )
 
                         # monthly curtailment
                         df_m = df_country.copy()
@@ -81,7 +88,12 @@ class Curtailments:
                         df_m = df_m.set_index("Month")
                         df_m.index.name = "Month"  # Set the index name to "Month"
                         group_n_rename(df_m).to_csv(
-                            f"{parentDirectory}/Outputs/{simu_name}/national_generation_and_capacity/national_curtailment_monthly_c_{country.lower()}_{year}.csv")
+                            os.path.join(
+                                self.postprocess_output_directory,
+                                "national_generation_and_capacity",
+                                f"national_curtailment_monthly_c_{country.lower()}_{year}.csv"
+                            )
+                        )
 
                         # annual generation has to be done only once
                         df_annual = df_country.T
@@ -95,8 +107,17 @@ class Curtailments:
             # write annual dataframes to files
             for country in ['DE', 'FR', 'IT', 'AT']:
                 annual_curtailment_dfs[country].columns = centIv_listyears
-                group_n_rename(annual_curtailment_dfs[country], index_name='Row', transposed=True).to_csv(
-                    f"{parentDirectory}/Outputs/{simu_name}/national_generation_and_capacity/national_curtailment_annual_c_{country.lower()}.csv")
+                group_n_rename(
+                    annual_curtailment_dfs[country],
+                    index_name='Row',
+                    transposed=True
+                ).to_csv(
+                    os.path.join(
+                        self.postprocess_output_directory,
+                        "national_generation_and_capacity",
+                        f"national_curtailment_annual_c_{country.lower()}.csv"
+                    )
+                )
             return curtailments_dic
 
     def get_curtailment_CH(self, curtailments):
@@ -121,7 +142,12 @@ class Curtailments:
             # group technologies
             df_h = group_n_rename(curtailment_df, index_name='Hour')
             df_h.to_csv(
-                f"{self.parent_directory}/Outputs/{self.simu_name}/national_generation_and_capacity/national_curtailment_hourly_c_ch_{year}.csv")
+                os.path.join(
+                    self.postprocess_output_directory,
+                    "national_generation_and_capacity",
+                    f"national_curtailment_hourly_c_ch_{year}.csv"
+                )
+            )
 
             # monthly curtailment
             df_m = curtailment_df.copy()
@@ -134,7 +160,12 @@ class Curtailments:
             df_m = df_m.drop(["date"], axis=1)
             df_m = df_m.set_index("Month")
             group_n_rename(df_m, index_name='Month').to_csv(
-                f"{self.parent_directory}/Outputs/{self.simu_name}/national_generation_and_capacity/national_curtailment_monthly_c_ch_{year}.csv")
+                os.path.join(
+                    self.postprocess_output_directory,
+                    "national_generation_and_capacity",
+                    f"national_curtailment_monthly_c_ch_{year}.csv"
+                )
+            )
 
             # annual generation has to be done only once
             # annual in Twh
@@ -146,18 +177,31 @@ class Curtailments:
             annual_curtailment_df = pd.concat([annual_curtailment_df, df_annual], axis=1)
 
         annual_curtailment_df.columns = self.centIv_listyears
-        group_n_rename(annual_curtailment_df, index_name='Row', transposed=True).to_csv(
-            f"{self.parent_directory}/Outputs/{self.simu_name}/national_generation_and_capacity/national_curtailment_annual_c_ch.csv")
+        group_n_rename(
+            annual_curtailment_df,
+            index_name='Row',
+            transposed=True
+        ).to_csv(
+            os.path.join(
+                self.postprocess_output_directory,
+                "national_generation_and_capacity",
+                "national_curtailment_annual_c_ch.csv"
+            )
+        )
 
         return
 
 def main(simulation: str):
-    parentDirectory = os.getcwd()
+    postprocess_output_directory = "postprocess"
 
-    centIv_listyears = get_folders_with_prefix(f"{parentDirectory}/../../Results/{simulation}", 'CentIv')
+    centIv_listyears = get_years_simulated_by_centiv(Path())
 
-    curtailments = Curtailments(parentDirectory, simulation, centIv_listyears)
-    curtailments_dic = curtailments.get_curtailment_data(centIv_listyears,parentDirectory,simulation)
+    curtailments = Curtailments(
+        postprocess_output_directory,
+        simulation,
+        centIv_listyears
+    )
+    curtailments_dic = curtailments.get_curtailment_data(centIv_listyears,)
     curtailments.get_curtailment_CH(curtailments_dic)
 
 if __name__ == "__main__":

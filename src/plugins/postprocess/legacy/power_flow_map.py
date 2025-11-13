@@ -1,10 +1,11 @@
 from dataclasses import dataclass
 import argparse
 import os
+from pathlib import Path
 import pandas as pd
 
 from .cross_country_flow import BorderFlows, LoginCredentials
-from .Generation import get_folders_with_prefix
+from ..results_context import get_years_simulated_by_centiv
 
 from nexus_e import config
 
@@ -56,25 +57,22 @@ class PowerFlows:
 
 
 def main(simulation: str, database: str, host: str, user: str, password: str):
-    simulated_years = get_folders_with_prefix(
-        f"{os.getcwd()}/../../Results/{simulation}", "CentIv"
-    )
+    simulated_years = get_years_simulated_by_centiv(Path())
 
     for year in simulated_years:
         border_flows = BorderFlows(
-        database=database,
-        simulation=simulation,
-        parent_directory=os.getcwd(),
-        database_credentials=LoginCredentials(
-            host=host,
-            user=user,
-            password=password
+            database=database,
+            database_credentials=LoginCredentials(
+                host=host,
+                user=user,
+                password=password
+            )
         )
-    )
         power_flows = PowerFlows(year)
         power_flows.collect_power_flows_for_all_borders(border_flows=border_flows)
         output_directory = os.path.join(
-            os.getcwd(), f"Outputs/{simulation}/national_generation_and_capacity"
+            "postprocess",
+            "national_generation_and_capacity"
         )
         power_flows.export_border_flow_file(output_directory)
 

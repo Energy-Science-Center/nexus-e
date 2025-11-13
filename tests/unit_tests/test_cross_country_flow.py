@@ -1,6 +1,5 @@
 import pytest
 import pandas as pd
-import numpy as np
 
 from src.plugins.postprocess.legacy.cross_country_flow import CrossCountryFlows, DataframeManager
 

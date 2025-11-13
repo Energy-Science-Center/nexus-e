@@ -1,8 +1,10 @@
 import os
+from pathlib import Path
 import pandas as pd
 import argparse
 import pymysql
-from .Generation import get_folders_with_prefix, year_dic, create_dir
+from .Generation import year_dic, create_dir
+from ..results_context import get_years_simulated_by_centiv
 
 from nexus_e import config
 
@@ -87,12 +89,13 @@ def main(database: str, simulation: str, host: str, user: str, password: str):
         database=database
     )
 
-    current_directory = os.getcwd()
-    centiv_years = get_folders_with_prefix(f"{current_directory}/../../Results/{simulation}", 'CentIv')
+    centiv_years = get_years_simulated_by_centiv(Path())
 
-    dir_new = f"{current_directory}/Outputs/{simulation}/national_generation_and_capacity"
-    create_dir(dir_new)
-    path = os.path.join(f"{current_directory}/Outputs/{simulation}/national_generation_and_capacity")
+    output_path = os.path.join(
+        "postprocess",
+        "national_generation_and_capacity"
+    )
+    create_dir(output_path)
     df_container = {}
     for year in centiv_years:
         if database_schema.table_exists('load_profiles'):
@@ -111,7 +114,7 @@ def main(database: str, simulation: str, host: str, user: str, password: str):
             country_lower = country.lower()
             hourly_demand_profiles.index.name = 'Hour'
             filename = f'demand_hourly_c_{country_lower}_{year}.csv'
-            hourly_demand_profiles.to_csv(os.path.join(path, filename))
+            hourly_demand_profiles.to_csv(os.path.join(output_path, filename))
 
             hourly_demand_profile_time = pd.DataFrame({
                 'DateTime': pd.date_range(start='2024-01-01', end='2024-12-31', freq='H'),
@@ -126,7 +129,7 @@ def main(database: str, simulation: str, host: str, user: str, password: str):
             monthly_data_sum.index = range(1, 1 + len(monthly_data_sum)) # to be able to run the model partially, e.g. for 168 hours, it is needed to be defined this flexibly
             filename = f'demand_monthly_c_{country_lower}_{year}.csv'
             monthly_data_sum.index.name = 'Month'
-            monthly_data_sum.to_csv(os.path.join(path, filename))
+            monthly_data_sum.to_csv(os.path.join(output_path, filename))
             filename = f'demand_annual_c_{country_lower}.csv'
             df_name = f'demand_annual_c_{country_lower}_{year}'
             # Remove the first column that contains the timestamp
@@ -145,7 +148,7 @@ def main(database: str, simulation: str, host: str, user: str, password: str):
 
         filename = f'demand_annual_c_{country_lower}.csv'
         yearly_data.index.name = 'Row'
-        yearly_data.to_csv(os.path.join(path, filename))
+        yearly_data.to_csv(os.path.join(output_path, filename))
 
 
 if __name__ == "__main__":

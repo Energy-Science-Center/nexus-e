@@ -29,8 +29,9 @@ import nexus_e.config as config
 
 class CascadesPostprocess():
 
-    def __init__(self, settings: config.Config):
-        self.settings = settings
+    def __init__(self, settings: config.Config, postprocess_path: str):
+        self.__settings = settings
+        self.__postprocess_path = postprocess_path
 
     def run(self):
         logging.info("Start of Cascades postprocess")
@@ -40,10 +41,7 @@ class CascadesPostprocess():
         # making the executed scripts usable with any path.
         current_directory = os.getcwd()
 
-        postprocess_scripts_directory = os.path.join(
-            "Shared", "resultPostProcess"
-        )
-        os.chdir(postprocess_scripts_directory)
+        os.chdir(self.__postprocess_path)
 
         try:
             logging.info("Executing Cascades latex to Excel...")
@@ -52,7 +50,7 @@ class CascadesPostprocess():
 
             logging.info("Executing grid expansion map generation...")
             postprocess_cascades_grid_expansion_map.main(
-                simulation=self.settings.results.simulation_folder
+                simulation=self.__settings.results.simulation_folder
             )
             logging.info("DONE")
 

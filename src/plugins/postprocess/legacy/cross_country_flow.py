@@ -1,11 +1,12 @@
 import argparse
 from dataclasses import dataclass
+from pathlib import Path
 import numpy as np
 import os
 import pandas as pd
 import pymysql
 
-from .Generation import get_folders_with_prefix
+from ..results_context import get_years_simulated_by_centiv
 
 from nexus_e import config
 
@@ -86,13 +87,9 @@ class BorderFlows:
     def __init__(
         self,
         database: str,
-        simulation: str,
-        parent_directory: str,
         database_credentials: LoginCredentials
     ):
         self.__database = database
-        self.__simulation = simulation
-        self.__parent_directory = parent_directory
         self.__database_credentials = database_credentials
 
     def load(self, year: int):
@@ -115,7 +112,7 @@ class BorderFlows:
         self.branch_data.columns = [desc[0] for desc in cursor.description]
 
     def __read_border_flows_and_set_columns(self):
-        CentIvDirectory = f"{self.__parent_directory}/../../Results/{self.__simulation}/CentIv_{self.__year}"
+        CentIvDirectory = f"CentIv_{self.__year}"
 
         file_path = os.path.join(CentIvDirectory, 'BranchFlows_hourly_ALL_LP.xlsx')
 
@@ -302,21 +299,18 @@ class CrossCountryFlows:
 
 
 
-def main(simulation: str, database: str, host: str, user: str, password: str):
+def main(database: str, host: str, user: str, password: str):
     output_directory = os.path.join(
-        os.getcwd(), f"Outputs/{simulation}/national_generation_and_capacity"
+        "postprocess",
+        "national_generation_and_capacity"
     )
     # CentIV only
     model = "c"
     dataframe_manager = DataframeManager(output_directory, "cross_country_flows", model)
-    simulated_years = get_folders_with_prefix(
-        f"{os.getcwd()}/../../Results/{simulation}", "CentIv"
-    )
+    simulated_years = get_years_simulated_by_centiv(Path())
     cross_country_flows = CrossCountryFlows(simulated_years, dataframe_manager)
     border_flows = BorderFlows(
         database=database,
-        simulation=simulation,
-        parent_directory=os.getcwd(),
         database_credentials=LoginCredentials(
             host=host,
             user=user,
@@ -328,7 +322,14 @@ def main(simulation: str, database: str, host: str, user: str, password: str):
 
 
 if __name__ == "__main__":
-    config_file_path = os.path.join(os.path.dirname(__file__), '..', '..', 'config.toml')
+    config_file_path = os.path.join(
+        os.path.dirname(__file__),
+        "..",
+        "..",
+        "..",
+        "..",
+        "config.toml"
+    )
     settings = config.load(config.TomlFile(config_file_path))
     argp = argparse.ArgumentParser(
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
@@ -339,7 +340,6 @@ if __name__ == "__main__":
                       default='pathfndr_s8_241119_cpv_s8')  # nexuse_schema2_disagg_ch2040
     args = argp.parse_args()
     main(
-        simulation=args.simuname,
         database=args.DBname,
         host=settings.input_database_server.host,
         user=settings.input_database_server.user,

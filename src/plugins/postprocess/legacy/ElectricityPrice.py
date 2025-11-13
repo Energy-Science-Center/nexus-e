@@ -1,8 +1,9 @@
 import os
+from pathlib import Path
 import pandas as pd
 import argparse
 
-from .Generation import get_folders_with_prefix
+from ..results_context import get_years_simulated_by_centiv
 
 annual_elprices_dfs = {
         "c": pd.DataFrame([]),
@@ -14,7 +15,15 @@ annual_elprices_dfs = {
         "e": pd.DataFrame([])
     }
 
-def create_elprices(y,CentIvDirectory,flexeco_dir,parentDirectory,simu_name,single_electric_node,elprices_dfs):
+def create_elprices(
+    y,
+    CentIvDirectory,
+    flexeco_dir,
+    simulation_postprocess_path,
+    simu_name,
+    single_electric_node,
+    elprices_dfs
+):
     country_names = {
         "CH": "Switzerland",
         "DE": "Germany",
@@ -96,7 +105,12 @@ def create_elprices(y,CentIvDirectory,flexeco_dir,parentDirectory,simu_name,sing
 
     # write hourly electricity price
     elprices_dfs['c'].to_csv(
-        f"{parentDirectory}/Outputs/{simu_name}/national_generation_and_capacity/national_elecprice_hourly_c_{y}.csv")
+        os.path.join(
+            simulation_postprocess_path,
+            "national_generation_and_capacity",
+            f"national_elecprice_hourly_c_{y}.csv"
+        )
+    )
 
 
 
@@ -113,7 +127,12 @@ def create_elprices(y,CentIvDirectory,flexeco_dir,parentDirectory,simu_name,sing
         # write hourly electricity price
         elprices_dfs['e'].index.name = "Hour"
         elprices_dfs['e'].to_csv(
-            f"{parentDirectory}/Outputs/{simu_name}/national_generation_and_capacity/national_elecprice_hourly_e_{y}.csv")
+            os.path.join(
+                simulation_postprocess_path,
+                "national_generation_and_capacity",
+                f"national_elecprice_hourly_e_{y}.csv"
+            )
+        )
 
     # write monthly and annual data
     for model in elprices_dfs:
@@ -134,7 +153,12 @@ def create_elprices(y,CentIvDirectory,flexeco_dir,parentDirectory,simu_name,sing
 
             # save to csv
             elprice_weighted_country_monthly_df.to_csv(
-                f"{parentDirectory}/Outputs/{simu_name}/national_generation_and_capacity/national_elecprice_monthly_{model}_{y}.csv")
+                os.path.join(
+                    simulation_postprocess_path,
+                    "national_generation_and_capacity",
+                    f"national_elecprice_monthly_{model}_{y}.csv"
+                )
+            )
 
             # annual electricity price
             total_yearly_load = demand_country_hourly_df[["Switzerland", "Germany", "Italy", "France", "Austria"]].sum(axis=0)
@@ -152,7 +176,12 @@ def create_elprices(y,CentIvDirectory,flexeco_dir,parentDirectory,simu_name,sing
             elprice_m.drop(["date"], axis=1, inplace=True)
             elprice_m = elprice_m.set_index("Month")
             elprice_m.to_csv(
-                f"{parentDirectory}/Outputs/{simu_name}/national_generation_and_capacity/national_elecprice_monthly_{model}_{y}.csv")
+                os.path.join(
+                    simulation_postprocess_path,
+                    "national_generation_and_capacity",
+                    f"national_elecprice_monthly_{model}_{y}.csv"
+                )
+            )
 
             # annual electricity price
             # elprices_dfs[model].drop('date', axis=1, inplace=True)
@@ -161,30 +190,38 @@ def create_elprices(y,CentIvDirectory,flexeco_dir,parentDirectory,simu_name,sing
 
     return
 
-def write_annual_elprices(annual_elprices_dfs, parentDirectory, simu_name):
+def write_annual_elprices(
+    annual_elprices_dfs,
+    simulation_postprocess_path,
+    simu_name
+):
     for model in annual_elprices_dfs:
         # annual electricity price
         annual_elprices_dfs[model].index.name = "Row"
         annual_elprices_dfs[model].to_csv(
-            f"{parentDirectory}/Outputs/{simu_name}/national_generation_and_capacity/national_elecprice_annual_{model}.csv")
+            os.path.join(
+                simulation_postprocess_path,
+                "national_generation_and_capacity",
+                f"national_elecprice_annual_{model}.csv"
+            )
+        )
 
 
 def main(simulation: str, single_electric_node: bool):
-    parentDirectory = os.getcwd()
-    centiv_years = get_folders_with_prefix(f"{parentDirectory}/../../Results/{simulation}", 'CentIv')
+    simulation_postprocess_path = "postprocess"
+    centiv_years = get_years_simulated_by_centiv(Path())
     elprices_dfs = {}
 
     for year in centiv_years:
         global CentIvDirectory
 
-        CentIvDirectory = f"{parentDirectory}/../../Results/{simulation}/CentIv_{year}"
+        CentIvDirectory = f"CentIv_{year}"
 
         global flexeco_dir
-        flexeco_dir = f"{parentDirectory}/../../Results/{simulation}/FlexEco_{year}"
+        flexeco_dir = f"FlexEco_{year}"
   
-
-        create_elprices(year,CentIvDirectory,flexeco_dir,parentDirectory,simulation,single_electric_node,elprices_dfs)
-        write_annual_elprices(annual_elprices_dfs, parentDirectory, simulation)
+        create_elprices(year,CentIvDirectory,flexeco_dir,simulation_postprocess_path,simulation,single_electric_node,elprices_dfs)
+        write_annual_elprices(annual_elprices_dfs, simulation_postprocess_path, simulation)
 
 if __name__ == "__main__":
     argp = argparse.ArgumentParser(

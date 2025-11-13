@@ -60,22 +60,19 @@ def main(
         "scenario_short_name": scenario_name
     }
 
-    # Save results to 
-    # nexus-e/Shared/postProcess/Outputs/<simu_name>/metadata.csv
-    simulation_output_folder = os.path.join(
+    simulation_postprocess_folder = os.path.join(
         nexus_e_framework_root_folder,
-        "Shared",
-        "resultPostProcess",
-        "Outputs",
-        simulation_name
+        "Results",
+        simulation_name,
+        "postprocess",
     )
-    if not os.path.exists(simulation_output_folder):
-        os.makedirs(simulation_output_folder, exist_ok=True)
+    if not os.path.exists(simulation_postprocess_folder):
+        os.makedirs(simulation_postprocess_folder, exist_ok=True)
     pd.DataFrame.from_dict(
         data=result,
         orient='index'
     ).to_csv(
-        os.path.join(simulation_output_folder, "metadata.csv"),
+        os.path.join(simulation_postprocess_folder, "metadata.csv"),
         index_label="name",
         header=["info"]
     )

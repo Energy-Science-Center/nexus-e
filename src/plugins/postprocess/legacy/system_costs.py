@@ -1,13 +1,13 @@
 import os
-import re
+from pathlib import Path
 import pandas as pd
 import numpy as np
 import argparse
 import pymysql
 import h5py
-import scipy.io as sc
 
-from .Generation import group_n_rename, get_folders_with_prefix, year_dic
+from .Generation import group_n_rename, year_dic
+from ..results_context import get_years_simulated_by_centiv
 
 from nexus_e import config as config
 
@@ -213,7 +213,6 @@ class AnnualDataCollectionAnnualized:
     def __init__(
         self,
         year,
-        parent_directory: str,
         simulation: str,
         database: str,
         output_path: str,
@@ -224,10 +223,8 @@ class AnnualDataCollectionAnnualized:
         previous_object=None,
     ):
         self.year = year
-        self.parent_directory = parent_directory
         self.simulation = simulation
         self.database = database
-        self.output_path = output_path
         self.centiv_only = centiv_only
         self.host = host
         self.user = user
@@ -249,13 +246,13 @@ class AnnualDataCollectionAnnualized:
         self.reference_year_discounting = 2020
 
         # define path to the results directory of a specific year
-        self.dir_path = f"{self.parent_directory}/../../Results/{self.simulation}/CentIv_{year}"
+        self.centiv_results_path = f"CentIv_{year}"
 
         # get new investments
         self.__get_costs_centIV()
 
         # calculate import costs and export revenue
-        imports_and_exports_calculation(self.dir_path, self.year, self.investment_interval, output_path)
+        imports_and_exports_calculation(self.centiv_results_path, self.year, self.investment_interval, output_path)
 
     def __get_costs_centIV(self):
         """
@@ -264,8 +261,13 @@ class AnnualDataCollectionAnnualized:
         """
        
         # get costs
-        centiv_gencon_ch = pd.read_excel(os.path.join(self.dir_path, 'GenerationConsumption_total_CH_LP.xlsx'),
-                                         index_col='Technology')
+        centiv_gencon_ch = pd.read_excel(
+            os.path.join(
+                self.centiv_results_path,
+                "GenerationConsumption_total_CH_LP.xlsx"
+            ),
+            index_col="Technology"
+        )
 
         year_list = [self.year]
         yearly_inv_cost = pd.DataFrame(columns=year_list)
@@ -323,7 +325,12 @@ class AnnualDataCollectionAnnualized:
 
 
     def __transmission_costs_calculation(self):
-        new_lines = pd.read_excel(os.path.join(self.dir_path, 'NewLinesOnlyOneStatus.xlsx'))
+        new_lines = pd.read_excel(
+            os.path.join(
+                self.centiv_results_path,
+                "NewLinesOnlyOneStatus.xlsx"
+            )
+        )
         new_lines = new_lines['LineName'].tolist()
 
         new_lines_costs = 0
@@ -371,7 +378,7 @@ class AnnualDataCollectionAnnualized:
 
         # overwrite results_df
         if self.year != 2020 and not self.centiv_only:
-            results_distiv = h5py.File(f"{self.parent_directory}/../../Results/{self.simulation}/DistIv_{self.year}.mat")
+            results_distiv = h5py.File(f"DistIv_{self.year}.mat")
 
             # hardcoded
             gen_names_distIv = ['PV 2-10 kW', 'PV 10-30 kW', 'PV 30-100 kW', 'PV >100 kW', 'Biomass wood',
@@ -461,14 +468,13 @@ def discount_df(df, rate, ignore_columns=None):
 
 
 class OutputPreparerAnnualized:
-    def __init__(self, parent_directory: str, simulation: str):
+    def __init__(self, output_path: str, simulation: str):
         """
         This class is used to create the output files
         """
         
         # output directory
-        self.output_dir = f"{parent_directory}/Outputs/{simulation}/national_generation_and_capacity"
-
+        self.output_path = output_path
         # discount rates
         self.discount_rates = [0, 3, 5, 7]
 
@@ -522,11 +528,11 @@ class OutputPreparerAnnualized:
             df_discounted = discount_df(df, rate, ignore_columns=add_columns_to_accumulation)
             # annualized
             self.__accumulate_costs(df_discounted, add_columns=add_columns_to_accumulation)\
-                .to_csv(os.path.join(self.output_dir, f'systemcosts_{name}_{rate}_an.csv'))
+                .to_csv(os.path.join(self.output_path, f'systemcosts_{name}_{rate}_an.csv'))
             if accumulated:
                 # accumulated
                 self.__accumulate_costs(df_discounted, sum_type='combined', add_columns=add_columns_to_accumulation)\
-                    .to_csv(os.path.join(self.output_dir, f'systemcosts_{name}_{rate}_cum.csv'))
+                    .to_csv(os.path.join(self.output_path, f'systemcosts_{name}_{rate}_cum.csv'))
 
         return
 
@@ -643,34 +649,27 @@ class OutputPreparerAnnualized:
         return
 
 def main(simulation: str, database: str, host: str, user: str, password: str):
-    parent_dirctory = os.getcwd()
+    parent_directory = os.getcwd()
 
     # output path
-    output_path = f"{parent_dirctory}/Outputs/{simulation}/national_generation_and_capacity"
+    output_path = os.path.join(
+        "postprocess",
+        "national_generation_and_capacity"
+    )
 
     # search for DistIv results
-    distiv_results_path = lambda year: os.path.join(
-        parent_dirctory,
-        "..",
-        "..",
-        "Results",
-        simulation,
-        f"DistIv_{year}.mat"
-    )
     has_distiv_results = any(
-        os.path.exists(distiv_results_path(year))
+        os.path.exists(f"DistIv_{year}.mat")
         for year in [2030, 2040, 2050]
     )
     
-
-    centiv_years = get_folders_with_prefix(f"{parent_dirctory}/../../Results/{simulation}", 'CentIv')
+    centiv_years = get_years_simulated_by_centiv(Path())
     obj_list = []
     previous_object = None
     # append costs for every simulated year
     for year in centiv_years:
         annualized_cost = AnnualDataCollectionAnnualized(
             year=year,
-            parent_directory=parent_dirctory,
             simulation=simulation,
             database=database,
             centiv_only= not has_distiv_results,
@@ -684,12 +683,19 @@ def main(simulation: str, database: str, host: str, user: str, password: str):
         previous_object = obj_list[-1]
 
     OutputPreparerAnnualized(
-        parent_directory=parent_dirctory,
+        output_path=output_path,
         simulation=simulation
     )
 
 if __name__ == '__main__':
-    config_file_path = os.path.join(os.path.dirname(__file__), '..', '..', 'config.toml')
+    config_file_path = os.path.join(
+        os.path.dirname(__file__),
+        "..",
+        "..",
+        "..",
+        "..",
+        "config.toml"
+    )
     settings = config.load(config.TomlFile(config_file_path))
     argp = argparse.ArgumentParser(
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)

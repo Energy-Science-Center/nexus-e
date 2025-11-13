@@ -11,14 +11,22 @@ def main(simulation: str):
 
     # Get a list of years
     years = []
-    grid_expansion_files = glob.glob(f"{module_directory}/../../Outputs/{simulation}/Cascades/Cascades_expansion_*.csv")
+    grid_expansion_files = glob.glob(
+        os.path.join(
+            "Cascades",
+            "Cascades_expansion_*.csv"
+        )
+    )
     for file in grid_expansion_files:
         years.append(file.rsplit(".", 1)[0].rsplit("_", 1)[1])
 
     for year in years:
         # TODO: enable read from multiple CSVs (e.g. from different years) and generate multiple PNGs.
         cascades_result = pd.read_csv(
-            f"{module_directory}/../../Outputs/{simulation}/Cascades/Cascades_expansion_{year}.csv"
+            os.path.join(
+                "Cascades",
+                f"Cascades_expansion_{year}.csv"
+            )
         )
 
         # Add a column "counts" into the dataframe to indicate how many times a line gets expanded
@@ -109,8 +117,12 @@ def main(simulation: str):
             print(f"Successfully converted to pdf. Now converting to jpg...")
 
             # pdf->jpg
-            command = f"convert {module_directory}/{map_year}_main.pdf -resample 300 " \
-                    f"{module_directory}/../../Outputs/{simulation}/Cascades/grid_expansion_map_{year}.jpg"
+            map_path = os.path.join("Cascades" f"grid_expansion_map_{year}.jpg")
+            command = (
+                f"convert {module_directory}/{map_year}_main.pdf" \
+                f" -resample 300" \
+                f" {map_path}"
+            )
             print(command)
             subprocess.run(command, shell=True, capture_output=True)
             print(f"Successfully converted to jpg.")

@@ -11,33 +11,39 @@ from .legacy import moveToMysql
 
 class PostProcess:
     def __init__(self, settings: config.Config):
-        self.settings = settings
-        self.simulation_results = SimulationResults(
-            results_folder = self.settings.results.base_folder,
-            simulation_name = self.settings.results.simulation_folder
+        self.__settings = settings
+        self.__simulation_results = SimulationResults(
+            results_folder = self.__settings.results.base_folder,
+            simulation_name = self.__settings.results.simulation_folder
         )
 
     def run(self):
         self.write_metadata()
-        if os.path.exists(self.settings.results.plot_config_file_path):
-            self.simulation_results.copy_plot_config(
-                self.settings.results.plot_config_file_path
+        if os.path.exists(self.__settings.results.plot_config_file_path):
+            self.__simulation_results.copy_plot_config(
+                self.__settings.results.plot_config_file_path
             )
-        if self.settings.postprocess.centiv:
-            centiv_postprocess = CentivPostprocess(self.settings)
+        if self.__settings.postprocess.centiv:
+            centiv_postprocess = CentivPostprocess(
+                self.__settings,
+                self.__simulation_results.path
+            )
             centiv_postprocess.run()
-        if self.settings.postprocess.cascades:
-            cascades_postprocess = CascadesPostprocess(self.settings)
+        if self.__settings.postprocess.cascades:
+            cascades_postprocess = CascadesPostprocess(
+                self.__settings,
+                self.__simulation_results.postprocess_path
+            )
             cascades_postprocess.run()
-        if self.settings.postprocess.move_to_mysql:
+        if self.__settings.postprocess.move_to_mysql:
             self.move_to_mysql()
         logging.info("Postprocess finished")
 
     def write_metadata(self):
-        metadata = self.simulation_results.get_metadata(
-            scenario_description = self.settings.scenario.description
+        metadata = self.__simulation_results.get_metadata(
+            scenario_description = self.__settings.scenario.description
         )
-        self.simulation_results.write_csv_in_postprocess(
+        self.__simulation_results.write_csv_in_postprocess(
             data_to_write = metadata,
             file_name = "metadata.csv"
         )
@@ -60,53 +66,45 @@ class PostProcess:
                     disp("FAILED to upload results to the output database.")
                 end
         """
-        original_directory = os.getcwd()
-        postprocess_scripts_directory = os.path.join(
-            "Shared", "resultPostProcess"
+        logging.info("Moving results to the output database")
+        moveToMysql.main(
+            simulation_postprocess_path = self.__simulation_results.postprocess_path,
+            simulation_execution_date = self.__settings.simulation.execution_date,
+            scenario = self.__settings.scenario.output_name,
+            webviewer_version = "results",
+            host=self.__settings.output_database_server.host,
+            port=self.__settings.output_database_server.port,
+            user=self.__settings.output_database_server.user,
+            password=self.__settings.output_database_server.password
         )
-        os.chdir(postprocess_scripts_directory)
-        try:
-            logging.info("Moving results to the output database")
-            moveToMysql.main(
-                simulation = self.settings.results.simulation_folder,
-                simulation_execution_date = self.settings.simulation.execution_date,
-                scenario = self.settings.scenario.output_name,
-                webviewer_version = "results",
-                host=self.settings.output_database_server.host,
-                port=self.settings.output_database_server.port,
-                user=self.settings.output_database_server.user,
-                password=self.settings.output_database_server.password
-            )
-            logging.info("DONE")
-        finally:
-            os.chdir(original_directory)
+        logging.info("DONE")
         
 
 class SimulationResults():
 
     def __init__(self, results_folder: str, simulation_name: str):
-        nexus_e_framework_root_folder = (
-            # pathlib.Path(__file__).parent.parent.parent.resolve()
-            pathlib.Path().resolve()
-        )
         self.__results_folder = results_folder
         self.__simulation_name = simulation_name
-        self.__simulation_results_path = os.path.join(
-            nexus_e_framework_root_folder,
+        self.__path = os.path.join(
+            pathlib.Path(),
             self.__results_folder,
             self.__simulation_name
         )
         self.__postprocess_output_folder = os.path.join(
-            "Shared",
-            "resultPostProcess",
-            "Outputs",
-            self.__simulation_name
+            self.__path,
+            "postprocess"
         )
+
+    @property
+    def path(self):
+        return self.__path
+
+    @property
+    def postprocess_path(self):
+        return self.__postprocess_output_folder
 
     def get_metadata(self, scenario_description: str) -> pd.DataFrame:
         """
-            Re-implementation of Shared/resultPostProcess/webviewMetadat.py
-
             Metadata fields: 
             - simulation_submission_time (Temporarily removed because this
                 info is unknown if Nexus-e is executed locally)
@@ -133,13 +131,13 @@ class SimulationResults():
         return output
 
     def get_simulated_years(self) -> list[int]:
-        if not os.path.isdir(self.__simulation_results_path):
+        if not os.path.isdir(self.__path):
             return []
         results_folders = [
             element 
-            for element in os.listdir(self.__simulation_results_path)
+            for element in os.listdir(self.__path)
             if os.path.isdir(
-                os.path.join(self.__simulation_results_path, element)
+                os.path.join(self.__path, element)
             )
         ]
         simulated_years = [

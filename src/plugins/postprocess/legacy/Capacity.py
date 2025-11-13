@@ -1,12 +1,12 @@
 import os
+from pathlib import Path
 import pandas as pd
-import numpy as np
 import argparse
 import pymysql
 
-from .Generation import group_n_rename, get_data, get_folders_with_prefix, read_generator_file
+from .Generation import group_n_rename, get_data, read_generator_file
+from ..results_context import get_years_simulated_by_centiv
 
-import sys
 from nexus_e import config
 
 year_dic = {
@@ -21,7 +21,7 @@ Cap_CH_centiv = pd.DataFrame()
 class Capacity:
     def __init__(
         self,
-        parent_directory,
+        simulation_postprocess_path,
         simu_name,
         centIv_listyears,
         pv_inv,
@@ -33,7 +33,7 @@ class Capacity:
         user,
         password
     ):
-        self.parent_directory = parent_directory
+        self.simulation_postprocess_path = simulation_postprocess_path
         self.simu_name = simu_name
         self.centIv_listyears = centIv_listyears
         self.pv_inv = pv_inv
@@ -54,7 +54,7 @@ class Capacity:
         df_cap_con = pd.DataFrame()
 
         for y in self.centIv_listyears:
-            centivpath = f"{self.parent_directory}/../../Results/{self.simu_name}/CentIv_{y}"
+            centivpath = f"CentIv_{y}"
 
             fn7 = os.path.join(centivpath, "Generators_EM_agg.csv")
             cap_ch = pd.read_csv(fn7, index_col=0)
@@ -216,7 +216,12 @@ class Capacity:
             # write to csv
             df_cap = group_n_rename(df_cap, transposed=True, index_name='Row').sort_index()
             df_cap.to_csv(
-                f"{self.parent_directory}/Outputs/{self.simu_name}/national_generation_and_capacity/national_capacity_gw_{country.lower()}.csv")
+                os.path.join(
+                    self.simulation_postprocess_path,
+                    "national_generation_and_capacity",
+                    f"national_capacity_gw_{country.lower()}.csv"
+                )
+            )
 
         return Cap_CH_centiv
     def get_cap_CH(self,Cap_CH_centiv):
@@ -265,13 +270,24 @@ class Capacity:
         annual_cap_CH = group_n_rename(annual_cap_CH, transposed=True, index_name='Row').sort_index()
 
         annual_cap_CH.to_csv(
-            f"{self.parent_directory}/Outputs/{self.simu_name}/national_generation_and_capacity/national_capacity_gw_ch.csv")
+            os.path.join(
+                self.simulation_postprocess_path,
+                "national_generation_and_capacity",
+                "national_capacity_gw_ch.csv"
+            )
+        )
 
     def get_storage_cap_CH(self):
         # add storage capacity of the DistIv technologies
 
         # read capacities from CentIV
-        annual_storage_cap_cap_CH = pd.read_csv(os.path.join(self.parent_directory, f"Storage_Cap_CH_centiv.csv"), index_col=0)
+        annual_storage_cap_cap_CH = pd.read_csv(
+            os.path.join(
+                self.simulation_postprocess_path,
+                "Storage_Cap_CH_centiv.csv"
+            ),
+            index_col=0
+        )
 
         # only batteries are added from DistIv
 
@@ -295,15 +311,20 @@ class Capacity:
         annual_cap_CH = group_n_rename(annual_storage_cap_cap_CH, transposed=True, index_name='Row').sort_index()
 
         annual_cap_CH.to_csv(
-            f"{self.parent_directory}/Outputs/{self.simu_name}/national_generation_and_capacity/national_capacity_storage_ch.csv")
+            os.path.join(
+                self.simulation_postprocess_path,
+                "national_generation_and_capacity",
+                "national_capacity_storage_ch.csv"
+            )
+        )
 
 def main(simulation: str, database: str, host: str, user: str, password: str):
-    parentDirectory = os.getcwd()
+    simulation_postprocess_path = "postprocess"
 
     # read generator file
     generators = read_generator_file()
 
-    centIv_listyears = get_folders_with_prefix(f"{parentDirectory}/../../Results/{simulation}", 'CentIv')
+    centIv_listyears = get_years_simulated_by_centiv(Path())
 
     # Example values for pv_inv, bat_inv, e_max, and p_max
     pv_inv = {year: 0 for year in centIv_listyears}
@@ -312,7 +333,7 @@ def main(simulation: str, database: str, host: str, user: str, password: str):
     p_max = 1.0   # Example value, replace with actual value
 
     capacity = Capacity(
-        parentDirectory,
+        simulation_postprocess_path,
         simulation,
         centIv_listyears,
         pv_inv,

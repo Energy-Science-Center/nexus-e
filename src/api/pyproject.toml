@@ -1,0 +1,22 @@
+[project]
+name = "nexus-e-interface"
+version = "0.0.2"
+description = ""
+readme = "README.md"
+authors = [
+    { name = "Matthieu Boubat", email = "mboubat@ethz.ch" }
+]
+requires-python = ">=3.9.15"
+dependencies = [
+    "mysqlclient>=2.2.7",
+    "sqlalchemy>=2.0.39",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "pymysql>=1.1.1",
+]

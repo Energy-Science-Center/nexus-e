@@ -2,6 +2,12 @@ version = 1
 revision = 3
 requires-python = "==3.10.12"
 
+[manifest]
+members = [
+    "nexus-e",
+    "nexus-e-interface",
+]
+
 [[package]]
 name = "anyio"
 version = "4.9.0"
@@ -859,7 +865,7 @@ requires-dist = [
     { name = "matlabengine", marker = "extra == 'matlab'", specifier = "<=24.0.0" },
     { name = "mesa", specifier = "==2.3.4" },
     { name = "mysql-connector-python", specifier = ">=9.2.0" },
-    { name = "nexus-e-interface", specifier = ">=0.0.3" },
+    { name = "nexus-e-interface", editable = "src/api" },
     { name = "numpy", specifier = "==1.26.4" },
     { name = "openpyxl", specifier = "==3.1.5" },
     { name = "pandas", specifier = "==1.5.3" },
@@ -880,16 +886,26 @@ dev = [{ name = "pytest", specifier = ">=8.3.5" }]
 
 [[package]]
 name = "nexus-e-interface"
-version = "0.0.3"
-source = { registry = "https://pypi.org/simple" }
+version = "0.0.2"
+source = { editable = "src/api" }
 dependencies = [
     { name = "mysqlclient" },
     { name = "sqlalchemy" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/8a/4f/ae02c4476192ea9521d50269f7a68ab6c97bffab08cdfa02c40f4d4a77e2/nexus_e_interface-0.0.3.tar.gz", hash = "sha256:86ef75891a7d3461164becb42b999ffe88bf9739cb040a5bd4f38bf0eb1efdcb", size = 40186, upload-time = "2025-04-01T07:42:25.421Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/4a/a2/137ff9861b5731ba249b46fdc21e40df72d3ccf0af5259927fc00211dd42/nexus_e_interface-0.0.3-py3-none-any.whl", hash = "sha256:6a25460f91977af0ff833b948d607521829d0fdf4771f67a36574002b307eb63", size = 16376, upload-time = "2025-04-01T07:42:24.079Z" },
+
+[package.dev-dependencies]
+dev = [
+    { name = "pymysql" },
 ]
+
+[package.metadata]
+requires-dist = [
+    { name = "mysqlclient", specifier = ">=2.2.7" },
+    { name = "sqlalchemy", specifier = ">=2.0.39" },
+]
+
+[package.metadata.requires-dev]
+dev = [{ name = "pymysql", specifier = ">=1.1.1" }]
 
 [[package]]
 name = "nose"

@@ -14,10 +14,9 @@ from nexus_e_interface import Plugin, Scenario
 
 from plugins.centiv.cgep import create_scenario_fast as centiv
 from plugins.postprocess.postprocess import PostProcess
-from plugins.update_investments.update_investments import UpdateInvestments
+from plugins.update_investments.nexus_e_plugin import NexusePlugin as UpdateInvestments
 from plugins.upload_scenario.upload_scenario import ScenarioUploader
 from plugins.upload_res_data import RESDataUploader
-
 
 class Module(Protocol):
     def run(self) -> None: ...

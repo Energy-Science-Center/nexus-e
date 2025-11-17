@@ -1,10 +1,16 @@
 from abc import ABC, abstractmethod
+from dataclasses import asdict
 from datetime import datetime
+import importlib
 import logging
 import os
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session
 from typing import Protocol
 
 from . import config
+
+from nexus_e_interface import Plugin, Scenario
 
 from plugins.centiv.cgep import create_scenario_fast as centiv
 from plugins.postprocess.postprocess import PostProcess
@@ -98,6 +104,45 @@ class CoreModuleFactory(ModuleFactory):
         else:
             raise UnknownModule(module_config.name)
 
+class CorePluginFactory(ModuleFactory):
+    def __init__(self, settings: config.Config):
+        self.settings = settings
+
+    def get_module(self, module_config: config.Module) -> Plugin:
+        # Dynamically import plugin module
+        try:
+            plugin_module = importlib.import_module(
+                name=f"plugins.{module_config.name}.nexus_e_plugin",
+            )
+        except ModuleNotFoundError:
+            raise UnknownModule(module_config.name)
+
+        # Prepare plugin parameters
+        parameters: dict = plugin_module.NexusePlugin.get_default_config()
+        parameters.update(asdict(self.settings.modules.commons))
+        parameters.update(module_config.parameters)
+        parameters = {
+            key: value
+            for key, value in parameters.items()
+            if key in plugin_module.NexusePlugin.get_default_config()
+        }
+
+        # Create database session
+        engine = create_engine(
+            "mysql+pymysql://" \
+            f"{self.settings.input_database_server.user}" \
+            f":{self.settings.input_database_server.password}" \
+            f"@{self.settings.input_database_server.host}" \
+            f":{self.settings.input_database_server.port}" \
+            f"/{self.settings.scenario.copy_name}" \
+        )
+        scenario = Scenario(Session(engine))
+
+        output = plugin_module.NexusePlugin(
+            scenario,
+            parameters
+        )
+        return output
 
 class Simulation:
     def __init__(self, settings: config.Config):

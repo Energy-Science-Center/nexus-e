@@ -9,7 +9,7 @@ dependencies = [
     "h5py==3.11.0",
     "matlabengine==23.2.3",
     "mesa==2.3.4",
-    "nexus-e-interface>=0.0.3",
+    "nexus-e-interface",
     "mysql-connector-python>=9.2.0",
     "numpy==1.26.4",
     "openpyxl==3.1.5",

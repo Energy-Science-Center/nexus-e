@@ -1,0 +1,28 @@
+#!/bin/bash
+# =============================================================
+# Local Configuration Template for euler_run.sbatch (see euler_run.sbatch)
+# =============================================================
+# SETUP INSTRUCTIONS:
+#   1. Copy this file: cp euler_run.config.example euler_run.config.local
+#   2. Edit euler_run.config.local with your personal settings
+#   3. euler_run.config.local is git-ignored (like modules_playlists/*.toml)
+#      so your changes won't affect other users
+# =============================================================
+
+# 1. Job configurations: database name and playlist name pairs
+# Format: "database_name|playlist_name"
+# This allows running the same database multiple times with different playlists
+JOBS=(
+  "nuclear_all_eu_evflex_10k|centiv_2050"
+  # Add more jobs as needed
+  # "another_db|another_playlist"
+)
+
+# 2. Repository path (where your nexus-e-framework code is located on Euler)
+# Adjust this to your personal repository location
+REPO_PATH="$HOME/repos/nexus-e"
+
+# 3. Email notifications (optional)
+# Set your email address to receive notifications when jobs END or FAIL
+# Leave empty (EMAIL_ADDRESS="") to disable email notifications - otherwise provide your email address (your.email@example.com)
+EMAIL_ADDRESS=""

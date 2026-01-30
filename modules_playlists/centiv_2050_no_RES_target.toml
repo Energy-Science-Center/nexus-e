@@ -1,0 +1,10 @@
+# Run CentIv for year 2050
+[[modules]]
+name = "centiv"
+[modules.parameters]
+idScenario = 5
+targetRES = 0.0
+
+# Run simulation postprocess
+[[modules]]
+name = "postprocess"

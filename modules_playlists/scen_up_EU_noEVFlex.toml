@@ -1,0 +1,35 @@
+# Upload one scenario from Excel file to MySQL database
+[[modules]]
+name = "upload_scenario"
+[modules.parameters]
+excel_file_path = "src/data/source_excel/Nexuse_DB-Input_v48_TYNDP24-DE09_CentIvPV_xbNTC_EU_NukCandidate.xlsx"
+push_to_mysql = true
+database_name = "test_nuclear_all_eu_noEVFlex"
+database_author = ""
+dump_file_path = "src/plugins/upload_scenario/schemas/Dump_STRUC_clean_v9.sql"
+
+include_flex_params = true
+demand_profiles_path = "src/data/nodal_demand_profiles/Nexuse_DB-Input_v48_TYNDP24-DE09_allEU_NoEVflex_DemandProfiles"
+
+include_tyndp24 = true
+tyndp24_data_path = "src/data/TYNDP24_datasets/TYNDP24_EU"
+tyndp24_scope = "EU"
+tyndp24_policy = "DE"
+tyndp24_climate_year = 2009
+
+ntc_type = "ref_grid"
+
+use_new_line_types = true
+preset_line_types = true
+new_line_types = "NTC"
+
+config_years = ["2018", "2020", "2030", "2040", "2050"]
+config_years_int = [2018, 2020, 2030, 2040, 2050]
+
+create_excel = false
+excel_file_target_path = "output.xlsx"
+
+include_branch_sheet = true
+
+update_only_specific_columns = false
+columns_to_update = { branch = ["line_id", "start_year", "S_max_win (MVA)"] }

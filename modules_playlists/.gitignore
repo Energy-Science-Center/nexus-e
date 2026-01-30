@@ -9,3 +9,10 @@
 !nothing.toml
 !postprocess_only.toml
 !upload_scenario.toml
+!res_upload_scenario.toml
+!update_inv_costs.toml
+!scen_up_EU_noEVFlex.toml
+!scen_up_EU_EVFlex.toml
+!centiv_2050_no_RES_target.toml
+# Except euler run configuration template
+!euler_run.config.example

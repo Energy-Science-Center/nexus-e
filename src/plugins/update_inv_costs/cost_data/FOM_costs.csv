@@ -1,0 +1,26 @@
+Technology,Year,percentage_per_annualizedCosts,annualized_costs [EUR/kW/Year],source
+WindOn,2020,1.1775,,"Danish Energy Agency, inputs/technology_data_for_el_and_dh.xlsx"
+WindOn,2030,1.1775,,"Danish Energy Agency, inputs/technology_data_for_el_and_dh.xlsx"
+WindOn,2040,1.1775,,"Danish Energy Agency, inputs/technology_data_for_el_and_dh.xlsx"
+WindOn,2050,1.1775,,"Danish Energy Agency, inputs/technology_data_for_el_and_dh.xlsx"
+PV-roof,2020,1.6059,,"Calculated. See 'further description'."
+PV-roof,2030,1.6059,,"Calculated. See 'further description'."
+PV-roof,2040,1.6059,,"Calculated. See 'further description'."
+PV-roof,2050,1.6059,,"Calculated. See 'further description'."
+PV-alpine,2020,2.0,,
+PV-alpine,2030,2.0,,
+PV-alpine,2040,2.0,,
+PV-alpine,2050,2.0,,
+PV_Openfield,2020,2.0,,
+PV_Openfield,2030,2.0,,
+PV_Openfield,2040,2.0,,
+PV_Openfield,2050,2.0,,
+GasCC-Syn,2020,1.0303,,
+GasCC-Syn,2030,1.0303,,
+GasCC-Syn,2040,1.0303,,
+GasCC-Syn,2050,1.0303,,
+GasCC-CCS,2020,1.303,,
+GasCC-CCS,2030,1.303,,
+GasCC-CCS,2040,1.303,,
+GasCC-CCS,2050,1.303,,
+Battery-TSO,2050,2.0,,"Own Assumption"

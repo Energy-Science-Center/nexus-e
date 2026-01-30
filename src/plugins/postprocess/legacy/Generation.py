@@ -165,63 +165,32 @@ def filter_by_country_and_format(data, country, group_techs=True):
         else:
             data = set_unit_names_as_column_names(data)
         return data
-def get_country_data(data):
-        # data calculation for CH and neighbouring countries
+
+def get_country_data(data, Data_buses, countries=['CH', 'DE', 'AT', 'FR', 'IT']):
+        # data calculation for CH and neighbouring countries (adjust argument countries to include more countries)
         data = data.transpose()
-        data_df_CH = data[
-            (data[0] != "DE") & (data[0] != "DE_X") & (data[0] != "FR") & (
-                    data[0] != "FR_X") &
-            (data[0] != "IT") & (data[0] != "IT_X") & (data[0] != "AT") & (
-                    data[0] != "AT_X")]
-        data_df_CH = data_df_CH.drop([0, 1], axis=1)
-        data_df_CH = data_df_CH.drop(["Unnamed: 0"])
-        data_df_CH = data_df_CH.astype(float)
-        data_sum_CH = data_df_CH.sum()
-        data_sum_CH = data_sum_CH.reset_index()
-        data_sum_CH = data_sum_CH.drop(["index"], axis=1)
+        
+        country_data_sums = {}
 
-        # DE data
+        for country in countries:
+            # Get list of buses for the current country from the mapping file
+            country_buses = Data_buses[Data_buses['Country'] == country]['BusName'].tolist()
 
-        options_DE = ['DE', 'DE_X']
-        data_df_DE = data[data[0].isin(options_DE)]
-        data_df_DE = data_df_DE.drop([0, 1], axis=1)
-        data_df_DE = data_df_DE.astype(float)
-        data_sum_DE = data_df_DE.sum()
-        data_sum_DE = data_sum_DE.reset_index()
-        data_sum_DE = data_sum_DE.drop(["index"], axis=1)
+            # Filter data for the current country using both bus names and country codes
+            data_df_country = data[data[1].isin(country_buses)]
+            
+            # Process the filtered data
+            data_df_country = data_df_country.drop([0, 1], axis=1)
+            if "Unnamed: 0" in data_df_country.columns:
+                data_df_country = data_df_country.drop(["Unnamed: 0"], axis=1)
+            data_df_country = data_df_country.astype(float)
+            data_sum_country = data_df_country.sum()
+            data_sum_country = data_sum_country.reset_index()
+            data_sum_country = data_sum_country.drop(["index"], axis=1)
+            
+            country_data_sums[country] = data_sum_country[0]
 
-        # FR data
-
-        options_FR = ['FR', 'FR_X']
-        data_df_FR = data[data[0].isin(options_FR)]
-        data_df_FR = data_df_FR.drop([0, 1], axis=1)
-        data_df_FR = data_df_FR.astype(float)
-        data_sum_FR = data_df_FR.sum()
-        data_sum_FR = data_sum_FR.reset_index()
-        data_sum_FR = data_sum_FR.drop(["index"], axis=1)
-
-        # IT data
-
-        options_IT = ['IT', 'IT_X']
-        data_df_IT = data[data[0].isin(options_IT)]
-        data_df_IT = data_df_IT.drop([0, 1], axis=1)
-        data_df_IT = data_df_IT.astype(float)
-        data_sum_IT = data_df_IT.sum()
-        data_sum_IT = data_sum_IT.reset_index()
-        data_sum_IT = data_sum_IT.drop(["index"], axis=1)
-
-        # AT data
-
-        options_AT = ['AT', 'AT_X']
-        data_df_AT = data[data[0].isin(options_AT)]
-        data_df_AT = data_df_AT.drop([0, 1], axis=1)
-        data_df_AT = data_df_AT.astype(float)
-        data_sum_AT = data_df_AT.sum()
-        data_sum_AT = data_sum_AT.reset_index()
-        data_sum_AT = data_sum_AT.drop(["index"], axis=1)
-
-        return {'DE': data_sum_DE[0], 'CH': data_sum_CH[0], 'FR': data_sum_FR[0], 'IT': data_sum_IT[0],
-                'AT': data_sum_AT[0]}
+        return country_data_sums
 
 def group_by_technologies(data):
         data = data.T
@@ -494,35 +463,37 @@ class Generation:
         # CentIV
         # TODO: check if CentIV results exist
         if True:
+            # read mapping file to be used in get_country_data()
+            Data_buses = pd.read_csv(os.path.join(CentIvDirectory, "mappings", "Data_buses.csv"), low_memory=False)
             # read files
             # all countries
             # load
             fn1 = os.path.join(CentIvDirectory, "DemandOriginal_hourly_ALL.csv")
             load = pd.read_csv(fn1, low_memory=False) # this file is used to get the size of the load and the simulation (8760 or 186 etc.), see definition of count_simulation_timestesp below  
-            centiv_loads = get_country_data(load)
+            centiv_loads = get_country_data(load, Data_buses)
             # read relevant files
             # curtailment
             fn6 = os.path.join(CentIvDirectory, "REScurtailmentDistIv_hourly_ALL_LP.csv")
             curtail_ch = pd.read_csv(fn6, low_memory=False)
-            curtail_all = get_country_data(curtail_ch)
+            curtail_all = get_country_data(curtail_ch, Data_buses)
             # Read DSM and emobility shifting data
             fn_dup = os.path.join(CentIvDirectory, "LoadShiftDSMUp_hourly_ALL_LP.xlsx")
-            dsm_up_all = get_country_data(pd.read_excel(fn_dup))
+            dsm_up_all = get_country_data(pd.read_excel(fn_dup), Data_buses)
             fn_ddown = os.path.join(CentIvDirectory, "LoadShiftDSMDown_hourly_ALL_LP.xlsx")
-            dsm_down_all = get_country_data(pd.read_excel(fn_ddown))
+            dsm_down_all = get_country_data(pd.read_excel(fn_ddown), Data_buses)
             fn_em_up = os.path.join(CentIvDirectory, "LoadShiftEmobUp_hourly_ALL_LP.xlsx")
-            emob_up_all = get_country_data(pd.read_excel(fn_em_up))
+            emob_up_all = get_country_data(pd.read_excel(fn_em_up), Data_buses)
             fn_em_down = os.path.join(CentIvDirectory, "LoadShiftEmobDown_hourly_ALL_LP.xlsx")
-            emob_down_all = get_country_data(pd.read_excel(fn_em_down))
+            emob_down_all = get_country_data(pd.read_excel(fn_em_down), Data_buses)
             fn_hp_up = os.path.join(CentIvDirectory, "LoadShiftHpUp_hourly_ALL_LP.xlsx")
             if os.path.exists(fn_hp_up):
-                hp_up = get_country_data(pd.read_excel(fn_hp_up))
+                hp_up = get_country_data(pd.read_excel(fn_hp_up), Data_buses)
             else:
                 hp_up = None
 
             fn_hp_down = os.path.join(CentIvDirectory, "LoadShiftHpDown_hourly_ALL_LP.xlsx")
             if os.path.exists(fn_hp_down):
-                hp_down = get_country_data(pd.read_excel(fn_hp_down))
+                hp_down = get_country_data(pd.read_excel(fn_hp_down), Data_buses)
             else:
                 hp_down = None
             # consumption
@@ -531,7 +502,7 @@ class Generation:
             gencons = gencons.transpose()
             # Loadshed
             fn_loadshed = os.path.join(CentIvDirectory, "LoadShedding_hourly_ALL_LP.xlsx")
-            centiv_loadshed = get_country_data(pd.read_excel(fn_loadshed))
+            centiv_loadshed = get_country_data(pd.read_excel(fn_loadshed), Data_buses)
             # check if file for LoadShedIndustry exists
             fn_lsi = os.path.join(CentIvDirectory, 'LoadSheddingIndustry_hourly_ALL_LP.csv')
             loadshed_ind = os.path.isfile(fn_lsi)
@@ -619,21 +590,21 @@ class Generation:
             gencons_CH = self.get_gencons(gencons[gencons[0] == "CH"])
             if "Battery-TSO" in gencons_CH:
                 batt_CH = gencons_CH["Battery-TSO"]
-                batt_CH_com = batt_CH.sum() if isinstance(batt_CH, pd.Series) else batt_CH.sum(axis=1) # it is a Series if there is only one plant of type Battery-TSO (e.g., in single electric node case)
+                batt_CH_com = batt_CH if isinstance(batt_CH, pd.Series) else batt_CH.sum(axis=1) # it is a Series if there is only one plant of type Battery-TSO (e.g., in single electric node case)
                 centiv_con_CH["Battery-TSO"] = batt_CH_com
             else:
                 centiv_con_CH["Battery-TSO"] = 0
 
             if "Battery-DSO" in gencons_CH:
                 batt_CH = gencons_CH["Battery-DSO"]
-                batt_CH_com = batt_CH.sum() if isinstance(batt_CH, pd.Series) else batt_CH.sum(axis=1) # it is a Series if there is only one plant of type Battery-DSO (e.g., in single electric node case)
+                batt_CH_com = batt_CH if isinstance(batt_CH, pd.Series) else batt_CH.sum(axis=1) # it is a Series if there is only one plant of type Battery-DSO (e.g., in single electric node case)
                 centiv_con_CH["Battery-DSO"] = batt_CH_com
             else:
                 centiv_con_CH["Battery-DSO"] = 0
 
             # add DAC to consumption dataframe
             if 'DAC' in gencons_CH:
-                centiv_con_CH['DAC'] = gencons_CH['DAC'].sum() if isinstance(gencons_CH['DAC'], pd.Series) else gencons_CH['DAC'].sum(axis=1) # it is a Series if there is only one plant of type DAC (e.g., in single electric node case)
+                centiv_con_CH['DAC'] = gencons_CH['DAC'] if isinstance(gencons_CH['DAC'], pd.Series) else gencons_CH['DAC'].sum(axis=1) # it is a Series if there is only one plant of type DAC (e.g., in single electric node case)
             else:
                 centiv_con_CH['DAC'] = 0
 

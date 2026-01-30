@@ -4,12 +4,12 @@ name = "upload_scenario"
 [modules.parameters]
 excel_file_path = "src/data/source_excel/Nexuse_DB-Input_v48_TYNDP24-DE09_CentIvPV_xbNTC_NoSwissGrid.xlsx"
 push_to_mysql = true
-database_name = "test_restructure"
+database_name = "project_date_version"
 database_author = "FirstName LastName"
 dump_file_path = "src/plugins/upload_scenario/schemas/Dump_STRUC_clean_v9.sql"
 
-include_flex_params = false
-demand_profiles_path = "src/data/source_excel/Nexuse_DB-Input_v47_TYNDP22-GA08_CentIvPV_base_DemandProfiles"
+include_flex_params = true
+demand_profiles_path = "src/data/nodal_demand_profiles/Nexuse_DB-Input_v48_TYNDP24-DE09_NoEVflex_NoHeatPumps"
 
 include_tyndp24 = false
 tyndp24_data_path = "src/data/TYNDP24_datasets/TYNDP24_nbc"

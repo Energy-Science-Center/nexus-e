@@ -23,6 +23,7 @@ dependencies = [
     "tomli-w==1.0.0",
     "xlrd==1.2.0",
     "xlsxwriter==3.2.0",
+    "sqlmodel>=0.0.22",
 ]
 
 [project.optional-dependencies]

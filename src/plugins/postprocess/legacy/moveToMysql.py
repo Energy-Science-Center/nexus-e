@@ -7,6 +7,7 @@ import json
 import re
 import argparse
 from datetime import datetime
+import logging
 
 from nexus_e import config
 from nexus_e.database import MYSQL_DATABASE_NAME_MAX_LENGTH
@@ -141,6 +142,11 @@ def main(
     print(f'https://nexus-e.org/{webviewer_version}/{schema_name}')
     print('---------------------------------------------------------------')
     print('\n')
+
+    logging.info('---------------------------------------------------------------')
+    logging.info('Link for the webviewer:')
+    logging.info(f'https://nexus-e.org/{webviewer_version}/{schema_name}')
+    logging.info('---------------------------------------------------------------')
     # retrieve image: https://pynative.com/python-mysql-blob-insert-retrieve-file-image-as-a-blob-in-mysql/
 
     # def write_file(data, filename):

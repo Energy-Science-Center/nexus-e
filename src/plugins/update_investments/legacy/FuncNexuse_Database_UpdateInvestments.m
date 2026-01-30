@@ -576,6 +576,82 @@ function [ ] = FuncNexuse_Database_UpdateInvestments(wkspace,conn,CentIvToMySQL)
             Pmax_orig_disp = GensInv_disp_Pmax(idx_disp_partially);
             Pmax_inv_disp = Pinv_disp(idx_disp_partially);
             Pmax_cd_disp = Pmax_orig_disp - Pmax_inv_disp;
+            
+            % Check for units misidentified as partially built (remaining capacity < tolerance)
+            % These should be reclassified as fully built to avoid creating 0 MW candidate units
+            CAPACITY_TOLERANCE_MW = 0.1;  % 100 kW minimum meaningful capacity
+            actually_fully_built_mask = abs(Pmax_cd_disp) < CAPACITY_TOLERANCE_MW;
+            
+            if any(actually_fully_built_mask)
+                fprintf('INFO: Reclassifying %d dispatchable generators from partially built to fully built (remaining capacity < %.2f MW)\n', sum(actually_fully_built_mask), CAPACITY_TOLERANCE_MW);
+                
+                % Move these units from partially built to fully built category
+                genNames_disp_reclassified = genNames_disp_partially(actually_fully_built_mask);
+                Pmax_disp_reclassified = Pmax_orig_disp(actually_fully_built_mask);
+                
+                % Process reclassified units as fully built
+                if ~isempty(genNames_disp_reclassified)
+                    % Adjust the name of the built generator (change from Cd to Inv)
+                    Str_beg_recl = extractBefore(genNames_disp_reclassified,"Cd");
+                    Str_end_recl = extractAfter(genNames_disp_reclassified,"Cd");
+                    Str_name_recl = strcat(Str_beg_recl,'Inv',Str_end_recl);
+                    
+                    % Get gendata for reclassified gens and create new invested entries
+                    GenData = fetch(conn,['SELECT * FROM gendata']);
+                    idGen_last = max(GenData.idGen);
+                    idGen_new_recl = (idGen_last+1:idGen_last+length(genNames_disp_reclassified))';
+                    
+                    for ig = 1:length(genNames_disp_reclassified)
+                        GenData_new_disp_reclassified(ig,:) = GenData( find(cell2mat(cellfun(@(x) ismember(x, genNames_disp_reclassified(ig)), GenData.GenName, 'UniformOutput', 0)),1,'first'),: );
+                    end
+                    GenData_new_disp_reclassified.idGen = idGen_new_recl;
+                    GenData_new_disp_reclassified.StartYr = repmat(Year,[length(idGen_new_recl),1]);
+                    GenData_new_disp_reclassified.EndYr = repmat(2100,[length(idGen_new_recl),1]);
+                    GenData_new_disp_reclassified.GenName = Str_name_recl;
+                    
+                    % Replace NaN in eta_dis,eta_ch with BLANKS
+                    vars_recl = {'eta_dis','eta_ch'};
+                    GenData_new_disp_reclassified.eta_dis = num2cell(GenData_new_disp_reclassified.eta_dis);
+                    GenData_new_disp_reclassified.eta_ch = num2cell(GenData_new_disp_reclassified.eta_ch);
+                    ztemp_recl = GenData_new_disp_reclassified{:,vars_recl};
+                    ztemp_recl(cellfun(@(ztemp_recl) any(isnan(ztemp_recl(:))), ztemp_recl)) = java.lang.String('');
+                    GenData_new_disp_reclassified{:,vars_recl} = ztemp_recl; clear ztemp_recl;
+                    
+                    colNames_recl = GenData_new_disp_reclassified.Properties.VariableNames;
+                    datainsert(conn,'gendata',colNames_recl,GenData_new_disp_reclassified);
+                    
+                    for d1=1:length(genNames_disp_reclassified)
+                        disp(['    Reclassified as Fully Built in gendata: idGen = ',num2str(GenData_new_disp_reclassified.idGen(d1)),', Pmax = ',num2str(Pmax_disp_reclassified(d1)),' MW, ',GenData_new_disp_reclassified.GenName{d1}])
+                    end
+                    
+                    % Update genconfiguration for reclassified units
+                    tablename_recl = 'genconfiguration';
+                    colnames_recl = {'idGen','GenName','CandidateUnit'};
+                    
+                    for c1=1:length(ToUpdate_GenConfigs)
+                        for g1=1:length(genNames_disp_reclassified)
+                            newdata_recl = {idGen_new_recl(g1),Str_name_recl{g1},0};
+                            whereclause_recl = {strcat('WHERE (idGenConfig = "',num2str(ToUpdate_GenConfigs(c1)),'") and (GenName = "',genNames_disp_reclassified{g1},'")')};
+                            update(conn,tablename_recl,colnames_recl,newdata_recl,whereclause_recl)
+                            
+                            if c1==1
+                                disp(['    Reclassified as Fully Built in genconfigs: idGen = ',num2str(idGen_new_recl(g1)),', Pmax = ',num2str(Pmax_disp_reclassified(g1)),' MW, ',Str_name_recl{g1}])
+                            end
+                        end
+                    end
+                end
+                
+                % Remove reclassified units from partially built processing
+                genNames_disp_partially = genNames_disp_partially(~actually_fully_built_mask);
+                Pmax_orig_disp = Pmax_orig_disp(~actually_fully_built_mask);
+                Pmax_inv_disp = Pmax_inv_disp(~actually_fully_built_mask);
+                Pmax_cd_disp = Pmax_cd_disp(~actually_fully_built_mask);
+            end
+            
+            % Continue only if there are still truly partially built units
+            if isempty(genNames_disp_partially)
+                disp('    All partially built dispatchable units were reclassified as fully built')
+            else
             % FOR other parameters: Pmin, Emax, Emin...
             % OPTION 1: calculate the Pmin_inv and Pmin_cd (for any newly built
             % storages)
@@ -948,6 +1024,7 @@ function [ ] = FuncNexuse_Database_UpdateInvestments(wkspace,conn,CentIvToMySQL)
             %--------------------------------------------------------------
             
             
+            end  % end of: if isempty(genNames_disp_partially)
         else
             % no updates needed to Dispatchable PARTIALLY built generators
             disp(['    none'])
@@ -983,9 +1060,14 @@ function [ ] = FuncNexuse_Database_UpdateInvestments(wkspace,conn,CentIvToMySQL)
         GensInv_nondisp_Emax    = genTable.Emax(    find(cell2mat(cellfun(@(x) ismember(x, genNames_nondisp), genTable.GenName, 'UniformOutput', 0))) );
         GensInv_nondisp_Emin    = genTable.Emin(    find(cell2mat(cellfun(@(x) ismember(x, genNames_nondisp), genTable.GenName, 'UniformOutput', 0))) );
         
+        % Define tolerance for capacity comparisons (to handle floating-point precision)
+        CAPACITY_TOLERANCE_MW = 0.1;  % 100 kW minimum meaningful capacity
+        
         % identify all nondisp that are NOT fully built
         idx_nondisp_partially = true(sum(idx_nondisp),1);     % initialize all as partially built
-        idx_nondisp_partially(GensInv_nondisp_Pmax==CentIvToMySQL.Pmax(idx_nondisp)) = false;   % change for any that are fully built
+        % Use tolerance-based comparison instead of exact equality to avoid floating-point issues
+        capacity_difference = abs(GensInv_nondisp_Pmax - CentIvToMySQL.Pmax(idx_nondisp));
+        idx_nondisp_partially(capacity_difference < CAPACITY_TOLERANCE_MW) = false;   % change for any that are fully built
         % identify all nondisp that ARE fully built
         idx_nondisp_fully = ~idx_nondisp_partially;
         
@@ -1220,6 +1302,84 @@ function [ ] = FuncNexuse_Database_UpdateInvestments(wkspace,conn,CentIvToMySQL)
             Pmax_inv_nondisp = Pinv_nondisp(idx_nondisp_partially);
             Pmax_cd_nondisp = GensInv_nondisp_Pmax(idx_nondisp_partially) - Pmax_inv_nondisp;
             Pmax_orig_nondisp = GensInv_nondisp_Pmax(idx_nondisp_partially);
+            
+            % Check for units misidentified as partially built (remaining capacity < tolerance)
+            % These should be reclassified as fully built to avoid creating 0 MW candidate units
+            actually_fully_built_mask_nondisp = abs(Pmax_cd_nondisp) < CAPACITY_TOLERANCE_MW;
+            
+            if any(actually_fully_built_mask_nondisp)
+                fprintf('INFO: Reclassifying %d non-dispatchable generators from partially built to fully built (remaining capacity < %.2f MW)\n', sum(actually_fully_built_mask_nondisp), CAPACITY_TOLERANCE_MW);
+                
+                % Move these units from partially built to fully built category
+                genNames_nondisp_reclassified = genNames_nondisp_partially(actually_fully_built_mask_nondisp);
+                Pmax_nondisp_reclassified = Pmax_orig_nondisp(actually_fully_built_mask_nondisp);
+                
+                % Process reclassified units as fully built
+                if ~isempty(genNames_nondisp_reclassified)
+                    % Adjust the name of the built generator (change from Cd to Inv)
+                    Str_beg_recl_nd = extractBefore(genNames_nondisp_reclassified,"Cd");
+                    Str_end_recl_nd = extractAfter(genNames_nondisp_reclassified,"Cd");
+                    Str_name_recl_nd = strcat(Str_beg_recl_nd,'Inv',Str_end_recl_nd);
+                    
+                    % Get gendata for reclassified gens and create new invested entries
+                    GenData = fetch(conn,['SELECT * FROM gendata']);
+                    idGen_last = max(GenData.idGen);
+                    idGen_new_recl_nd = (idGen_last+1:idGen_last+length(genNames_nondisp_reclassified))';
+                    
+                    for ig = 1:length(genNames_nondisp_reclassified)
+                        GenData_new_nondisp_reclassified(ig,:) = GenData( find(cell2mat(cellfun(@(x) ismember(x, genNames_nondisp_reclassified(ig)), GenData.GenName, 'UniformOutput', 0)),1,'first'),: );
+                    end
+                    GenData_new_nondisp_reclassified.idGen = idGen_new_recl_nd;
+                    GenData_new_nondisp_reclassified.StartYr = repmat(Year,[length(idGen_new_recl_nd),1]);
+                    GenData_new_nondisp_reclassified.EndYr = repmat(2100,[length(idGen_new_recl_nd),1]);
+                    GenData_new_nondisp_reclassified.GenName = Str_name_recl_nd;
+                    
+                    % Replace NaN in eta_dis,eta_ch with BLANKS
+                    vars_recl_nd = {'eta_dis','eta_ch'};
+                    GenData_new_nondisp_reclassified.eta_dis = num2cell(GenData_new_nondisp_reclassified.eta_dis);
+                    GenData_new_nondisp_reclassified.eta_ch = num2cell(GenData_new_nondisp_reclassified.eta_ch);
+                    ztemp_recl_nd = GenData_new_nondisp_reclassified{:,vars_recl_nd};
+                    ztemp_recl_nd(cellfun(@(ztemp_recl_nd) any(isnan(ztemp_recl_nd(:))), ztemp_recl_nd)) = java.lang.String('');
+                    GenData_new_nondisp_reclassified{:,vars_recl_nd} = ztemp_recl_nd; clear ztemp_recl_nd;
+                    
+                    colNames_recl_nd = GenData_new_nondisp_reclassified.Properties.VariableNames;
+                    datainsert(conn,'gendata',colNames_recl_nd,GenData_new_nondisp_reclassified);
+                    
+                    for d1=1:length(genNames_nondisp_reclassified)
+                        disp(['    Reclassified as Fully Built in gendata: idGen = ',num2str(GenData_new_nondisp_reclassified.idGen(d1)),', Pmax = ',num2str(Pmax_nondisp_reclassified(d1)),' MW, ',GenData_new_nondisp_reclassified.GenName{d1}])
+                    end
+                    
+                    % Update genconfiguration for reclassified units
+                    tablename_recl_nd = 'genconfiguration';
+                    colnames_recl_nd = {'idGen','GenName','CandidateUnit'};
+                    
+                    for c1=1:length(ToUpdate_GenConfigs)
+                        for g1=1:length(genNames_nondisp_reclassified)
+                            newdata_recl_nd = {idGen_new_recl_nd(g1),Str_name_recl_nd{g1},0};
+                            whereclause_recl_nd = {strcat('WHERE (idGenConfig = "',num2str(ToUpdate_GenConfigs(c1)),'") and (GenName = "',genNames_nondisp_reclassified{g1},'")')};
+                            update(conn,tablename_recl_nd,colnames_recl_nd,newdata_recl_nd,whereclause_recl_nd)
+                            
+                            if c1==1
+                                disp(['    Reclassified as Fully Built in genconfigs: idGen = ',num2str(idGen_new_recl_nd(g1)),', Pmax = ',num2str(Pmax_nondisp_reclassified(g1)),' MW, ',Str_name_recl_nd{g1}])
+                            end
+                        end
+                    end
+                end
+                
+                % Remove reclassified units from partially built processing
+                genNames_nondisp_partially = genNames_nondisp_partially(~actually_fully_built_mask_nondisp);
+                Pmax_orig_nondisp = Pmax_orig_nondisp(~actually_fully_built_mask_nondisp);
+                Pmax_inv_nondisp = Pmax_inv_nondisp(~actually_fully_built_mask_nondisp);
+                Pmax_cd_nondisp = Pmax_cd_nondisp(~actually_fully_built_mask_nondisp);
+            end
+            
+            % Clean any remaining floating-point artifacts
+            Pmax_cd_nondisp(abs(Pmax_cd_nondisp) < CAPACITY_TOLERANCE_MW) = 0;
+            
+            % Continue only if there are still truly partially built units
+            if isempty(genNames_nondisp_partially)
+                disp('    All partially built non-dispatchable units were reclassified as fully built')
+            else
             % FOR other parameters: Pmin, Emax, Emin...
             % OPTION 1: calculate the Pmin_inv and Pmin_cd (for any newly built
             % storages)
@@ -1240,14 +1400,24 @@ function [ ] = FuncNexuse_Database_UpdateInvestments(wkspace,conn,CentIvToMySQL)
             Pmin_orig_nondisp = GensInv_nondisp_Pmin(idx_nondisp_partially);
             Pmin_inv_nondisp2 = PminInvestmentForNonDispatchables(idx_nondisp_partially);
             Pmin_cd_nondisp2 = Pmin_orig_nondisp - Pmin_inv_nondisp2;
+            % Clean floating-point artifacts in Pmin
+            Pmin_cd_nondisp2(abs(Pmin_cd_nondisp2) < CAPACITY_TOLERANCE_MW) = 0;
             % also make same calculation for Emax_inv / Emax_cd
             Emax_orig_nondisp = GensInv_nondisp_Emax(idx_nondisp_partially);
             Emax_inv_nondisp2 = round(Emax_orig_nondisp .* (Pmax_inv_nondisp ./ Pmax_orig_nondisp),1);
             Emax_cd_nondisp2 = round(Emax_orig_nondisp .* (Pmax_cd_nondisp ./ Pmax_orig_nondisp),1);
+            % Handle NaN from division by zero and clean floating-point artifacts
+            Emax_inv_nondisp2(isnan(Emax_inv_nondisp2)) = 0;
+            Emax_cd_nondisp2(isnan(Emax_cd_nondisp2)) = 0;
+            Emax_cd_nondisp2(abs(Emax_cd_nondisp2) < CAPACITY_TOLERANCE_MW) = 0;
             % also make same calculation for Emin_inv / Emin_cd
             Emin_orig_nondisp = GensInv_nondisp_Emin(idx_nondisp_partially);
             Emin_inv_nondisp2 = round(Emin_orig_nondisp .* (Pmax_inv_nondisp ./ Pmax_orig_nondisp),1);
             Emin_cd_nondisp2 = round(Emin_orig_nondisp .* (Pmax_cd_nondisp ./ Pmax_orig_nondisp),1);
+            % Handle NaN from division by zero and clean floating-point artifacts
+            Emin_inv_nondisp2(isnan(Emin_inv_nondisp2)) = 0;
+            Emin_cd_nondisp2(isnan(Emin_cd_nondisp2)) = 0;
+            Emin_cd_nondisp2(abs(Emin_cd_nondisp2) < CAPACITY_TOLERANCE_MW) = 0;
             
             % display info about newly created gens
             for d1=1:length(genNames_nondisp_partially)
@@ -1564,6 +1734,7 @@ function [ ] = FuncNexuse_Database_UpdateInvestments(wkspace,conn,CentIvToMySQL)
             %--------------------------------------------------------------
             
             
+            end  % end of: if isempty(genNames_nondisp_partially)
         else
             % no updates needed to Non-Dispatchable PARTIALLY built generators
             disp(['    none'])

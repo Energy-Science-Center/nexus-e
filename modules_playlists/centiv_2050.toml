@@ -3,13 +3,13 @@
 name = "centiv"
 [modules.parameters]
 idScenario = 5
-# Update investments from CentIv 2050
-[[modules]]
-name = "update_investments"
-[modules.parameters]
-startyear = 5
-endyear = 5
-scenYear = 2050
+# # Update investments from CentIv 2050
+# [[modules]]
+# name = "update_investments"
+# [modules.parameters]
+# startyear = 5
+# endyear = 5
+# scenYear = 2050
 
 
 # Run simulation postprocess

@@ -36,3 +36,12 @@ Shared/resultPostProcess/Dependencies/grid_map/temp*.tex
 Shared/resultPostProcess/Dependencies/grid_map/.idea
 Shared/resultPostProcess/Dependencies/grid_map/grid_expansion_*.tex
 Shared/resultPostProcess/Dependencies/grid_map/_Archive
+
+src/plugins/upload_res_data/wind_data/rcp26
+src/plugins/upload_res_data/wind_data/rcp85
+src/plugins/upload_res_data/pv_data/**/*.csv
+src/plugins/upload_res_data/wind_data/**/*.csv
+src/plugins/upload_res_data/alpine_PV_data/**/*.csv
+src/plugins/upload_res_data/ror_data/**/*.csv
+
+docs

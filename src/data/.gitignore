@@ -14,6 +14,9 @@
 !nodal_demand_profiles/Nexuse_DB-Input_v48_TYNDP24-DE09_WithEVflex_NoHeatPumps/*
 
 !source_excel
+!source_excel/Nexuse_DB-Input_v48_TYNDP24-DE09_CentIvPV_xbNTC_BIOCurrentADJUSTED_withPV_andNuc.xlsx
+!source_excel/Nexuse_DB-Input_v48_TYNDP24-DE09_CentIvPV_xbNTC_EU_NukCandidate.xlsx
+!source_excel/Nexuse_DB-Input_v48_TYNDP24-DE09_CentIvPV_xbNTC_EU.xlsx
 !source_excel/Nexuse_DB-Input_v48_TYNDP24-DE09_CentIvPV_xbNTC_NoSwissGrid.xlsx
 
 !TYNDP24_datasets

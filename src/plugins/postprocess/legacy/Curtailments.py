@@ -30,11 +30,12 @@ class Curtailments:
             for year in centIv_listyears:
 
                 CentIvDirectory = f"CentIv_{year}"
+                Data_buses = pd.read_csv(os.path.join(CentIvDirectory,"mappings","Data_buses.csv"))
 
                 # curtailment data for CH   
                 fn6 = os.path.join(CentIvDirectory, "REScurtailmentDistIv_hourly_ALL_LP.csv")
                 curtail_ch = pd.read_csv(fn6, low_memory=False)
-                curtail_all = get_country_data(curtail_ch)
+                curtail_all = get_country_data(curtail_ch, Data_buses)
                 curtailments_CH[year] = curtail_all['CH']
 
 

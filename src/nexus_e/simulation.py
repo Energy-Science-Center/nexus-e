@@ -10,10 +10,11 @@ from plugins.centiv.cgep import create_scenario_fast as centiv
 from plugins.postprocess.postprocess import PostProcess
 from plugins.update_investments.update_investments import UpdateInvestments
 from plugins.upload_scenario.upload_scenario import ScenarioUploader
+from plugins.upload_res_data import RESDataUploader
 
 
 class Module(Protocol):
-    def run() -> None: ...
+    def run(self) -> None: ...
 
 
 class UnknownModule(Exception): ...
@@ -77,6 +78,23 @@ class CoreModuleFactory(ModuleFactory):
             parameters["password"] = self.settings.input_database_server.password
             parameters.update(module_config.parameters)
             return ScenarioUploader(config=parameters)
+        elif module_config.name == "update_inv_costs":
+            from plugins.update_inv_costs import InvCostDataUpdater
+            parameters = {}
+            parameters["host"] = self.settings.input_database_server.host
+            parameters["user"] = self.settings.input_database_server.user
+            parameters["password"] = self.settings.input_database_server.password
+            parameters["dbName"] = self.settings.scenario.copy_name
+            parameters.update(module_config.parameters)
+            return InvCostDataUpdater(config=parameters)
+        elif module_config.name == "upload_res_data":
+            parameters = {}
+            parameters["host"] = self.settings.input_database_server.host
+            parameters["user"] = self.settings.input_database_server.user
+            parameters["password"] = self.settings.input_database_server.password
+            parameters["dbName"] = self.settings.scenario.copy_name
+            parameters.update(module_config.parameters)
+            return RESDataUploader(config=parameters)
         else:
             raise UnknownModule(module_config.name)
 

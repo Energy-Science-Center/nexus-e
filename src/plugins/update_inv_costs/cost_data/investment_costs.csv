@@ -1,0 +1,112 @@
+Technology,Size,Year,Unit,Variant,Investment_cost,Currency_Year,Source
+WindOn,,2020,CHF/kWe,Low,2000,2020,https://sweet-cross.ch/crossdat/
+WindOn,,2020,CHF/kWe,Reference,2500,2020,https://sweet-cross.ch/crossdat/
+WindOn,,2020,CHF/kWe,High,3000,2020,https://sweet-cross.ch/crossdat/
+WindOn,,2030,CHF/kWe,Low,1846,2020,https://sweet-cross.ch/crossdat/
+WindOn,,2030,CHF/kWe,Reference,2308,2020,https://sweet-cross.ch/crossdat/
+WindOn,,2030,CHF/kWe,High,2769,2020,https://sweet-cross.ch/crossdat/
+WindOn,,2040,CHF/kWe,Low,1672,2020,https://sweet-cross.ch/crossdat/
+WindOn,,2040,CHF/kWe,Reference,1992,2020,https://sweet-cross.ch/crossdat/
+WindOn,,2040,CHF/kWe,High,2392,2020,https://sweet-cross.ch/crossdat/
+WindOn,,2050,CHF/kWe,Low,1497,2020,https://sweet-cross.ch/crossdat/
+WindOn,,2050,CHF/kWe,Reference,1871,2020,https://sweet-cross.ch/crossdat/
+WindOn,,2050,CHF/kWe,High,2246,2020,https://sweet-cross.ch/crossdat/
+PV-roof,0 - 10 kWp,2020,CHF/kWe,Low,1456,2020,https://sweet-cross.ch/crossdat/
+PV-roof,0 - 10 kWp,2020,CHF/kWe,Reference,2692,2020,https://sweet-cross.ch/crossdat/
+PV-roof,0 - 10 kWp,2020,CHF/kWe,High,3928,2020,https://sweet-cross.ch/crossdat/
+PV-roof,0 - 10 kWp,2030,CHF/kWe,Low,1247,2020,https://sweet-cross.ch/crossdat/
+PV-roof,0 - 10 kWp,2030,CHF/kWe,Reference,2305,2020,https://sweet-cross.ch/crossdat/
+PV-roof,0 - 10 kWp,2030,CHF/kWe,High,3364,2020,https://sweet-cross.ch/crossdat/
+PV-roof,0 - 10 kWp,2040,CHF/kWe,Low,1036,2020,https://sweet-cross.ch/crossdat/
+PV-roof,0 - 10 kWp,2040,CHF/kWe,Reference,1722,2020,https://sweet-cross.ch/crossdat/
+PV-roof,0 - 10 kWp,2040,CHF/kWe,High,2513,2020,https://sweet-cross.ch/crossdat/
+PV-roof,0 - 10 kWp,2050,CHF/kWe,Low,825,2020,https://sweet-cross.ch/crossdat/
+PV-roof,0 - 10 kWp,2050,CHF/kWe,Reference,1526,2020,https://sweet-cross.ch/crossdat/
+PV-roof,0 - 10 kWp,2050,CHF/kWe,High,2227,2020,https://sweet-cross.ch/crossdat/
+PV-roof,10 - 30 kWp,2020,CHF/kWe,Low,1219,2020,https://sweet-cross.ch/crossdat/
+PV-roof,10 - 30 kWp,2020,CHF/kWe,Reference,2071,2020,https://sweet-cross.ch/crossdat/
+PV-roof,10 - 30 kWp,2020,CHF/kWe,High,2923,2020,https://sweet-cross.ch/crossdat/
+PV-roof,10 - 30 kWp,2030,CHF/kWe,Low,1049,2020,https://sweet-cross.ch/crossdat/
+PV-roof,10 - 30 kWp,2030,CHF/kWe,Reference,1782,2020,https://sweet-cross.ch/crossdat/
+PV-roof,10 - 30 kWp,2030,CHF/kWe,High,2516,2020,https://sweet-cross.ch/crossdat/
+PV-roof,10 - 30 kWp,2040,CHF/kWe,Low,741,2020,https://sweet-cross.ch/crossdat/
+PV-roof,10 - 30 kWp,2040,CHF/kWe,Reference,1259,2020,https://sweet-cross.ch/crossdat/
+PV-roof,10 - 30 kWp,2040,CHF/kWe,High,1777,2020,https://sweet-cross.ch/crossdat/
+PV-roof,10 - 30 kWp,2050,CHF/kWe,Low,603,2020,https://sweet-cross.ch/crossdat/
+PV-roof,10 - 30 kWp,2050,CHF/kWe,Reference,1024,2020,https://sweet-cross.ch/crossdat/
+PV-roof,10 - 30 kWp,2050,CHF/kWe,High,1446,2020,https://sweet-cross.ch/crossdat/
+PV-roof,30 - 100 kWp,2020,CHF/kWe,Low,699,2020,https://sweet-cross.ch/crossdat/
+PV-roof,30 - 100 kWp,2020,CHF/kWe,Reference,1407,2020,https://sweet-cross.ch/crossdat/
+PV-roof,30 - 100 kWp,2020,CHF/kWe,High,2115,2020,https://sweet-cross.ch/crossdat/
+PV-roof,30 - 100 kWp,2030,CHF/kWe,Low,534,2020,https://sweet-cross.ch/crossdat/
+PV-roof,30 - 100 kWp,2030,CHF/kWe,Reference,1074,2020,https://sweet-cross.ch/crossdat/
+PV-roof,30 - 100 kWp,2030,CHF/kWe,High,1615,2020,https://sweet-cross.ch/crossdat/
+PV-roof,30 - 100 kWp,2040,CHF/kWe,Low,347,2020,https://sweet-cross.ch/crossdat/
+PV-roof,30 - 100 kWp,2040,CHF/kWe,Reference,698,2020,https://sweet-cross.ch/crossdat/
+PV-roof,30 - 100 kWp,2040,CHF/kWe,High,1049,2020,https://sweet-cross.ch/crossdat/
+PV-roof,30 - 100 kWp,2050,CHF/kWe,Low,325,2020,https://sweet-cross.ch/crossdat/
+PV-roof,30 - 100 kWp,2050,CHF/kWe,Reference,654,2020,https://sweet-cross.ch/crossdat/
+PV-roof,30 - 100 kWp,2050,CHF/kWe,High,983,2020,https://sweet-cross.ch/crossdat/
+PV-roof,100 - 300 kWp,2020,CHF/kWe,Low,608,2020,https://sweet-cross.ch/crossdat/
+PV-roof,100 - 300 kWp,2020,CHF/kWe,Reference,1132,2020,https://sweet-cross.ch/crossdat/
+PV-roof,100 - 300 kWp,2020,CHF/kWe,High,1655,2020,https://sweet-cross.ch/crossdat/
+PV-roof,100 - 300 kWp,2030,CHF/kWe,Low,515,2020,https://sweet-cross.ch/crossdat/
+PV-roof,100 - 300 kWp,2030,CHF/kWe,Reference,959,2020,https://sweet-cross.ch/crossdat/
+PV-roof,100 - 300 kWp,2030,CHF/kWe,High,1402,2020,https://sweet-cross.ch/crossdat/
+PV-roof,100 - 300 kWp,2040,CHF/kWe,Low,444,2020,https://sweet-cross.ch/crossdat/
+PV-roof,100 - 300 kWp,2040,CHF/kWe,Reference,838,2020,https://sweet-cross.ch/crossdat/
+PV-roof,100 - 300 kWp,2040,CHF/kWe,High,1229,2020,https://sweet-cross.ch/crossdat/
+PV-roof,100 - 300 kWp,2050,CHF/kWe,Low,371,2020,https://sweet-cross.ch/crossdat/
+PV-roof,100 - 300 kWp,2050,CHF/kWe,Reference,690,2020,https://sweet-cross.ch/crossdat/
+PV-roof,100 - 300 kWp,2050,CHF/kWe,High,1009,2020,https://sweet-cross.ch/crossdat/
+PV-roof,300 - 1000 kWp,2020,CHF/kWe,Low,566,2020,https://sweet-cross.ch/crossdat/
+PV-roof,300 - 1000 kWp,2020,CHF/kWe,Reference,919,2020,https://sweet-cross.ch/crossdat/
+PV-roof,300 - 1000 kWp,2020,CHF/kWe,High,1271,2020,https://sweet-cross.ch/crossdat/
+PV-roof,300 - 1000 kWp,2030,CHF/kWe,Low,498,2020,https://sweet-cross.ch/crossdat/
+PV-roof,300 - 1000 kWp,2030,CHF/kWe,Reference,810,2020,https://sweet-cross.ch/crossdat/
+PV-roof,300 - 1000 kWp,2030,CHF/kWe,High,1117,2020,https://sweet-cross.ch/crossdat/
+PV-roof,300 - 1000 kWp,2040,CHF/kWe,Low,424,2020,https://sweet-cross.ch/crossdat/
+PV-roof,300 - 1000 kWp,2040,CHF/kWe,Reference,689,2020,https://sweet-cross.ch/crossdat/
+PV-roof,300 - 1000 kWp,2040,CHF/kWe,High,949,2020,https://sweet-cross.ch/crossdat/
+PV-roof,300 - 1000 kWp,2050,CHF/kWe,Low,350,2020,https://sweet-cross.ch/crossdat/
+PV-roof,300 - 1000 kWp,2050,CHF/kWe,Reference,568,2020,https://sweet-cross.ch/crossdat/
+PV-roof,300 - 1000 kWp,2050,CHF/kWe,High,786,2020,https://sweet-cross.ch/crossdat/
+PV-alpine,,2030,EUR/kW,Low,3794,,Axpo Powerswitcher
+PV-alpine,,2030,EUR/kW,Reference,3629,,Axpo Powerswitcher
+PV-alpine,,2030,EUR/kW,High,5163,,Axpo Powerswitcher
+PV-alpine,,2040,EUR/kW,Low,2353,,Axpo Powerswitcher
+PV-alpine,,2040,EUR/kW,Reference,3091,,Axpo Powerswitcher
+PV-alpine,,2040,EUR/kW,High,4532,,Axpo Powerswitcher
+PV-alpine,,2050,EUR/kW,Low,2237,,Axpo Powerswitcher
+PV-alpine,,2050,EUR/kW,Reference,2914,,Axpo Powerswitcher
+PV-alpine,,2050,EUR/kW,High,4295,,Axpo Powerswitcher
+PV_Openfield,,2030,EUR/kW,Low,677,,Axpo Powerswitcher
+PV_Openfield,,2030,EUR/kW,Reference,705,,Axpo Powerswitcher
+PV_Openfield,,2030,EUR/kW,High,766,,Axpo Powerswitcher
+PV_Openfield,,2040,EUR/kW,Low,530,,Axpo Powerswitcher
+PV_Openfield,,2040,EUR/kW,Reference,566,,Axpo Powerswitcher
+PV_Openfield,,2040,EUR/kW,High,644,,Axpo Powerswitcher
+PV_Openfield,,2050,EUR/kW,Low,506,,Axpo Powerswitcher
+PV_Openfield,,2050,EUR/kW,Reference,535,,Axpo Powerswitcher
+PV_Openfield,,2050,EUR/kW,High,614,,Axpo Powerswitcher
+GasCC-Syn,,2030,EUR/kW,Low,877,,Axpo Powerswitcher
+GasCC-Syn,,2030,EUR/kW,Reference,975,,Axpo Powerswitcher
+GasCC-Syn,,2030,EUR/kW,High,1072,,Axpo Powerswitcher
+GasCC-Syn,,2040,EUR/kW,Low,877,,Axpo Powerswitcher
+GasCC-Syn,,2040,EUR/kW,Reference,975,,Axpo Powerswitcher
+GasCC-Syn,,2040,EUR/kW,High,1072,,Axpo Powerswitcher
+GasCC-Syn,,2050,EUR/kW,Low,877,,Axpo Powerswitcher
+GasCC-Syn,,2050,EUR/kW,Reference,975,,Axpo Powerswitcher
+GasCC-Syn,,2050,EUR/kW,High,1072,,Axpo Powerswitcher
+GasCC-CCS,,2030,EUR/kW,Low,1916,,
+GasCC-CCS,,2030,EUR/kW,Reference,1916,,
+GasCC-CCS,,2030,EUR/kW,High,1916,,
+GasCC-CCS,,2040,EUR/kW,Low,1769,,
+GasCC-CCS,,2040,EUR/kW,Reference,1769,,
+GasCC-CCS,,2040,EUR/kW,High,1769,,
+GasCC-CCS,,2050,EUR/kW,Low,1769,,
+GasCC-CCS,,2050,EUR/kW,Reference,1769,,
+GasCC-CCS,,2050,EUR/kW,High,1769,,
+Battery-TSO,,2050,CHF/kW,Low,239.05,2025,https://www.bfe.admin.ch/bfe/en/home/versorgung/stromversorgung/stromversorgungssicherheit.exturl.html/aHR0cHM6Ly9wdWJkYi5iZmUuYWRtaW4uY2gvZGUvcHVibGljYX/Rpb24vZG93bmxvYWQvMTIzOTI=.html
+Battery-TSO,,2050,CHF/kW,Reference,239.05,2025,https://www.bfe.admin.ch/bfe/en/home/versorgung/stromversorgung/stromversorgungssicherheit.exturl.html/aHR0cHM6Ly9wdWJkYi5iZmUuYWRtaW4uY2gvZGUvcHVibGljYX/Rpb24vZG93bmxvYWQvMTIzOTI=.html
+Battery-TSO,,2050,CHF/kW,High,239.05,2025,https://www.bfe.admin.ch/bfe/en/home/versorgung/stromversorgung/stromversorgungssicherheit.exturl.html/aHR0cHM6Ly9wdWJkYi5iZmUuYWRtaW4uY2gvZGUvcHVibGljYX/Rpb24vZG93bmxvYWQvMTIzOTI=.html

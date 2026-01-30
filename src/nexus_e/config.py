@@ -135,14 +135,14 @@ class Module:
 
 @dataclass
 class ModulesCommons:
-    resolution_in_days: int = 8
+    resolution_in_days: int = 1
     single_electric_node: bool = False
 
 
 @dataclass
 class Modules:
     commons: ModulesCommons = field(default_factory=ModulesCommons)
-    playlist_name: str = "centiv_2020_2050"
+    playlist_name: str = "centiv_2050"
 
     def __post_init__(self):
         """Parse the dictionnaries given by a Config object"""

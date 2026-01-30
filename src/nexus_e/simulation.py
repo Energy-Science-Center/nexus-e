@@ -77,6 +77,15 @@ class CoreModuleFactory(ModuleFactory):
             parameters["password"] = self.settings.input_database_server.password
             parameters.update(module_config.parameters)
             return ScenarioUploader(config=parameters)
+        elif module_config.name == "update_inv_costs":
+            from plugins.update_inv_costs import InvCostDataUpdater
+            parameters = {}
+            parameters["host"] = self.settings.input_database_server.host
+            parameters["user"] = self.settings.input_database_server.user
+            parameters["password"] = self.settings.input_database_server.password
+            parameters["dbName"] = self.settings.scenario.copy_name
+            parameters.update(module_config.parameters)
+            return InvCostDataUpdater(config=parameters)
         else:
             raise UnknownModule(module_config.name)
 

@@ -1,0 +1,5 @@
+[[modules]]
+name = "update_inv_costs"
+[modules.parameters]
+# Options: "Low", "Reference", "High"
+cost_scenario = "Reference"

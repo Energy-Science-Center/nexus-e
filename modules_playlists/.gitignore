@@ -9,5 +9,6 @@
 !nothing.toml
 !postprocess_only.toml
 !upload_scenario.toml
+!update_inv_costs.toml
 # Except euler run configuration template
 !euler_run.config.example

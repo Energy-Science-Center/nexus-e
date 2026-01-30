@@ -9,7 +9,7 @@ database_author = "FirstName LastName"
 dump_file_path = "src/plugins/upload_scenario/schemas/Dump_STRUC_clean_v9.sql"
 
 include_flex_params = true
-demand_profiles_path = "src/data/source_excel/Nexuse_DB-Input_v48_TYNDP24-DE09_NoEVflex_DemandProfiles"
+demand_profiles_path = "src/data/nodal_demand_profiles/Nexuse_DB-Input_v48_TYNDP24-DE09_NoEVflex_NoHeatPumps"
 
 include_tyndp24 = false
 tyndp24_data_path = "src/data/TYNDP24_datasets/TYNDP24_nbc"

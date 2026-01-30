@@ -226,11 +226,16 @@ class SystemState:
         opt.options["Threads"] = threads
         opt.options["BarConvTol"] = 1e-4
         opt.options["Method"] = 2
-        opt.options["Aggregate"] = 0
+        opt.options["Aggregate"] = 1 # Presolve: use moderate constraint aggregation
         opt.options["Crossover"] = 0
-        opt.options["BarHomogeneous"] = 1
-        opt.options["NumericFocus"] = 3
+        opt.options["BarHomogeneous"] = -1 # Use the homogeneous self-dual variant or not. -1 is the default, allowing Gurobi to decide automatically.
+        opt.options["NumericFocus"] = 1 # Slightly increased numerical robustness vs. default
         opt.options['ResultFile'] = "test_2018.ilp" #diagnoses infeasibilities
+
+        # Add scaling parameters
+        opt.options["ScaleFlag"] = 2      # Geometric scaling for constraint matrix
+        opt.options["ObjScale"] = -1      # Scale objective by 10^-1
+
         results = opt.solve(self.model, symbolic_solver_labels=True, tee = True)
         self.model.solutions.load_from(results)
         if (results.solver.status == SolverStatus.ok) and (results.solver.termination_condition == TerminationCondition.optimal):
@@ -243,10 +248,10 @@ class SystemState:
         opt.options["Threads"] = threads
         opt.options["BarConvTol"] = 1e-4
         opt.options["Method"] = 2
-        opt.options["Aggregate"] = 0
+        opt.options["Aggregate"] = 1 # Presolve: use moderate constraint aggregation
         opt.options["Crossover"] = 0
-        opt.options["BarHomogeneous"] = 1
-        opt.options["NumericFocus"] = 3
+        opt.options["BarHomogeneous"] = - 1 # Use the homogeneous self-dual variant or not. -1 is the default, allowing Gurobi to decide automatically.
+        opt.options["NumericFocus"] = 1 # Slightly increased numerical robustness vs. default
         opt.options['ResultFile'] = "test_2018_LP.ilp" #diagnoses infeasibilities
         # Solve the model using the specified solver and store the results object as a class attribute.
         # This new approach allows us to access solver status and termination condition later from self.results,

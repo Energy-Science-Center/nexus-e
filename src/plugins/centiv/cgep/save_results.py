@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 import pyomo.environ as pyo
+import logging
 
 
 class SaveResults:
@@ -169,6 +170,9 @@ def saveVarParDualsCsv(model: pyo.ConcreteModel, results_folder: str):
     
 
     # Main code --------------------------------------------------------
+    # create results folder if it does not exist
+    if not os.path.exists(results_folder):
+        os.makedirs(results_folder)
     # Extract variables---------------
     # create a list of all variables in the model
     var_list = [
@@ -246,7 +250,7 @@ def saveVarParDualsCsv(model: pyo.ConcreteModel, results_folder: str):
         # export dual values in an ScalarConstraint object
         data = {}
         counter = 0
-        # print(constraint)
+        # logging.debug(constraint)
         try: 
             for index in constraint:
                 if constraint.dim() == 0:
@@ -284,7 +288,143 @@ def saveVarParDualsCsv(model: pyo.ConcreteModel, results_folder: str):
 
             result_duals_dict[constraint.name] = result_duals
         except:
-            print(f"Error in exporting duals for {constraint.name}")
+            logging.debug(f"Error in exporting duals for {constraint.name}")
+
+def saveMappingFiles(data_dict, results_folder: str):
+    """
+    Create mapping files for all model elements to help with post-processing analysis.
+    
+    Args:
+        data_dict: Dictionary containing all data structures to create mappings for
+        results_folder: Base folder where mappings subfolder will be created
+    """
+    
+    # Create mappings subfolder
+    mappings_folder = os.path.join(results_folder, "mappings")
+    os.makedirs(mappings_folder, exist_ok=True)
+    
+    # Define key attributes for each element type
+    key_attributes = {
+        'generators': ['Country', 'Technology', 'BusName', 'GenType', 'UnitType', 'GenName', 'FuelType', 'SubRegion'],
+        'buses': ['Country', 'BusName', 'SubRegion'],
+        'lines': ['FromCountry', 'ToCountry', 'LineName', 'FromBusName', 'ToBusName'],
+        'transformers': ['FromCountry', 'ToCountry', 'TrafoName', 'FromBusName', 'ToBusName'],
+        'loads_busnodes': ['Country', 'BusName', 'LoadType'],
+        'emobilityloads_busnodes': ['Country', 'BusName', 'LoadType'],
+        'heatpumploads_busnodes': ['Country', 'BusName', 'LoadType'],
+        'H2loads_busnodes': ['Country', 'BusName', 'LoadType'],
+        'gens_busnodes': ['Country', 'BusName', 'Technology', 'GenName'],
+        'distivinj_busnodes': ['Country', 'BusName']
+    }
+    
+    logging.debug("Creating mapping files...")
+    
+    for element_name, element_data in data_dict.items():
+        if element_name in key_attributes and element_data:
+            logging.debug(f"  Processing {element_name}...")
+            _createElementMappings(element_data, element_name, key_attributes[element_name], mappings_folder)
+    
+    logging.debug(f"Mapping files created in: {mappings_folder}")
+
+
+def _createElementMappings(element_data, element_name, key_attributes, mappings_folder):
+    """
+    Create mapping files for a specific element type.
+    
+    Args:
+        element_data: List of dictionaries containing element data
+        element_name: Name of the element type (e.g., 'generators', 'buses')
+        key_attributes: List of attribute names to create mappings for
+        mappings_folder: Folder to save mapping files
+    """
+    
+    # Create DataFrame from element data
+    df = pd.DataFrame(element_data)
+    # if some of the values look like integer but are float (like 140.0), turn them to integer
+    df = df.applymap(lambda x: int(x) if isinstance(x, float) and x.is_integer() else x)
+    
+    if df.empty:
+        logging.debug(f"    Warning: No data for {element_name}")
+        return
+    
+    # Save complete data
+    complete_file = os.path.join(mappings_folder, f"Data_{element_name}.csv")
+    df.to_csv(complete_file, index=True)
+    logging.debug(f"    Saved complete data: Data_{element_name}.csv ({len(df)} rows)")
+    
+    # Determine the ID column (usually the index or first meaningful ID column)
+    id_col = 'ID'
+    df_with_id = df.reset_index().rename(columns={'index': id_col})
+    
+    # Create forward and reverse mappings for each key attribute
+    available_attrs = []
+    for attr in key_attributes:
+        if attr in df_with_id.columns:
+            available_attrs.append(attr)
+            # Forward mapping: ID -> Attribute
+            forward_mapping = df_with_id[[id_col, attr]].dropna()
+            if not forward_mapping.empty:
+                forward_file = os.path.join(mappings_folder, f"Map_{element_name}_{attr.lower()}.csv")
+                forward_mapping.to_csv(forward_file, index=False)
+                
+                # Reverse mapping: Attribute -> IDs
+                reverse_mapping = _createReverseMapping(forward_mapping, id_col, attr)
+                reverse_file = os.path.join(mappings_folder, f"Map_{attr.lower()}_{element_name}.csv")
+                reverse_mapping.to_csv(reverse_file, index=False)
+                
+                logging.debug(f"    Created mappings for {attr}: Map_{element_name}_{attr.lower()}.csv and Map_{attr.lower()}_{element_name}.csv")
+            else:
+                logging.debug(f"    Warning: No valid data for attribute {attr} in {element_name}")
+        else:
+            logging.debug(f"    Warning: Attribute {attr} not found in {element_name}")
+    
+    if available_attrs:
+        logging.debug(f"    Available attributes in {element_name}: {available_attrs}")
+    else:
+        logging.debug(f"    Warning: No requested attributes found in {element_name}")
+        logging.debug(f"    Actual columns in {element_name}: {list(df.columns)[:10]}...")  # Show first 10 columns
+
+def _createReverseMapping(mapping_df, id_col, value_col):
+    """
+    Create reverse mapping from attribute values to IDs.
+    Each attribute value gets one row with multiple columns for each ID.
+    
+    Args:
+        mapping_df: DataFrame with ID and value columns
+        id_col: Name of the ID column
+        value_col: Name of the value column
+    
+    Returns:
+        DataFrame with one row per attribute value and separate columns for each ID
+    """
+    
+    # Group by value and get list of IDs for each
+    grouped = mapping_df.groupby(value_col)[id_col].apply(list).reset_index()
+    
+    # Find the maximum number of IDs for any attribute value
+    max_ids = grouped[id_col].apply(len).max()
+    
+    # Create result DataFrame
+    result_data = []
+    for _, row in grouped.iterrows():
+        attribute_value = row[value_col]
+        ids = row[id_col]
+        
+        # Create a row with the attribute value and all its IDs in separate columns
+        row_data = {value_col: attribute_value}
+        for i, id_val in enumerate(ids):
+            row_data[f"{id_col}_{i+1}"] = id_val
+        
+        # Fill remaining columns with empty values if this attribute has fewer IDs
+        for i in range(len(ids), max_ids):
+            row_data[f"{id_col}_{i+1}"] = ""
+        
+        result_data.append(row_data)
+    
+    result_df = pd.DataFrame(result_data)
+    
+    return result_df
+
 def saveSelectedStats(opt, duration_log_dict: dict, results_folder: str):
     """
     Save selected statistics of the model, plus the duration log.

@@ -36,7 +36,7 @@ from .gen_NET_invest_empty import NETInvest_Empty
 from .ext2int import ext2int
 from .change_timeperiod_resolution import ChangeResolution
 from .save_results import SaveResults
-from .save_results import saveVarParDualsCsv, saveSelectedStats
+from .save_results import saveVarParDualsCsv, saveSelectedStats, saveMappingFiles
 import time
 import logging
 
@@ -76,7 +76,7 @@ class Config():
     demandCH : float = 0
     """Total (yearly) Swiss demand in MWh - Input from Gemel"""
     
-    targetRES: float = 0.0
+    targetRES: float | None = None
     """Total Swiss RES target in TWh"""
     
     targetRESPV: float = 0.0
@@ -187,6 +187,9 @@ class Config():
 
     include_nuclear_in_RES_target : bool = False
     """ if set true, the generation from nuclear plants is included in the RES target accounting (e.g., in the 45 TWh target for 2050)"""
+
+    max_LL_switch: float = 0.3
+    """ For calibration purposes, adding X% of max lost load for other countries as back up capacity """
 
 
 class DataImport(object):
@@ -465,7 +468,11 @@ class DataImport(object):
                 self.H2profileId = target['idProfile']
             elif target["TargetName"] == "Renew_Gen_Target":
                 if config.timeperiods != 8760: #if not annual time resolution
-                    config.targetRES = 0
+                    if config.targetRES is None:
+                        config.targetRES = target['Value']
+                        print(f"Info: Using RES target from database: {config.targetRES}")
+                    else:
+                        print(f"Info: Using RES target from config: {config.targetRES} (ignoring database value)") 
                     logging.warning("In DataImport, targetRES is set to 0 because timeperiods != 8760 (timeperiods is e.g. 168 for debugging)")
                 else:
                     #if annual time resolution, then set targetRES to the value from the database
@@ -616,6 +623,89 @@ class DataImport(object):
 
             # Step 6: Drop all the extra generator rows
             Generators_DataFrame = Generators_DataFrame.drop(index=indices_to_drop)
+
+        # --- Optional: boost installed capacities in selected countries to avoid lost load (calibration) ---
+        # Controlled by a switch value on the Config, e.g. config.max_LL_switch in {0, 0.5, 1}.
+        # If present and > 0, we add factor * value (MW) to Pmax for matching GenName keys.
+        # Countries with highest lost load are chosen, and some GasSC is added.
+        try:
+            factor = float(getattr(config, "max_LL_switch", 0.0))
+        except Exception:
+            factor = 0.0
+        if factor and factor != 0.0:
+            max_LL = {
+                # "DE_Conv_GasSC": 110568,
+                "DE_Conv_GasCC-CCS": 13333, # what CH_Conv_GasCC-CCS generated 
+                "IT_Conv_GasCC-CCS": 13333,
+                "AT_Conv_GasCC-CCS": 13333,
+                "FR_Conv_GasCC-CCS": 13333,
+                "UK_Conv_GasSC": 33130,
+                # "NL_Conv_GasSC": 28917,
+                "CZ_Conv_GasSC": 50000,  # 19631
+                "PL_Conv_GasSC": 60000, # 19479
+                "BE_Conv_GasSC": 33000, # 18947 was original peak lost load (5K peak lost load seen after 30% GasSC increase)
+                # "ES_Conv_GasSC": 11627,
+                "PT_Conv_GasSC": 9018,
+                # "FI_Conv_GasSC": 8939,
+                "DK_Conv_GasSC": 20000, # 7899
+                "SE_Conv_GasSC": 12000, # 6977
+                "HU_Conv_GasSC": 10000, # 4995
+                # "AT_Conv_GasSC": 4921,
+                "LT_Conv_GasSC": 3436,
+                "EE_Conv_GasSC": 10000, # 3419
+                "SK_Conv_GasSC": 10000, #2723
+                "LV_Conv_GasSC": 10000, # 2411
+                "RO_Conv_GasSC": 10000, #2212
+                # "LU_Conv_GasSC": 1891,
+                "HR_Conv_GasSC": 2000, # 491
+                "RS_Conv_GasSC": 2000, #439
+                "SI_Conv_GasSC": 1000, #377
+                "BA_Conv_GasSC": 300, #70
+                # "BG_Conv_GasSC": 98,
+                "MT_Conv_GasSC": 500, # 90
+            }
+            add_map = pd.Series(max_LL)
+            add_series = Generators_DataFrame["GenName"].map(add_map).fillna(0.0) * float(factor)
+            # Record applied addition for traceability
+            Generators_DataFrame["LL_added_MW"] = add_series
+            # Apply to installed capacity (Pmax)
+            logging.warning(f"In DataImport, boosting Pmax of selected generators by up to {factor*100:.1f}% of max lost load values for calibration.")
+            Generators_DataFrame["Pmax"] = Generators_DataFrame["Pmax"].astype(float) + add_series.astype(float)
+            logging.warning("In DataImport, investment options are deactivated as part of calibration")
+            # remove certain technologies from the candidate list, in the calibration stage
+
+            # Further calibrations
+            # For all power generators that are of Technology "Battery-TSO", multiply the current value of Emax by 6
+            Generators_DataFrame.loc[
+                Generators_DataFrame["Technology"] == "Battery-TSO",
+                "Emax",
+            ] = Generators_DataFrame.loc[
+                Generators_DataFrame["Technology"] == "Battery-TSO",
+                "Emax",
+            ].astype(float) * 6.0
+            print("here")
+
+            # Further calibrations
+            # Mannually adjusting severla batteries, for the plants with names like keys in bat_new, apply the new Emax and Pmax values
+            stor_new = {
+                "PT_Stor_Battery-TSO": [("Emax", 6000)],
+                "PL_Stor_Battery-TSO": [("Pmax", 5000), ("Pmin", -5000), ("Emax", 10000)],
+                "DK_Stor_Battery-TSO": [("Emax", 6000)],
+                "EE_Stor_Battery-TSO": [("Pmax", 1000), ("Pmin", -1000), ("Emax", 6000)],
+                "PL_Hydro_Dam": [("Emax", 62000)],
+                "CZ_Hydro_Dam": [("Emax", 111000)],
+                "SI_Hydro_Dam": [("Emax", 1000)],
+            }
+
+            # for the plants with names like keys in stor_new, apply the new Emax and Pmax values
+            for name, updates in stor_new.items():
+                for col, new_val in updates:
+                    Generators_DataFrame.loc[
+                        Generators_DataFrame["GenName"] == name,
+                        col,
+                    ] = new_val
+
+        # -------------------------------------------------------------------------------------------
 
         for row in Generators_DataFrame.iterrows():
             #self.generator_id.append(len(self.generators))
@@ -1125,6 +1215,49 @@ class DataImport(object):
         self.heatpumploadsECumulMin_busnodes = [{k:remap_bus_id(k,v) for k,v in d.items()} for d in self.heatpumploadsECumulMin_busnodes]
         self.H2loads_busnodes = [{k:remap_bus_id(k,v) for k,v in d.items()} for d in self.H2loads_busnodes]
 
+        # Create mapping files for post-processing analysis (after all remapping is complete)
+        print('-----Creating Mapping Files----------------------')
+        mapping_data = {
+            'generators': self.generators,
+            'buses': self.buses,
+            'lines': self.lines,
+            'transformers': self.transformers,
+            'gens_busnodes': self.gens_busnodes,
+            'distivinj_busnodes': self.distivinj_busnodes,
+            'loads_busnodes': self.loads_busnodes,
+            'emobilityloads_busnodes': self.emobilityloads_busnodes,
+            'heatpumploads_busnodes': self.heatpumploads_busnodes,
+            'H2loads_busnodes': self.H2loads_busnodes
+        }
+        
+        # Construct results_folder path using the same logic as in GetOptimization
+        try:
+            idScenario_to_year = {1: 2018, 2: 2020, 3: 2030, 4: 2040, 5: 2050}
+
+            if __name__ == "__main__": 
+                # matlab workflow
+                results_folder = ""
+            else: 
+                # python workflow
+                idScenario_to_year = {
+                    1: 2018,
+                    2: 2020,
+                    3: 2030,
+                    4: 2040,
+                    5: 2050,
+                }
+                results_folder = str(
+                    Path(config.results_folder) 
+                    / f"CentIv_{idScenario_to_year[config.idScenario]}"
+                )
+            # Create mappings subfolder
+            saveMappingFiles(mapping_data, results_folder)
+
+        except Exception as e:
+            print(f"Warning: Could not create mapping files: {e}")
+        print('-------------------------------------------------')
+        print('')
+
         print('-----Number of Transmission Lines----------------')
         print(len(self.lines))
         print('-------------------------------------------------')
@@ -1585,21 +1718,32 @@ class DataImport(object):
         
         #add all load timeseries 
         H2_plus_heatpumpload_timeseries = {}
-        for k,v in H2load_timeseries.items():
-            if k in heatpumpload_timeseries:
-                dict_add = {key: heatpumpload_timeseries[k][key] + v.get(key, 0) for key in heatpumpload_timeseries[k]} # this is heat pump + H2 loads
-                H2_plus_heatpumpload_timeseries[k] = dict_add
+        # Include all buses from both H2 and heatpump loads
+        all_buses_h2_hp = set(H2load_timeseries.keys()) | set(heatpumpload_timeseries.keys())
+        for k in all_buses_h2_hp:
+            h2_load = H2load_timeseries.get(k, {t: 0 for t in range(self.timeperiods)})
+            hp_load = heatpumpload_timeseries.get(k, {t: 0 for t in range(self.timeperiods)})
+            dict_add = {key: h2_load.get(key, 0) + hp_load.get(key, 0) for key in range(self.timeperiods)}
+            H2_plus_heatpumpload_timeseries[k] = dict_add
+
         eload_plus_emobilityload_timeseries = {}
-        for k,v in eload_timeseries.items():
-            if k in emobilityload_timeseries:
-                dict_add = {key: emobilityload_timeseries[k][key] + v.get(key, 0) for key in emobilityload_timeseries[k]} # this is load + e-mobility load
-                eload_plus_emobilityload_timeseries[k] = dict_add
+        # Include all buses from both conventional and e-mobility loads
+        all_buses_conv_emob = set(eload_timeseries.keys()) | set(emobilityload_timeseries.keys())
+        for k in all_buses_conv_emob:
+            conv_load = eload_timeseries.get(k, {t: 0 for t in range(self.timeperiods)})
+            emob_load = emobilityload_timeseries.get(k, {t: 0 for t in range(self.timeperiods)})
+            dict_add = {key: conv_load.get(key, 0) + emob_load.get(key, 0) for key in range(self.timeperiods)}
+            eload_plus_emobilityload_timeseries[k] = dict_add
+
         load_timeseries = {} #this is the sum of all loads
-        for k,v in H2_plus_heatpumpload_timeseries.items():
-            if k in eload_plus_emobilityload_timeseries:
-                dict_add = {key: eload_plus_emobilityload_timeseries[k][key] + v.get(key, 0) for key in eload_plus_emobilityload_timeseries[k]}
-                load_timeseries[k] = dict_add
-        
+        # Include all buses from both combined dictionaries
+        all_buses_final = set(H2_plus_heatpumpload_timeseries.keys()) | set(eload_plus_emobilityload_timeseries.keys())
+        for k in all_buses_final:
+            h2_hp_load = H2_plus_heatpumpload_timeseries.get(k, {t: 0 for t in range(self.timeperiods)})
+            conv_emob_load = eload_plus_emobilityload_timeseries.get(k, {t: 0 for t in range(self.timeperiods)})
+            dict_add = {key: h2_hp_load.get(key, 0) + conv_emob_load.get(key, 0) for key in range(self.timeperiods)}
+            load_timeseries[k] = dict_add
+            
         self.original_load = copy.deepcopy(load_timeseries) #this is the total original load before any adjustments (i.e. Gemel load scale factor, subtraction of DistIv injections, etc.)
         
         #swiss busses
@@ -2262,7 +2406,6 @@ class DataImport(object):
         time_restarted = time.time()
 
         #13.Set up the network for DC Power Flow (here we have all constraints related to the grid)
-        #   Ali moved some line definitions up here so that line set definitions can be defined more flexibly.        
         line_idFromBus = [int(self.lines[k]['idFromBus']) for k in self.line_id]
         line_idToBus = [int(self.lines[k]['idToBus']) for k in self.line_id]
         line_type = [str(self.lines[k]['line_type']) if "line_type" in self.lines[k] else "AC" for k in self.line_id]
@@ -2333,7 +2476,7 @@ class DataImport(object):
             if config.single_electric_node: #lines is equal to union of lines_NTC and cross_border_lines_CH
                 lines = list(set(lines_NTC + cross_border_lines_CH)) 
             else:
-                lines = self.line_id #NOTE: Ali does not aggree with this approach of writing the code, but it is just a copy from previous version.
+                lines = self.line_id
 
             DCPF = DC_PowerFlow_TrafoFlex(opt, num_nodes = len(self.bus_id), lines=lines, no_load_shift_buses=[]) # no_loadshift_buses_test
             #DCPF = DC_PowerFlow_Trafo(opt, num_nodes = len(self.bus_id), num_lines=len(self.line_id))
@@ -2357,22 +2500,23 @@ class DataImport(object):
                         tap_ratio={k:self.lines[k]['tapRatio'] for k in self.line_id},
                         line_power_limit_forward_direction={k:self.lines[k]['rateA']/baseMVA for k in self.line_id},
                         line_power_limit_backward_direction={k:self.lines[k]['rateA2']/baseMVA if "rateA2" in self.lines[k] else self.lines[k]['rateA']/baseMVA for k in self.line_id},
-                        type={k:self.lines[k]['line_type'] if "line_type" in self.lines[k] else "AC" for k in self.line_id},
-                        single_electric_node = config.single_electric_node)
+                        type={k:self.lines[k]['line_type'] if "line_type" in self.lines[k] else "AC" for k in self.line_id})
             #set flexibility constraints
-            DCPF.set_flexibility(max_shift_hourly={k:dsm_pshift_hourly[k]/baseMVA for k in self.bus_id},
-                        max_shift_daily={k:dsm_eshift_daily[k]/baseMVA for k in self.bus_id},
-                        max_up_shift_hourly_emob={k:{t:emob_pupshift_hourly[k][t]/baseMVA for t in range(int(self.timeperiods))} for k in self.bus_id},
-                        max_down_shift_hourly_emob={k:{t:emob_pdownshift_hourly[k][t]/baseMVA for t in range(int(self.timeperiods))} for k in self.bus_id},
-                        max_shift_daily_emob={k:{t:emob_eshift_daily[k][t]/baseMVA for t in range(int(self.timeperiods/24))} for k in self.bus_id},
-                        emob_demand={k:self.adjusted_emobilityload[k] for k in self.bus_id},
-                        max_up_shift_hourly_heatpump={k:{t:heatpump_ecumulmax_hourly[k][t]/baseMVA for t in range(int(self.timeperiods))} for k in self.bus_id},
-                        max_down_shift_hourly_heatpump={k:{t:heatpump_ecumulmin_hourly[k][t]/baseMVA for t in range(int(self.timeperiods))} for k in self.bus_id},
-                        max_p_hourly_heatpump = {k:heatpump_pmax_hourly[k]/baseMVA for k in self.bus_id},
-                        heatpump_demand={k:self.adjusted_heatpumpload[k] for k in self.bus_id},
-                        baseMVA=baseMVA,
-                        num_days=self.days, 
-                        tpRes=config.tpResolution) 
+            DCPF.set_flexibility(
+                max_shift_hourly={k: dsm_pshift_hourly.get(k, 0) / baseMVA for k in self.bus_id},
+                max_shift_daily={k: dsm_eshift_daily.get(k, 0) / baseMVA for k in self.bus_id},
+                max_up_shift_hourly_emob={k: {t: emob_pupshift_hourly.get(k, [0.0]*int(self.timeperiods))[t] / baseMVA for t in range(int(self.timeperiods))} for k in self.bus_id},
+                max_down_shift_hourly_emob={k: {t: emob_pdownshift_hourly.get(k, [0.0]*int(self.timeperiods))[t] / baseMVA for t in range(int(self.timeperiods))} for k in self.bus_id},
+                max_shift_daily_emob={k: {t: emob_eshift_daily.get(k, [0.0]*int(self.timeperiods//24))[t] / baseMVA for t in range(int(self.timeperiods//24))} for k in self.bus_id},
+                emob_demand={k: self.adjusted_emobilityload.get(k, [0.0]*int(self.timeperiods)) for k in self.bus_id},  # <-- series fallback
+                max_up_shift_hourly_heatpump={k: {t: heatpump_ecumulmax_hourly.get(k, [0.0]*int(self.timeperiods))[t] / baseMVA for t in range(int(self.timeperiods))} for k in self.bus_id},
+                max_down_shift_hourly_heatpump={k: {t: heatpump_ecumulmin_hourly.get(k, [0.0]*int(self.timeperiods))[t] / baseMVA for t in range(int(self.timeperiods))} for k in self.bus_id},
+                max_p_hourly_heatpump={k: heatpump_pmax_hourly.get(k, 0) / baseMVA for k in self.bus_id},
+                heatpump_demand={k: self.adjusted_heatpumpload.get(k, [0.0]*int(self.timeperiods)) for k in self.bus_id},  # <-- series fallback
+                baseMVA=baseMVA,
+                num_days=self.days,
+                tpRes=config.tpResolution
+            )
             
             #nodal balance at each bus
             DCPF.connect_buses_distIv_injection(line_start=line_idFromBus, line_end=line_idToBus, type=line_type, gen_nodes=gen_idBus, loss_factor = line_loss_factor)
@@ -2541,18 +2685,18 @@ class DataImport(object):
             #set flexibility constraints
             # added the differentiation between up and down flexibility
             DCPF.set_flexibility(max_shift_hourly={k:dsm_pshift_hourly[k]/baseMVA for k in self.bus_id},
-                        max_shift_daily={k:dsm_eshift_daily[k]/baseMVA for k in self.bus_id},
-                        max_up_shift_hourly_emob={k:{t:emob_pupshift_hourly[k][t]/baseMVA for t in range(int(self.timeperiods))} for k in self.bus_id},
-                        max_down_shift_hourly_emob={k:{t:emob_pdownshift_hourly[k][t]/baseMVA for t in range(int(self.timeperiods))} for k in self.bus_id},
-                        max_shift_daily_emob={k:{t:emob_eshift_daily[k][t]/baseMVA for t in range(int(self.timeperiods/24))} for k in self.bus_id},
-                        emob_demand={k:self.adjusted_emobilityload[k] for k in self.bus_id},
-                        max_up_shift_hourly_heatpump={k:{t:heatpump_ecumulmax_hourly[k][t]/baseMVA for t in range(int(self.timeperiods))} for k in self.bus_id},
-                        max_down_shift_hourly_heatpump={k:{t:heatpump_ecumulmin_hourly[k][t]/baseMVA for t in range(int(self.timeperiods))} for k in self.bus_id},
-                        max_p_hourly_heatpump = {k:heatpump_pmax_hourly[k]/baseMVA for k in self.bus_id},
-                        heatpump_demand={k:self.adjusted_heatpumpload[k] for k in self.bus_id},
+                        max_shift_daily={k:dsm_eshift_daily.get(k, 0)/baseMVA for k in self.bus_id},
+                        max_up_shift_hourly_emob={k:{t:emob_pupshift_hourly.get(k, [0.0]*int(self.timeperiods))[t]/baseMVA for t in range(int(self.timeperiods))} for k in self.bus_id},
+                        max_down_shift_hourly_emob={k:{t:emob_pdownshift_hourly.get(k, [0.0]*int(self.timeperiods))[t]/baseMVA for t in range(int(self.timeperiods))} for k in self.bus_id},
+                        max_shift_daily_emob={k:{t:emob_eshift_daily.get(k, [0.0]*int(self.timeperiods//24))[t]/baseMVA for t in range(int(self.timeperiods//24))} for k in self.bus_id},
+                        emob_demand={k:self.adjusted_emobilityload.get(k, [0.0]*int(self.timeperiods)) for k in self.bus_id},
+                        max_up_shift_hourly_heatpump={k:{t:heatpump_ecumulmax_hourly.get(k, [0.0]*int(self.timeperiods))[t]/baseMVA for t in range(int(self.timeperiods))} for k in self.bus_id},
+                        max_down_shift_hourly_heatpump={k:{t:heatpump_ecumulmin_hourly.get(k, [0.0]*int(self.timeperiods))[t]/baseMVA for t in range(int(self.timeperiods))} for k in self.bus_id},
+                        max_p_hourly_heatpump = {k:heatpump_pmax_hourly.get(k, 0)/baseMVA for k in self.bus_id},
+                        heatpump_demand={k:self.adjusted_heatpumpload.get(k, [0.0]*int(self.timeperiods)) for k in self.bus_id},
                         baseMVA=baseMVA,
                         num_days=self.days, 
-                        tpRes=config.tpResolution) 
+                        tpRes=config.tpResolution)
             #nodal balance at each bus
             DCPF.connect_buses(line_start=line_idFromBus, line_end=line_idToBus, type = line_type, gen_nodes=gen_idBus, loss_factor = line_loss_factor, single_electric_node=config.single_electric_node, buses_CH = buses_CH, bus_neighbor_NTC_rep = bus_neighbor_NTC_rep, bus_neighbor_no_NTC_rep = bus_neighbor_no_NTC_rep)
             # TSO-DSO trafo power limit
@@ -2745,6 +2889,7 @@ class DataImport(object):
         duration_log_dict['15'] = (time.time() - time_restarted)/60
         logging.debug('Within GetOptimization, time for solving the optimization problem, 15: %f minutes' %duration_log_dict['15'])
         time_restarted = time.time()
+        saveVarParDualsCsv(opt.model, results_folder.replace("CentIv", "InvestmentRun"))        
 
         #16.Post Processing
         #16.0 Initiating and basic info extraction
@@ -4024,8 +4169,8 @@ class DataImport(object):
                 d_load_emob_beforeshift_per_bus[i] = list(res_change.expand_array(DCPF.get_emobload_beforeshift(i)*baseMVA))
                 d_load_emob_aftershift_per_bus[i] = list(res_change.expand_array(DCPF.get_emobload_aftershift(i)*baseMVA))
                 d_load_flex_heatpump_per_bus[i] = list(res_change.expand_array(DCPF.get_hpflexload(i)*baseMVA))
-                d_load_uncontrolled_heatpump_per_bus[i] = list(res_change.expand_array(self.adjusted_uncontrolledheatpumpload[i]))  # expanding the uncontrolled heat pump demand - this is for fair comparison when tpRes>1, JG: this is the full HP demand before shifting
-                d_load_unflex_heatpump_per_bus[i] = list(res_change.expand_array(self.adjusted_heatpumpload[i])) # expanding the unflex heat pump demand
+                d_load_uncontrolled_heatpump_per_bus[i] = list(res_change.expand_array(self.adjusted_uncontrolledheatpumpload.get(i, [0.0]*int(self.timeperiods))))  # expanding the uncontrolled heat pump demand - this is for fair comparison when tpRes>1, JG: this is the full HP demand before shifting
+                d_load_unflex_heatpump_per_bus[i] = list(res_change.expand_array(self.adjusted_heatpumpload.get(i, [0.0]*int(self.timeperiods)))) # expanding the unflex heat pump demand
                 d_load_emob_PmaxLimit_per_bus[i] = list(res_change.expand_array(DCPF.get_emobload_PmaxHourlyLimit(i)*baseMVA))
                 d_load_emob_PminLimit_per_bus[i] = list(res_change.expand_array(DCPF.get_emobload_PminHourlyLimit(i)*baseMVA))
                 d_load_hp_EmaxCumulativeLimit_per_bus[i] = list(res_change.expand_array(DCPF.get_hpload_EmaxHourlyCumulativeLimit(i)*baseMVA))

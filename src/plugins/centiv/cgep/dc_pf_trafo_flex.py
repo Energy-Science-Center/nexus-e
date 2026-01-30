@@ -428,7 +428,7 @@ class DC_PowerFlow_TrafoFlex(object):
             gens_at_node[gen_nodes[gen]].append(gen)
 
         self.model.PowerFlowCon_AClines = Constraint(
-            self.model.Lines_AC,
+            self.model.Lines,
             self.model.TimePeriods,
             rule=lambda m,l,t:( 
                 m.ActivePower[l,t] == m.B[l]*(m.V_angle[line_start[l],t] - m.V_angle[line_end[l],t]) if type[l] == 'AC'  

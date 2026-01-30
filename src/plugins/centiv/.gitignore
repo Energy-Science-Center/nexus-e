@@ -5,6 +5,7 @@
 *.xlsx
 *.xlsx#
 *.csv
+!aggregation/timemaps_nexuse.csv
 .dccache
 *.mat
 output_jo/

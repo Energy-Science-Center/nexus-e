@@ -1,7 +1,6 @@
 import os
 from pathlib import Path
 import pandas as pd
-import argparse
 
 from .Generation import group_n_rename, filter_by_country_and_format,get_country_data
 from ..results_context import get_years_simulated_by_centiv
@@ -204,16 +203,3 @@ def main(simulation: str):
     )
     curtailments_dic = curtailments.get_curtailment_data(centIv_listyears,)
     curtailments.get_curtailment_CH(curtailments_dic)
-
-if __name__ == "__main__":
-    argp = argparse.ArgumentParser(
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter
-    )
-    argp.add_argument(
-        "--simuname",
-        type=str,
-        help="Name of MySQL database results",
-        default='pathfndr_s8_241119_cpv_s8'
-    )
-    args = argp.parse_args()
-    main(simulation=args.simuname)

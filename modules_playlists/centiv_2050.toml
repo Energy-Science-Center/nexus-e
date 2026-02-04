@@ -15,3 +15,6 @@ idScenario = 5
 # Run simulation postprocess
 [[modules]]
 name = "postprocess"
+[modules.parameters]
+centiv = true
+move_to_mysql = true

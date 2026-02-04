@@ -3,7 +3,6 @@ from datetime import datetime
 import os
 import subprocess
 import glob
-import argparse
 
 
 def main(simulation: str):
@@ -128,12 +127,3 @@ def main(simulation: str):
             print(f"Successfully converted to jpg.")
         finally:
             os.chdir(current_directory)
-
-if __name__ == "__main__":
-    ## Definition of all arguments passed through the command line
-    parser = argparse.ArgumentParser(description='Generate grid expansion maps with Latex using Cascades results.')
-    # Source file: By default, it is left empty, then the script will look for and read from the lsf.o* file.
-    parser.add_argument("--simu-name", type=str, help="Simulation name (i.e., result folder's name)",
-                        default='nexus_disagg_nuc50_Jun27_T1020_NoResTarg_27-Jun-2020_10-20')
-    args = parser.parse_args()
-    main(simulation=args.simu_name)

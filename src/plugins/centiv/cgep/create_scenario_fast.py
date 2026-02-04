@@ -1,17 +1,22 @@
-from dataclasses import dataclass
-import dataclasses
-from pathlib import Path
-import os, shutil
-import pandas as pd
-import numpy as np
 import argparse
-from pandas.errors import EmptyDataError
-import pymysql
-import json
-import scipy.io
 import copy
-import datetime, glob
-import csv
+from dataclasses import dataclass, asdict
+import dataclasses
+import datetime
+import glob
+import json
+import logging
+import numpy as np
+import os
+import pandas as pd
+from pandas.errors import EmptyDataError
+from pathlib import Path
+import pymysql
+import scipy.io
+import shutil
+import time
+
+from nexus_e_interface import Plugin, Scenario
 
 from .system_state import SystemState
 from .gen_conventional_CH_invest_binary import ConventionalGeneratorsCHInvestBinary #used for both investment and operation of all non-nuclear conventional generators in CH (binary variable for investment decisions)
@@ -37,8 +42,6 @@ from .ext2int import ext2int
 from .change_timeperiod_resolution import ChangeResolution
 from .save_results import SaveResults
 from .save_results import saveVarParDualsCsv, saveSelectedStats, saveMappingFiles
-import time
-import logging
 
 
 @dataclass
@@ -4634,12 +4637,16 @@ class DataImport(object):
         # Export stats, including timing information
         saveSelectedStats(opt, duration_log_dict, results_folder)
 
-class CentIvModule:
+class CentIvModule(Plugin):
     """Run CentIv simulations"""
     
-    def __init__(self, config: Config):
-        self.config = config
-        self.model = DataImport(config.timeperiods)
+    @classmethod
+    def get_default_parameters(cls) -> dict:
+        return asdict(Config())
+
+    def __init__(self, parameters: dict, scenario: Scenario | None = None):
+        self.config = Config(**parameters)
+        self.model = DataImport(self.config.timeperiods)
 
     def run(self) -> None:
 
@@ -4712,8 +4719,7 @@ def parse_script_arguments() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_script_arguments()
-    config = Config(**vars(args))
-    simulation = CentIvModule(config)
+    simulation = CentIvModule(**vars(args))
     simulation.run()
 
 

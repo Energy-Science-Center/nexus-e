@@ -76,9 +76,7 @@
 """
 import logging
 import os
-from pathlib import Path
 
-import nexus_e.config as config
 from .legacy import Capacity as postprocess_capacity
 from .legacy import cross_country_flow as postprocess_cross_country_flow
 from .legacy import Curtailments as postprocess_curtailments
@@ -93,9 +91,24 @@ from .legacy import system_costs as postprocess_system_costs
 
 class CentivPostprocess():
 
-    def __init__(self, settings: config.Config, results_path: str):
-        self.__settings = settings
-        self.__results_path = results_path
+    def __init__(
+        self,
+        results_base_path: str,
+        results_simulation_folder: str,
+        scenario_original_name: str,
+        input_host: str,
+        input_user: str,
+        input_password: str,
+        single_electric_node: bool,
+    ):
+        self.__results_base_path = results_base_path
+        self.__results_simulation_folder = results_simulation_folder
+        self.__scenario_original_name = scenario_original_name
+        self.__input_host = input_host
+        self.__input_user = input_user
+        self.__input_password = input_password
+        self.__single_electric_node = single_electric_node
+
 
     def run(self):
         logging.info("Start of CentIv postprocess")
@@ -104,104 +117,106 @@ class CentivPostprocess():
         # We should get rid of this directory navigation in the future by
         # making the executed scripts usable with any path.
         current_directory = os.getcwd()
-        os.chdir(self.__results_path)
+        os.chdir(
+            os.path.join(
+                self.__results_base_path,
+                self.__results_simulation_folder
+            )
+        )
 
         try:
             logging.info("Executing Demand calculation")
             postprocess_demand.main(
-                simulation=self.__settings.results.simulation_folder,
-                database=self.__settings.scenario.original_name,
-                host=self.__settings.input_database_server.host,
-                user=self.__settings.input_database_server.user,
-                password=self.__settings.input_database_server.password
+                database=self.__scenario_original_name,
+                host=self.__input_host,
+                user=self.__input_user,
+                password=self.__input_password
             )
             logging.info("DONE")
             
             logging.info("Executing Generation...")
             postprocess_generation.main(
-                simulation=self.__settings.results.simulation_folder
+                simulation=self.__results_simulation_folder
             )
             logging.info("DONE")
             
             logging.info("Executing Curtailments...")
             postprocess_curtailments.main(
-                simulation=self.__settings.results.simulation_folder
+                simulation=self.__results_simulation_folder
             )
             logging.info("DONE")
             
             logging.info("Executing Capacity...")
             postprocess_capacity.main(
-                simulation=self.__settings.results.simulation_folder,
-                database=self.__settings.scenario.original_name,
-                host=self.__settings.input_database_server.host,
-                user=self.__settings.input_database_server.user,
-                password=self.__settings.input_database_server.password
+                simulation=self.__results_simulation_folder,
+                database=self.__scenario_original_name,
+                host=self.__input_host,
+                user=self.__input_user,
+                password=self.__input_password
             )
             logging.info("DONE")
                 
             logging.info("Executing ElectricityPrice...")
             postprocess_electricity_price.main(
-                simulation=self.__settings.results.simulation_folder,
-                single_electric_node=self.__settings.modules.commons.single_electric_node,
+                simulation=self.__results_simulation_folder,
+                single_electric_node=self.__single_electric_node,
             )
             logging.info("DONE")
             
             logging.info("Executing Storage...")
             postprocess_storage.main(
-                simulation=self.__settings.results.simulation_folder,
-                database=self.__settings.scenario.original_name,
-                host=self.__settings.input_database_server.host,
-                user=self.__settings.input_database_server.user,
-                password=self.__settings.input_database_server.password
+                simulation=self.__results_simulation_folder,
+                database=self.__scenario_original_name,
+                host=self.__input_host,
+                user=self.__input_user,
+                password=self.__input_password
             )
             logging.info("DONE")
             
             logging.info("Executing Revenue & Profit calculation")
             postprocess_revenue_profit.main(
-                simulation=self.__settings.results.simulation_folder,
-                database=self.__settings.scenario.original_name,
-                host=self.__settings.input_database_server.host,
-                user=self.__settings.input_database_server.user,
-                password=self.__settings.input_database_server.password
+                database=self.__scenario_original_name,
+                host=self.__input_host,
+                user=self.__input_user,
+                password=self.__input_password
             )
             logging.info("DONE")
             
             logging.info("Executing System Cost script")
             postprocess_system_costs.main(
-                simulation=self.__settings.results.simulation_folder,
-                database=self.__settings.scenario.original_name,
-                host=self.__settings.input_database_server.host,
-                user=self.__settings.input_database_server.user,
-                password=self.__settings.input_database_server.password
+                simulation=self.__results_simulation_folder,
+                database=self.__scenario_original_name,
+                host=self.__input_host,
+                user=self.__input_user,
+                password=self.__input_password
             )
             logging.info("DONE")
             
             logging.info("Executing Emission calculation")
             postprocess_emissions.main(
-                simulation=self.__settings.results.simulation_folder,
-                database=self.__settings.scenario.original_name,
-                host=self.__settings.input_database_server.host,
-                user=self.__settings.input_database_server.user,
-                password=self.__settings.input_database_server.password
+                simulation=self.__results_simulation_folder,
+                database=self.__scenario_original_name,
+                host=self.__input_host,
+                user=self.__input_user,
+                password=self.__input_password
             )
             logging.info("DONE")
             
             logging.info("Executing Cross Country Flow script")
             postprocess_cross_country_flow.main(
-                database=self.__settings.scenario.original_name,
-                host=self.__settings.input_database_server.host,
-                user=self.__settings.input_database_server.user,
-                password=self.__settings.input_database_server.password
+                database=self.__scenario_original_name,
+                host=self.__input_host,
+                user=self.__input_user,
+                password=self.__input_password
             )
             logging.info("DONE")
             
             logging.info("Executing Power Flow Map script")
             postprocess_power_flow_map.main(
-                simulation=self.__settings.results.simulation_folder,
-                database=self.__settings.scenario.original_name,
-                host=self.__settings.input_database_server.host,
-                user=self.__settings.input_database_server.user,
-                password=self.__settings.input_database_server.password
+                database=self.__scenario_original_name,
+                host=self.__input_host,
+                user=self.__input_user,
+                password=self.__input_password
             )
             logging.info("DONE")
 

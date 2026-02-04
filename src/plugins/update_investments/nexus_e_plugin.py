@@ -1,28 +1,35 @@
-from dataclasses import dataclass
-import nexus_e_interface.tables as tables
+from dataclasses import dataclass, asdict
 import os
+
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session
 
+from nexus_e_interface import Plugin, Scenario
+import nexus_e_interface.tables as tables
 
 @dataclass
 class Config:
-    host: str
-    user: str
-    password: str
-    dbName: str
-    startyear: int
-    endyear: int
-    scenYear: int
-    simulation_results_folder: str
+    host: str = ""
+    user: str = ""
+    password: str = ""
+    dbName: str = ""
+    startyear: int = 2020
+    endyear: int = 2020
+    scenYear: int = 2
+    simulation_results_folder: str = ""
     matlab_engine: str = "matlab"
 
 
-class UpdateInvestments:
-    def __init__(self, parameters: dict):
+class NexusePlugin(Plugin):
+    @classmethod
+    def get_default_parameters(cls) -> dict:
+        return asdict(Config())
+
+    def __init__(self, parameters: dict, scenario: Scenario | None = None):
+        self.scenario = scenario
         self.config = Config(**parameters)
 
-    def run(self):
+    def run(self) -> None:
         engine = self.__get_matlab_engine(self.config.matlab_engine)
         engine.addpath(engine.genpath("."))
         engine.workspace["parameters"] = { 
@@ -77,5 +84,3 @@ class UpdateInvestments:
                 f"No scenario found for year {self.config.scenYear}."
             )
         return result
-
-

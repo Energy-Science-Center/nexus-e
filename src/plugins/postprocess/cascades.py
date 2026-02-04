@@ -25,12 +25,10 @@ import os
 from .legacy import latexToExcel as postprocess_cascades_latex_to_excel
 from .legacy import generateGridExpansionMap as postprocess_cascades_grid_expansion_map
 
-import nexus_e.config as config
-
 class CascadesPostprocess():
 
-    def __init__(self, settings: config.Config, postprocess_path: str):
-        self.__settings = settings
+    def __init__(self, results_simulation_folder: str, postprocess_path: str):
+        self.__results_simulation_fodler = results_simulation_folder
         self.__postprocess_path = postprocess_path
 
     def run(self):
@@ -50,7 +48,7 @@ class CascadesPostprocess():
 
             logging.info("Executing grid expansion map generation...")
             postprocess_cascades_grid_expansion_map.main(
-                simulation=self.__settings.results.simulation_folder
+                simulation=self.__results_simulation_fodler
             )
             logging.info("DONE")
 

@@ -4,7 +4,7 @@ import pandas as pd
 import pytest
 import shutil
 
-import src.plugins.postprocess.postprocess as postprocess
+import src.plugins.postprocess.nexus_e_plugin as postprocess
 
 TEMP_FOLDER: str = os.path.join("tests", "temp")
 

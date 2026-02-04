@@ -1,14 +1,10 @@
 from dataclasses import dataclass
-import argparse
 import os
 from pathlib import Path
 import pandas as pd
 
 from .cross_country_flow import BorderFlows, LoginCredentials
 from ..results_context import get_years_simulated_by_centiv
-
-from nexus_e import config
-
 
 @dataclass
 class Border:
@@ -20,7 +16,6 @@ class Border:
 class PowerFlows:
     def __init__(self, year):
         self.__year = year
-        self.__border_flows = None
         self.__country_borders = [
             Border(name="CH-FR", from_country="CH", to_country="FR"),
             Border(name="CH-IT", from_country="CH", to_country="IT"),
@@ -56,7 +51,7 @@ class PowerFlows:
         )
 
 
-def main(simulation: str, database: str, host: str, user: str, password: str):
+def main(database: str, host: str, user: str, password: str):
     simulated_years = get_years_simulated_by_centiv(Path())
 
     for year in simulated_years:
@@ -75,31 +70,3 @@ def main(simulation: str, database: str, host: str, user: str, password: str):
             "national_generation_and_capacity"
         )
         power_flows.export_border_flow_file(output_directory)
-
-
-if __name__ == "__main__":
-    config_file_path = os.path.join(os.path.dirname(__file__), '..', '..', 'config.toml')
-    settings = config.load(config.TomlFile(config_file_path))
-    argp = argparse.ArgumentParser(
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter
-    )
-    argp.add_argument(
-        "--simuname",
-        type=str,
-        help="Name of MySQL database results",
-        default='pathfndr_s8_241119_cpv_s8',
-    )
-    argp.add_argument(
-        "--DBname",
-        type=str,
-        help="Name of the input MySQL database",
-        default='pathfndr_s8_241119_cpv_s8',
-    )
-    args = argp.parse_args()
-    main(
-        simulation=args.DBname,
-        database=args.simuname,
-        host=settings.input_database_server.host,
-        user=settings.input_database_server.user,
-        password=settings.input_database_server.password
-    )

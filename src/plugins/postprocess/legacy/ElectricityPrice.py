@@ -1,7 +1,6 @@
 import os
 from pathlib import Path
 import pandas as pd
-import argparse
 
 from ..results_context import get_years_simulated_by_centiv
 
@@ -222,22 +221,3 @@ def main(simulation: str, single_electric_node: bool):
   
         create_elprices(year,CentIvDirectory,flexeco_dir,simulation_postprocess_path,simulation,single_electric_node,elprices_dfs)
         write_annual_elprices(annual_elprices_dfs, simulation_postprocess_path, simulation)
-
-if __name__ == "__main__":
-    argp = argparse.ArgumentParser(
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter
-    )
-    argp.add_argument(
-        "--simuname",
-        type=str,
-        help="Name of MySQL database results",
-        default='test_newwind_targetbio_2025-07-01T13-15-59',
-    )
-    argp.add_argument(
-        "--singleElectricNode",
-        type=bool,
-        help="If True, only one electric node is used in the simulation",
-        default=False,
-    )
-    args = argp.parse_args()
-    main(simulation=args.simuname, single_electric_node=args.singleElectricNode)

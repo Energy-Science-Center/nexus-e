@@ -1,5 +1,5 @@
 import copy
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from enum import Enum
 import itertools
@@ -11,7 +11,7 @@ import subprocess
 
 import mysql
 import mysql.connector
-import nexus_e_interface
+from nexus_e_interface import Plugin, Scenario
 import numpy as np
 import pandas as pd
 from sqlalchemy import create_engine
@@ -85,11 +85,15 @@ class Config:
         {"branch": ["line_id", "start_year", "S_max_win (MVA)"]}
     )
 
-class ScenarioUploader(nexus_e_interface.Plugin):
-    def __init__(self, config: dict, scenario: nexus_e_interface.Scenario = None):
-        self.settings = Config(**config)
+class NexusePlugin(Plugin):
+    @classmethod
+    def get_default_parameters(cls) -> dict:
+        return asdict(Config())
 
-    def run(self):
+    def __init__(self, parameters: dict, scenario: Scenario | None = None):
+        self.settings = Config(**parameters)
+
+    def run(self) -> None:
         # Load the data
         self.data_loader = DataLoader(
             excel_file_path=self.settings.excel_file_path
@@ -172,11 +176,6 @@ class ScenarioUploader(nexus_e_interface.Plugin):
                 # 'sheet_name' comes from the key of each DataFrame in the dictionary
                 df.to_excel(writer, sheet_name=sheet_name, index=False)
         logging.debug(f"Excel file saved to: {excel_file_path}")
-
-    def get_default_config(self) -> dict:
-        config = Config()
-        return config.__dict__
-
 
 class DataLoader:
     def __init__(self, excel_file_path: str):

@@ -1,12 +1,9 @@
 import os
 from pathlib import Path
 import pandas as pd
-import argparse
 import pymysql
 from .Generation import year_dic, create_dir
 from ..results_context import get_years_simulated_by_centiv
-
-from nexus_e import config
 
 class DatabaseSchema:
     def __init__(
@@ -81,7 +78,7 @@ def get_profiles_flex(country, demand_data):
     hourly_demand_profiles.columns = ['idProfile', 'idProfile_eMobility', 'idProfile_eHeatPump', 'idProfile_eHydrogen']
     return hourly_demand_profiles
 
-def main(database: str, simulation: str, host: str, user: str, password: str):
+def main(database: str, host: str, user: str, password: str):
     database_schema = DatabaseSchema(
         host=host,
         user=user,
@@ -149,21 +146,3 @@ def main(database: str, simulation: str, host: str, user: str, password: str):
         filename = f'demand_annual_c_{country_lower}.csv'
         yearly_data.index.name = 'Row'
         yearly_data.to_csv(os.path.join(output_path, filename))
-
-
-if __name__ == "__main__":
-    config_file_path = os.path.join(os.path.dirname(__file__), '..', '..', 'config.toml')
-    settings = config.load(config.TomlFile(config_file_path))
-    argp = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    argp.add_argument("--simuname", type=str, help="Name of MySQL database results",
-                      default='pathfndr_s8_241119_cpv_s8')
-    argp.add_argument("--DBname", type=str, help="Name of MySQL database",
-                      default='pathfndr_s8_241119_cpv_s8')
-    args = argp.parse_args()
-    main(
-        database=args.DBname,
-        simulation=args.simuname,
-        host=settings.input_database_server.host,
-        user=settings.input_database_server.user,
-        password=settings.input_database_server.password
-    )

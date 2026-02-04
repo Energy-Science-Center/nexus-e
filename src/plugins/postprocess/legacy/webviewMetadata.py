@@ -11,7 +11,6 @@
 
 import os
 import pandas as pd
-import argparse
 import pathlib
 
 def main(
@@ -75,45 +74,4 @@ def main(
         os.path.join(simulation_postprocess_folder, "metadata.csv"),
         index_label="name",
         header=["info"]
-    )
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Generate metadata.csv.')
-    parser.add_argument(
-        "--source",
-        type=str,
-        help="DEPRECATED ARGUMENT",
-        default=''
-    )
-    parser.add_argument(
-        "--simu-name",
-        type=str,
-        help="Simulation name (i.e., result folder's name)",
-        default='nexus_disagg_nuc50_Jun27_T1020_NoResTarg_27-Jun-2020_10-20'
-    )
-    parser.add_argument(
-        "--scen-name",
-        type=str,
-        help="Scenario name",
-        default=''
-    )
-    parser.add_argument(
-        "--scen-description",
-        type=str,
-        help="Scenario description",
-        default=''
-    )
-    parser.add_argument(
-        "--simulated-years",
-        type=str,
-        help="Simulated years",
-        default=''
-    )
-    args = parser.parse_args()
-    main(
-        simulation_name=args.simu_name,
-        scenario_name=args.scen_name,
-        scenario_description=args.scen_description,
-        simulated_years=args.simulated_years,
     )

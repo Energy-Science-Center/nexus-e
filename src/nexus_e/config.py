@@ -159,13 +159,6 @@ class Results:
 
 
 @dataclass
-class Postprocess:
-    centiv: bool = True
-    cascades: bool = False
-    move_to_mysql: bool = True
-
-
-@dataclass
 class Simulation:
     execution_date: str = "created_by_nexus_e"
 
@@ -198,7 +191,6 @@ class Config:
     scenario: Scenario = field(default_factory=Scenario)
     modules: Modules = field(default_factory=Modules)
     results: Results = field(default_factory=Results)
-    postprocess: Postprocess = field(default_factory=Postprocess)
     simulation: Simulation = field(default_factory=Simulation)
 
     def parse(self, **config: dict):

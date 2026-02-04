@@ -1,47 +1,78 @@
+from dataclasses import dataclass, asdict
 import logging
 import os
-import shutil
 import pandas as pd
 import pathlib
+import shutil
 
-import nexus_e.config as config
+from nexus_e_interface import Plugin, Scenario
 from .centiv import CentivPostprocess
 from .cascades import CascadesPostprocess
 from .legacy import moveToMysql
 
-class PostProcess:
-    def __init__(self, settings: config.Config):
-        self.__settings = settings
+@dataclass
+class Parameters:
+    results_base_path: str = ""
+    results_simulation_folder: str = ""
+    plot_config_file_path: str = ""
+    centiv: bool = False
+    cascades: bool = False
+    move_to_mysql: bool = False
+    scenario_description: str = ""
+    execution_date: str = ""
+    input_host: str = ""
+    input_user: str = ""
+    input_password: str = ""
+    output_name: str = ""
+    output_host: str = ""
+    output_port: str = ""
+    output_user: str = ""
+    output_password: str = ""
+    scenario_original_name: str = ""
+    single_electric_node: bool = False
+
+class NexusePlugin(Plugin):
+    @classmethod
+    def get_default_parameters(cls) -> dict:
+        return asdict(Parameters())
+
+    def __init__(self, parameters: dict, scenario: Scenario | None = None):
+        self.__parameters = Parameters(**parameters)
         self.__simulation_results = SimulationResults(
-            results_folder = self.__settings.results.base_folder,
-            simulation_name = self.__settings.results.simulation_folder
+            results_folder = self.__parameters.results_base_path,
+            simulation_name = self.__parameters.results_simulation_folder
         )
 
-    def run(self):
+    def run(self) -> None:
         self.write_metadata()
-        if os.path.exists(self.__settings.results.plot_config_file_path):
+        if os.path.exists(self.__parameters.plot_config_file_path):
             self.__simulation_results.copy_plot_config(
-                self.__settings.results.plot_config_file_path
+                self.__parameters.plot_config_file_path
             )
-        if self.__settings.postprocess.centiv:
+        if self.__parameters.centiv:
             centiv_postprocess = CentivPostprocess(
-                self.__settings,
-                self.__simulation_results.path
+                results_base_path=self.__parameters.results_base_path,
+                results_simulation_folder=self.__parameters.results_simulation_folder,
+                scenario_original_name=self.__parameters.scenario_original_name,
+                input_host=self.__parameters.input_host,
+                input_user=self.__parameters.input_user,
+                input_password=self.__parameters.input_password,
+                single_electric_node=self.__parameters.single_electric_node,
             )
             centiv_postprocess.run()
-        if self.__settings.postprocess.cascades:
+        if self.__parameters.cascades:
             cascades_postprocess = CascadesPostprocess(
-                self.__settings,
+                self.__parameters.results_simulation_folder,
                 self.__simulation_results.postprocess_path
             )
             cascades_postprocess.run()
-        if self.__settings.postprocess.move_to_mysql:
+        if self.__parameters.move_to_mysql:
             self.move_to_mysql()
         logging.info("Postprocess finished")
 
     def write_metadata(self):
         metadata = self.__simulation_results.get_metadata(
-            scenario_description = self.__settings.scenario.description
+            scenario_description = self.__parameters.scenario_description
         )
         self.__simulation_results.write_csv_in_postprocess(
             data_to_write = metadata,
@@ -69,13 +100,13 @@ class PostProcess:
         logging.info("Moving results to the output database")
         moveToMysql.main(
             simulation_postprocess_path = self.__simulation_results.postprocess_path,
-            simulation_execution_date = self.__settings.simulation.execution_date,
-            scenario = self.__settings.scenario.output_name,
+            simulation_execution_date = self.__parameters.execution_date,
+            scenario = self.__parameters.output_name,
             webviewer_version = "results",
-            host=self.__settings.output_database_server.host,
-            port=self.__settings.output_database_server.port,
-            user=self.__settings.output_database_server.user,
-            password=self.__settings.output_database_server.password
+            host=self.__parameters.output_host,
+            port=self.__parameters.output_port,
+            user=self.__parameters.output_user,
+            password=self.__parameters.output_password
         )
         logging.info("DONE")
         
@@ -175,12 +206,3 @@ class SimulationResults():
                 os.path.basename(plot_config_file_path)
             )
         )
-        
-    
-def main():
-    settings = config.load()
-    post_process = PostProcess(settings)
-    post_process.run()
-
-if __name__ == "__main__":
-    main()

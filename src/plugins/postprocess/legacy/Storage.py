@@ -1,13 +1,10 @@
 import os
 from pathlib import Path
 import pandas as pd
-import argparse
 import pymysql
 
 from .Generation import group_n_rename,filter_by_country_and_format,read_generator_file,get_data
 from ..results_context import get_years_simulated_by_centiv
-
-from nexus_e import config
 
 year_dic = {
     2018: 1,
@@ -461,31 +458,4 @@ def main(simulation: str, database: str, host: str, user: str, password: str):
         simulation,
         DistIV,
         Storage_Cap_CH_centiv
-    )
-
-if __name__ == "__main__":
-    config_file_path = os.path.join(os.path.dirname(__file__), '..', '..', 'config.toml')
-    settings = config.load(config.TomlFile(config_file_path))
-    argp = argparse.ArgumentParser(
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter
-    )
-    argp.add_argument(
-        "--simuname",
-        type=str,
-        help="Name of MySQL database results",
-        default='evflex_ntc70_33pvt_ct_te',
-    )
-    argp.add_argument(
-        "--DBname",
-        type=str,
-        help="Name of the input MySQL database",
-        default='evflex_ntc70_33pvt_ct_te',
-    )
-    args = argp.parse_args()
-    main(
-        simulation=args.simuname,
-        database=args.DBname,
-        host=settings.input_database_server.host,
-        user=settings.input_database_server.user,
-        password=settings.input_database_server.password
     )

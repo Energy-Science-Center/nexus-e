@@ -1,22 +1,23 @@
-from abc import ABC, abstractmethod
-from dataclasses import asdict
-from datetime import datetime
 import importlib
 import logging
 import os
-from sqlalchemy import create_engine
-from sqlalchemy.orm import Session
+from abc import ABC, abstractmethod
+from dataclasses import asdict
+from datetime import datetime
 from typing import Protocol
 
-from . import config
-
 from nexus_e_interface import Plugin, Scenario
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session
 
 from plugins.centiv.cgep import create_scenario_fast as centiv
-from plugins.postprocess.postprocess import PostProcess
+from plugins.postprocess.nexus_e_plugin import NexusePlugin as PostProcess
 from plugins.update_investments.nexus_e_plugin import NexusePlugin as UpdateInvestments
 from plugins.upload_scenario.nexus_e_plugin import NexusePlugin as ScenarioUploader
 from plugins.upload_res_data import RESDataUploader
+
+from . import config
+
 
 class Module(Protocol):
     def run(self) -> None: ...
@@ -41,29 +42,42 @@ class CoreModuleFactory(ModuleFactory):
         if module_config.name == "centiv":
             # First add module-wide parameters to avoid rewriting them in
             # the config file
-            centiv_parameters = {}
-            centiv_parameters["DB_host"] = (
-                f"{self.settings.input_database_server.host}"
-            )
-            centiv_parameters["DB_name"] = self.settings.scenario.copy_name
-            centiv_parameters["DB_user"] = self.settings.input_database_server.user
-            centiv_parameters["DB_pwd"] = self.settings.input_database_server.password
-            centiv_parameters["tpResolution"] = (
+            parameters = {}
+            parameters["DB_host"] = f"{self.settings.input_database_server.host}"
+            parameters["DB_name"] = self.settings.scenario.copy_name
+            parameters["DB_user"] = self.settings.input_database_server.user
+            parameters["DB_pwd"] = self.settings.input_database_server.password
+            parameters["tpResolution"] = (
                 self.settings.modules.commons.resolution_in_days
             )
-            centiv_parameters["single_electric_node"] = (
+            parameters["single_electric_node"] = (
                 self.settings.modules.commons.single_electric_node
             )
-            centiv_parameters["results_folder"] = (
-                os.path.join(
-                    self.settings.results.base_folder,
-                    self.settings.results.simulation_folder
-                )
+            parameters["results_folder"] = os.path.join(
+                self.settings.results.base_folder,
+                self.settings.results.simulation_folder,
             )
-            centiv_parameters.update(module_config.parameters)
-            return centiv.CentIvModule(centiv.Config(**centiv_parameters))
+            parameters.update(module_config.parameters)
+            return centiv.CentIvModule(parameters)
         elif module_config.name == "postprocess":
-            return PostProcess(settings=self.settings)
+            parameters = {}
+            parameters["results_base_path"] = self.settings.results.base_folder
+            parameters["results_simulation_folder"] = self.settings.results.simulation_folder
+            parameters["plot_config_file_path"] = self.settings.results.plot_config_file_path
+            parameters["scenario_description"] = self.settings.scenario.description
+            parameters["execution_date"] = self.settings.simulation.execution_date
+            parameters["scenario_original_name"] = self.settings.scenario.original_name
+            parameters["single_electric_node"] = self.settings.modules.commons.single_electric_node
+            parameters["input_host"] = self.settings.input_database_server.host
+            parameters["input_user"] = self.settings.input_database_server.user
+            parameters["input_password"] = self.settings.input_database_server.password
+            parameters["output_name"] = self.settings.scenario.output_name
+            parameters["output_host"] = self.settings.output_database_server.host
+            parameters["output_port"] = self.settings.output_database_server.port
+            parameters["output_user"] = self.settings.output_database_server.user
+            parameters["output_password"] = self.settings.output_database_server.password
+            parameters.update(module_config.parameters)
+            return PostProcess(parameters)
         elif module_config.name == "update_investments":
             parameters = {}
             parameters["host"] = self.settings.input_database_server.host
@@ -75,14 +89,14 @@ class CoreModuleFactory(ModuleFactory):
                 self.settings.results.simulation_folder
             )
             parameters.update(module_config.parameters)
-            return UpdateInvestments(parameters=parameters)
+            return UpdateInvestments(parameters)
         elif module_config.name == "upload_scenario":
             parameters = {}
             parameters["host"] = self.settings.input_database_server.host
             parameters["user"] = self.settings.input_database_server.user
             parameters["password"] = self.settings.input_database_server.password
             parameters.update(module_config.parameters)
-            return ScenarioUploader(config=parameters)
+            return ScenarioUploader(parameters)
         elif module_config.name == "update_inv_costs":
             from plugins.update_inv_costs import InvCostDataUpdater
             parameters = {}
@@ -103,6 +117,7 @@ class CoreModuleFactory(ModuleFactory):
         else:
             raise UnknownModule(module_config.name)
 
+
 class CorePluginFactory(ModuleFactory):
     def __init__(self, settings: config.Config):
         self.settings = settings
@@ -115,33 +130,32 @@ class CorePluginFactory(ModuleFactory):
             )
         except ModuleNotFoundError:
             raise UnknownModule(module_config.name)
+        plugin: Plugin = plugin_module.NexusePlugin
 
         # Prepare plugin parameters
-        parameters: dict = plugin_module.NexusePlugin.get_default_config()
+        parameters: dict = plugin.get_default_parameters()
         parameters.update(asdict(self.settings.modules.commons))
         parameters.update(module_config.parameters)
         parameters = {
             key: value
             for key, value in parameters.items()
-            if key in plugin_module.NexusePlugin.get_default_config()
+            if key in plugin.get_default_parameters()
         }
 
         # Create database session
         engine = create_engine(
-            "mysql+pymysql://" \
-            f"{self.settings.input_database_server.user}" \
-            f":{self.settings.input_database_server.password}" \
-            f"@{self.settings.input_database_server.host}" \
-            f":{self.settings.input_database_server.port}" \
-            f"/{self.settings.scenario.copy_name}" \
+            "mysql+pymysql://"
+            f"{self.settings.input_database_server.user}"
+            f":{self.settings.input_database_server.password}"
+            f"@{self.settings.input_database_server.host}"
+            f":{self.settings.input_database_server.port}"
+            f"/{self.settings.scenario.copy_name}"
         )
         scenario = Scenario(Session(engine))
 
-        output = plugin_module.NexusePlugin(
-            scenario,
-            parameters
-        )
+        output = plugin(scenario, parameters)
         return output
+
 
 class Simulation:
     def __init__(self, settings: config.Config):
@@ -159,22 +173,19 @@ class Simulation:
 
         for module_config in config.load_playlist(self.settings.modules.playlist_name):
             logging.info(f"Run module: {module_config}")
-            module = module_factory.get_module(module_config)
+            module: Module = module_factory.get_module(module_config)
             logging.info("Module created")
             module.run()
 
     def __setup_results_folder(self):
         timestamp = self.settings.simulation.execution_date
-        results_folder_name = (
-            f"{self.settings.scenario.original_name}_{timestamp}"
-        )
+        results_folder_name = f"{self.settings.scenario.original_name}_{timestamp}"
         results_folder_path = os.path.join(
-            self.settings.results.base_folder,
-            results_folder_name
+            self.settings.results.base_folder, results_folder_name
         )
         logging.info(f"Setup results folder: {results_folder_path}")
         os.makedirs(results_folder_path, exist_ok=True)
-        
+
         self.settings.results.simulation_folder = results_folder_name
         logging.info("Save results folder in settings")
         config.write(self.settings)

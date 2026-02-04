@@ -1,4 +1,3 @@
-import argparse
 from dataclasses import dataclass
 from pathlib import Path
 import numpy as np
@@ -7,8 +6,6 @@ import pandas as pd
 import pymysql
 
 from ..results_context import get_years_simulated_by_centiv
-
-from nexus_e import config
 
 year_dic = {
     2018: 1,
@@ -319,29 +316,3 @@ def main(database: str, host: str, user: str, password: str):
     )
     cross_country_flows.load_flows_for_all_years(border_flows=border_flows)
     cross_country_flows.save_flows_to_files()
-
-
-if __name__ == "__main__":
-    config_file_path = os.path.join(
-        os.path.dirname(__file__),
-        "..",
-        "..",
-        "..",
-        "..",
-        "config.toml"
-    )
-    settings = config.load(config.TomlFile(config_file_path))
-    argp = argparse.ArgumentParser(
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter
-    )
-    argp.add_argument("--simuname", type=str, help="Name of MySQL database results",
-                      default='pathfndr_s8_241119_cpv_s8')
-    argp.add_argument("--DBname", type=str, help="Name of MySQL database",
-                      default='pathfndr_s8_241119_cpv_s8')  # nexuse_schema2_disagg_ch2040
-    args = argp.parse_args()
-    main(
-        database=args.DBname,
-        host=settings.input_database_server.host,
-        user=settings.input_database_server.user,
-        password=settings.input_database_server.password
-    )

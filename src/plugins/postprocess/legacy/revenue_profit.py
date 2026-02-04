@@ -3,12 +3,9 @@ from pathlib import Path
 import pandas as pd
 import numpy as np
 import pymysql
-import argparse
 
 from .Generation import group_n_rename
 from ..results_context import get_years_simulated_by_centiv
-
-from nexus_e import config as config
 
 def create_revenue(
     years,
@@ -399,7 +396,7 @@ def create_revenue(
 
     return
 
-def main(simulation: str, database: str, host: str, user: str, password: str):
+def main(database: str, host: str, user: str, password: str):
     os.path.abspath(os.curdir)
     simulation_postprocess_path = os.getcwd()
 
@@ -433,30 +430,3 @@ def main(simulation: str, database: str, host: str, user: str, password: str):
             user=user,
             password=password
         )
-
-if __name__ == "__main__":
-    config_file_path = os.path.join(os.path.dirname(__file__), '..', '..', 'config.toml')
-    settings = config.load(config.TomlFile(config_file_path))
-    argp = argparse.ArgumentParser(
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter
-    )
-    argp.add_argument(
-        "--simuname",
-        type=str,
-        help="Name of MySQL database results",
-        default='evflex_ntc70_33pvt_ct_te',
-    )
-    argp.add_argument(
-        "--DBname",
-        type=str,
-        help="Name of the input MySQL database",
-        default='evflex_ntc70_33pvt_ct_te',
-    )
-    args = argp.parse_args()
-    main(
-        simulation=args.simuname,
-        database=args.DBname,
-        host=settings.input_database_server.host,
-        user=settings.input_database_server.user,
-        password=settings.input_database_server.password
-    )

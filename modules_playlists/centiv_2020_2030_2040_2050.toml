@@ -57,3 +57,6 @@ scenYear = 2050
 # Run simulation postprocess
 [[modules]]
 name = "postprocess"
+[modules.parameters]
+centiv = true
+move_to_mysql = true

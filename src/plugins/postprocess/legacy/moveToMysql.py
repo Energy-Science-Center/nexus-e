@@ -1,15 +1,11 @@
-import os
 import pandas as pd
 from sqlalchemy import create_engine, DDL
 import glob
 import base64
 import json
 import re
-import argparse
-from datetime import datetime
 import logging
 
-from nexus_e import config
 from nexus_e.database import MYSQL_DATABASE_NAME_MAX_LENGTH
 
 def main(
@@ -161,38 +157,3 @@ def main(
     #     for row in result:
     #         print("id = ", row[0])
     #         write_file(row[1], "test.jpg")
-
-if __name__ == '__main__':
-    config_file_path = os.path.join(
-        os.path.dirname(__file__),
-        "..",
-        "..",
-        "..",
-        "..",
-        "config.toml"
-    )
-    settings = config.load(config.TomlFile(config_file_path))
-    parser = argparse.ArgumentParser(description='Move csv/json/jpg data to MySQL')
-    # TODO: allow to select what data to move to MySQL (e.g. sometimes we don't want to process the image data because it
-    #  takes a long time.)# Source file: By default, it is left empty, then the script will look for and read from the
-    #  lsf.o* file.
-    parser.add_argument("--simu-name", type=str, help="Simulation name (i.e., result folder's name)",
-                        default='nexuse_s6_vzug_wp2_ntc_100_Nov12_T0117_MB_12-Nov-2023_01-17')
-    parser.add_argument("--scen-name", type=str, help="A descriptive scenario name (e.g. Baseline)",
-                        default='nexuse_s6_vzug_wp2_ntc_100')
-    parser.add_argument("--version-wv", type=str, help="Prefix for webviewer",
-                        default='')
-    args = parser.parse_args()
-    main(
-        simulation_postprocess_path=os.path.join(
-            settings.results.simulation_folder,
-            "postprocess"
-        ),
-        simulation_execution_date=datetime.now().strftime("%Y-%m-%dT%H-%M-%S"),
-        scenario=args.scen_name,
-        webviewer_version=args.version_wv,
-        host=settings.output_database_server.host,
-        port=settings.output_database_server.port,
-        user=settings.output_database_server.user,
-        password=settings.output_database_server.password
-    )

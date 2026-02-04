@@ -25,7 +25,7 @@ class NexusePlugin(Plugin):
     def get_default_parameters(cls) -> dict:
         return asdict(Config())
 
-    def __init__(self, scenario: Scenario, parameters: dict):
+    def __init__(self, parameters: dict, scenario: Scenario | None = None):
         self.scenario = scenario
         self.config = Config(**parameters)
 

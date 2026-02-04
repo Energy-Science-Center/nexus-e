@@ -3,11 +3,7 @@
 #######################
 
 import pandas as pd
-import sys
-from datetime import datetime
 import os
-import subprocess
-import glob
 import argparse
 
 current_directory = os.path.dirname(os.path.abspath(__file__))

@@ -2,7 +2,6 @@ import os
 from pathlib import Path
 import pandas as pd
 import numpy as np
-import argparse
 import h5py
 import re
 
@@ -1023,16 +1022,3 @@ def main(simulation: str):
         generation.write_annual_generation_values()
 
     generation.combine_generation_data()
-
-
-if __name__ == "__main__":
-    argp = argparse.ArgumentParser(
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter
-    )
-    argp.add_argument(
-        "--simuname",
-        type=str,
-        help="Name of MySQL database results",
-    )
-    args = argp.parse_args()
-    main(simulation=args.simuname)

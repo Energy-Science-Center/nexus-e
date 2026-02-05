@@ -25,7 +25,7 @@ Running this script asks the user if a default config file should be written.
 """
 
 import os
-from typing import List
+from typing import Any, List
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, asdict, field
 import tomli
@@ -97,26 +97,6 @@ class Logging:
 
 
 @dataclass
-class InputDatabaseServer:
-    """Connection informations to a database server."""
-
-    host: str = ""
-    port: str = ""
-    user: str = ""
-    password: str = ""
-
-
-@dataclass
-class OutputDatabaseServer:
-    """Connection informations to a database server."""
-
-    host: str = ""
-    port: str = ""
-    user: str = ""
-    password: str = ""
-
-
-@dataclass
 class Scenario:
     original_name: str = ""
     create_a_copy: bool = True
@@ -133,22 +113,6 @@ class Module:
     parameters: dict = field(default_factory=dict)
 
 
-@dataclass
-class ModulesCommons:
-    resolution_in_days: int = 1
-    single_electric_node: bool = False
-
-
-@dataclass
-class Modules:
-    commons: ModulesCommons = field(default_factory=ModulesCommons)
-    playlist_name: str = "centiv_2050"
-
-    def __post_init__(self):
-        """Parse the dictionnaries given by a Config object"""
-        if isinstance(self.commons, dict):
-            self.commons = ModulesCommons(**self.commons)
-
 
 @dataclass
 class Results:
@@ -161,6 +125,21 @@ class Results:
 @dataclass
 class Simulation:
     execution_date: str = "created_by_nexus_e"
+
+
+@dataclass
+class Modules:
+    commons: dict[str, Any] = field(default_factory=lambda: 
+        {
+            "input_data_host": "",
+            "input_data_port": "",
+            "input_data_user": "",
+            "input_data_password": "",
+            "resolution_in_days": 1,
+            "single_electric_node": False,
+        }
+    )
+    playlist_name: str = "centiv_2050"
 
 
 @dataclass
@@ -186,12 +165,10 @@ class Config:
     """
 
     logging: Logging = field(default_factory=Logging)
-    input_database_server: InputDatabaseServer = field(default_factory=InputDatabaseServer)
-    output_database_server: OutputDatabaseServer = field(default_factory=OutputDatabaseServer)
     scenario: Scenario = field(default_factory=Scenario)
-    modules: Modules = field(default_factory=Modules)
     results: Results = field(default_factory=Results)
     simulation: Simulation = field(default_factory=Simulation)
+    modules: Modules = field(default_factory=Modules)
 
     def parse(self, **config: dict):
         """Populate the Config class with an input dictionnary."""

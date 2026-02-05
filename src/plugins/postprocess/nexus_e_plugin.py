@@ -25,7 +25,7 @@ class Parameters:
     input_password: str = ""
     output_name: str = ""
     output_host: str = ""
-    output_port: str = ""
+    output_port: str = "3307"
     output_user: str = ""
     output_password: str = ""
     scenario_original_name: str = ""
@@ -37,6 +37,14 @@ class NexusePlugin(Plugin):
         return asdict(Parameters())
 
     def __init__(self, parameters: dict, scenario: Scenario | None = None):
+        if "output_host" not in parameters:
+            parameters["output_host"] = parameters["input_host"]
+        if "output_port" not in parameters:
+            logging.warning("Default output database port is set to 3307 for legacy reasons.")
+        if "output_user" not in parameters:
+            parameters["output_user"] = parameters["input_user"]
+        if "output_password" not in parameters:
+            parameters["output_password"] = parameters["input_password"]
         self.__parameters = Parameters(**parameters)
         self.__simulation_results = SimulationResults(
             results_folder = self.__parameters.results_base_path,

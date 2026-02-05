@@ -2,7 +2,6 @@ import importlib
 import logging
 import os
 from abc import ABC, abstractmethod
-from dataclasses import asdict
 from datetime import datetime
 from typing import Protocol
 
@@ -43,15 +42,15 @@ class CoreModuleFactory(ModuleFactory):
             # First add module-wide parameters to avoid rewriting them in
             # the config file
             parameters = {}
-            parameters["DB_host"] = f"{self.settings.input_database_server.host}"
+            parameters["DB_host"] = self.settings.modules.commons["input_data_host"]
             parameters["DB_name"] = self.settings.scenario.copy_name
-            parameters["DB_user"] = self.settings.input_database_server.user
-            parameters["DB_pwd"] = self.settings.input_database_server.password
+            parameters["DB_user"] = self.settings.modules.commons["input_data_user"]
+            parameters["DB_pwd"] = self.settings.modules.commons["input_data_password"]
             parameters["tpResolution"] = (
-                self.settings.modules.commons.resolution_in_days
+                self.settings.modules.commons["resolution_in_days"]
             )
             parameters["single_electric_node"] = (
-                self.settings.modules.commons.single_electric_node
+                self.settings.modules.commons["single_electric_node"]
             )
             parameters["results_folder"] = os.path.join(
                 self.settings.results.base_folder,
@@ -67,22 +66,18 @@ class CoreModuleFactory(ModuleFactory):
             parameters["scenario_description"] = self.settings.scenario.description
             parameters["execution_date"] = self.settings.simulation.execution_date
             parameters["scenario_original_name"] = self.settings.scenario.original_name
-            parameters["single_electric_node"] = self.settings.modules.commons.single_electric_node
-            parameters["input_host"] = self.settings.input_database_server.host
-            parameters["input_user"] = self.settings.input_database_server.user
-            parameters["input_password"] = self.settings.input_database_server.password
+            parameters["single_electric_node"] = self.settings.modules.commons["single_electric_node"]
+            parameters["input_host"] = self.settings.modules.commons["input_data_host"]
+            parameters["input_user"] = self.settings.modules.commons["input_data_user"]
+            parameters["input_password"] = self.settings.modules.commons["input_data_password"]
             parameters["output_name"] = self.settings.scenario.output_name
-            parameters["output_host"] = self.settings.output_database_server.host
-            parameters["output_port"] = self.settings.output_database_server.port
-            parameters["output_user"] = self.settings.output_database_server.user
-            parameters["output_password"] = self.settings.output_database_server.password
             parameters.update(module_config.parameters)
             return PostProcess(parameters)
         elif module_config.name == "update_investments":
             parameters = {}
-            parameters["host"] = self.settings.input_database_server.host
-            parameters["user"] = self.settings.input_database_server.user
-            parameters["password"] = self.settings.input_database_server.password
+            parameters["host"] = self.settings.modules.commons["input_data_host"]
+            parameters["user"] = self.settings.modules.commons["input_data_user"]
+            parameters["password"] = self.settings.modules.commons["input_data_password"]
             parameters["dbName"] = self.settings.scenario.copy_name
             parameters["simulation_results_folder"] = os.path.join(
                 self.settings.results.base_folder,
@@ -92,25 +87,25 @@ class CoreModuleFactory(ModuleFactory):
             return UpdateInvestments(parameters)
         elif module_config.name == "upload_scenario":
             parameters = {}
-            parameters["host"] = self.settings.input_database_server.host
-            parameters["user"] = self.settings.input_database_server.user
-            parameters["password"] = self.settings.input_database_server.password
+            parameters["host"] = self.settings.modules.commons["input_data_host"]
+            parameters["user"] = self.settings.modules.commons["input_data_user"]
+            parameters["password"] = self.settings.modules.commons["input_data_password"]
             parameters.update(module_config.parameters)
             return ScenarioUploader(parameters)
         elif module_config.name == "update_inv_costs":
             from plugins.update_inv_costs import InvCostDataUpdater
             parameters = {}
-            parameters["host"] = self.settings.input_database_server.host
-            parameters["user"] = self.settings.input_database_server.user
-            parameters["password"] = self.settings.input_database_server.password
+            parameters["host"] = self.settings.modules.commons["input_data_host"]
+            parameters["user"] = self.settings.modules.commons["input_data_user"]
+            parameters["password"] = self.settings.modules.commons["input_data_password"]
             parameters["dbName"] = self.settings.scenario.copy_name
             parameters.update(module_config.parameters)
             return InvCostDataUpdater(config=parameters)
         elif module_config.name == "upload_res_data":
             parameters = {}
-            parameters["host"] = self.settings.input_database_server.host
-            parameters["user"] = self.settings.input_database_server.user
-            parameters["password"] = self.settings.input_database_server.password
+            parameters["host"] = self.settings.modules.commons["input_data_host"]
+            parameters["user"] = self.settings.modules.commons["input_data_user"]
+            parameters["password"] = self.settings.modules.commons["input_data_password"]
             parameters["dbName"] = self.settings.scenario.copy_name
             parameters.update(module_config.parameters)
             return RESDataUploader(config=parameters)
@@ -134,7 +129,7 @@ class CorePluginFactory(ModuleFactory):
 
         # Prepare plugin parameters
         parameters: dict = plugin.get_default_parameters()
-        parameters.update(asdict(self.settings.modules.commons))
+        parameters.update(self.settings.modules.commons)
         parameters.update(module_config.parameters)
         parameters = {
             key: value
@@ -145,10 +140,10 @@ class CorePluginFactory(ModuleFactory):
         # Create database session
         engine = create_engine(
             "mysql+pymysql://"
-            f"{self.settings.input_database_server.user}"
-            f":{self.settings.input_database_server.password}"
-            f"@{self.settings.input_database_server.host}"
-            f":{self.settings.input_database_server.port}"
+            f"{self.settings.modules.commons['input_data_user']}"
+            f":{self.settings.modules.commons['input_data_password']}"
+            f"@{self.settings.modules.commons['input_data_host']}"
+            f":{self.settings.modules.commons['input_data_port']}"
             f"/{self.settings.scenario.copy_name}"
         )
         scenario = Scenario(Session(engine))

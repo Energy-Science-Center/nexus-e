@@ -41,10 +41,10 @@ class App:
         error = None
         try:
             database_context = MySQLDatabaseContext(
-                host=settings.input_database_server.host,
-                port=settings.input_database_server.port,
-                username=settings.input_database_server.user,
-                password=settings.input_database_server.password,
+                host=settings.modules.commons["input_data_host"],
+                port=settings.modules.commons["input_data_port"],
+                username=settings.modules.commons["input_data_user"],
+                password=settings.modules.commons["input_data_password"],
             )
             if settings.scenario.create_a_copy:
                 logging.info(f"Copy database: {settings.scenario.original_name}")

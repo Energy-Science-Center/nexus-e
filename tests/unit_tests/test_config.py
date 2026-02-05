@@ -102,9 +102,7 @@ class TestConfig:
 
         # Act
         try:
-            config.write(
-                any_config, config.TomlFile(test_file_name)
-            )
+            config.write(any_config, config.TomlFile(test_file_name))
             with open(test_file_name, "rb") as fid:
                 result = tomli.load(fid)
         except Exception as e:
@@ -115,3 +113,25 @@ class TestConfig:
         # Assert
         assert result["logging"]["filename"] == any_config.logging.filename
         assert result["logging"]["format"] == any_config.logging.format
+
+    def test_common_modules_parameters_is_flexible_dict(self):
+        # Arrange
+        any_config = config.Config()
+        any_config.modules.commons = {
+            "any_parameter": "any_value",
+            "another_parameter": "another_value",
+        }
+        test_file_name = "test_to_delete.toml"
+
+        # Act
+        try:
+            config.write(any_config, config.TomlFile(test_file_name))
+            result = config.load(config.TomlFile(test_file_name))
+        except Exception as e:
+            raise e
+        finally:
+            os.remove(test_file_name)
+
+        # Assert
+        assert result.modules.commons["any_parameter"] == "any_value"
+        assert result.modules.commons["another_parameter"] == "another_value"

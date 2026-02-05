@@ -62,7 +62,6 @@ class CoreModuleFactory(ModuleFactory):
             parameters = {}
             parameters["results_base_path"] = self.settings.results.base_folder
             parameters["results_simulation_folder"] = self.settings.results.simulation_folder
-            parameters["plot_config_file_path"] = self.settings.results.plot_config_file_path
             parameters["scenario_description"] = self.settings.scenario.description
             parameters["execution_date"] = self.settings.simulation.execution_date
             parameters["scenario_original_name"] = self.settings.scenario.original_name

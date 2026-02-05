@@ -113,13 +113,11 @@ class Module:
     parameters: dict = field(default_factory=dict)
 
 
-
 @dataclass
 class Results:
     base_folder: str = "Results"
     create_new_simulation_results_folder: bool = True
     simulation_folder: str = ""
-    plot_config_file_path: str = ""
 
 
 @dataclass

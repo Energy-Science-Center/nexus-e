@@ -133,16 +133,6 @@ class Module:
     parameters: dict = field(default_factory=dict)
 
 
-@dataclass
-class Modules:
-    commons: dict[str, Any] = field(default_factory=lambda: 
-        {
-            "resolution_in_days": 1,
-            "single_electric_node": False,
-        }
-    )
-    playlist_name: str = "centiv_2050"
-
 
 @dataclass
 class Results:
@@ -155,6 +145,17 @@ class Results:
 @dataclass
 class Simulation:
     execution_date: str = "created_by_nexus_e"
+
+
+@dataclass
+class Modules:
+    commons: dict[str, Any] = field(default_factory=lambda: 
+        {
+            "resolution_in_days": 1,
+            "single_electric_node": False,
+        }
+    )
+    playlist_name: str = "centiv_2050"
 
 
 @dataclass
@@ -183,9 +184,9 @@ class Config:
     input_database_server: InputDatabaseServer = field(default_factory=InputDatabaseServer)
     output_database_server: OutputDatabaseServer = field(default_factory=OutputDatabaseServer)
     scenario: Scenario = field(default_factory=Scenario)
-    modules: Modules = field(default_factory=Modules)
     results: Results = field(default_factory=Results)
     simulation: Simulation = field(default_factory=Simulation)
+    modules: Modules = field(default_factory=Modules)
 
     def parse(self, **config: dict):
         """Populate the Config class with an input dictionnary."""

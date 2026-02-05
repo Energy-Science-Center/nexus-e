@@ -97,16 +97,6 @@ class Logging:
 
 
 @dataclass
-class InputDatabaseServer:
-    """Connection informations to a database server."""
-
-    host: str = ""
-    port: str = ""
-    user: str = ""
-    password: str = ""
-
-
-@dataclass
 class OutputDatabaseServer:
     """Connection informations to a database server."""
 
@@ -151,6 +141,10 @@ class Simulation:
 class Modules:
     commons: dict[str, Any] = field(default_factory=lambda: 
         {
+            "input_data_host": "",
+            "input_data_port": "",
+            "input_data_user": "",
+            "input_data_password": "",
             "resolution_in_days": 1,
             "single_electric_node": False,
         }
@@ -181,7 +175,6 @@ class Config:
     """
 
     logging: Logging = field(default_factory=Logging)
-    input_database_server: InputDatabaseServer = field(default_factory=InputDatabaseServer)
     output_database_server: OutputDatabaseServer = field(default_factory=OutputDatabaseServer)
     scenario: Scenario = field(default_factory=Scenario)
     results: Results = field(default_factory=Results)

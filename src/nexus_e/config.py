@@ -97,16 +97,6 @@ class Logging:
 
 
 @dataclass
-class OutputDatabaseServer:
-    """Connection informations to a database server."""
-
-    host: str = ""
-    port: str = ""
-    user: str = ""
-    password: str = ""
-
-
-@dataclass
 class Scenario:
     original_name: str = ""
     create_a_copy: bool = True
@@ -175,7 +165,6 @@ class Config:
     """
 
     logging: Logging = field(default_factory=Logging)
-    output_database_server: OutputDatabaseServer = field(default_factory=OutputDatabaseServer)
     scenario: Scenario = field(default_factory=Scenario)
     results: Results = field(default_factory=Results)
     simulation: Simulation = field(default_factory=Simulation)

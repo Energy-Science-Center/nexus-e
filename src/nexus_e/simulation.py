@@ -71,10 +71,6 @@ class CoreModuleFactory(ModuleFactory):
             parameters["input_user"] = self.settings.modules.commons["input_data_user"]
             parameters["input_password"] = self.settings.modules.commons["input_data_password"]
             parameters["output_name"] = self.settings.scenario.output_name
-            parameters["output_host"] = self.settings.output_database_server.host
-            parameters["output_port"] = self.settings.output_database_server.port
-            parameters["output_user"] = self.settings.output_database_server.user
-            parameters["output_password"] = self.settings.output_database_server.password
             parameters.update(module_config.parameters)
             return PostProcess(parameters)
         elif module_config.name == "update_investments":

@@ -63,7 +63,7 @@ class CoreModuleFactory(ModuleFactory):
             parameters["results_base_path"] = self.settings.results.base_folder
             parameters["results_simulation_folder"] = self.settings.results.simulation_folder
             parameters["scenario_description"] = self.settings.scenario.description
-            parameters["execution_date"] = self.settings.simulation.execution_date
+            parameters["execution_date"] = self.settings.modules.commons["execution_date"]
             parameters["scenario_original_name"] = self.settings.scenario.original_name
             parameters["single_electric_node"] = self.settings.modules.commons["single_electric_node"]
             parameters["input_host"] = self.settings.modules.commons["input_data_host"]
@@ -156,7 +156,7 @@ class Simulation:
         self.settings = settings
 
     def run(self, module_factory: ModuleFactory):
-        self.settings.simulation.execution_date = datetime.now().strftime(
+        self.settings.modules.commons["execution_date"] = datetime.now().strftime(
             "%Y-%m-%dT%H-%M-%S"
         )
         logging.info("Save simulation execution date in settings")
@@ -172,7 +172,7 @@ class Simulation:
             module.run()
 
     def __setup_results_folder(self):
-        timestamp = self.settings.simulation.execution_date
+        timestamp = self.settings.modules.commons["execution_date"]
         results_folder_name = f"{self.settings.scenario.original_name}_{timestamp}"
         results_folder_path = os.path.join(
             self.settings.results.base_folder, results_folder_name

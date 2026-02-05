@@ -121,11 +121,6 @@ class Results:
 
 
 @dataclass
-class Simulation:
-    execution_date: str = "created_by_nexus_e"
-
-
-@dataclass
 class Modules:
     commons: dict[str, Any] = field(default_factory=lambda: 
         {
@@ -165,7 +160,6 @@ class Config:
     logging: Logging = field(default_factory=Logging)
     scenario: Scenario = field(default_factory=Scenario)
     results: Results = field(default_factory=Results)
-    simulation: Simulation = field(default_factory=Simulation)
     modules: Modules = field(default_factory=Modules)
 
     def parse(self, **config: dict):

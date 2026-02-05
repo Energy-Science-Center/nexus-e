@@ -25,7 +25,7 @@ Running this script asks the user if a default config file should be written.
 """
 
 import os
-from typing import List
+from typing import Any, List
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, asdict, field
 import tomli
@@ -134,20 +134,14 @@ class Module:
 
 
 @dataclass
-class ModulesCommons:
-    resolution_in_days: int = 1
-    single_electric_node: bool = False
-
-
-@dataclass
 class Modules:
-    commons: ModulesCommons = field(default_factory=ModulesCommons)
+    commons: dict[str, Any] = field(default_factory=lambda: 
+        {
+            "resolution_in_days": 1,
+            "single_electric_node": False,
+        }
+    )
     playlist_name: str = "centiv_2050"
-
-    def __post_init__(self):
-        """Parse the dictionnaries given by a Config object"""
-        if isinstance(self.commons, dict):
-            self.commons = ModulesCommons(**self.commons)
 
 
 @dataclass

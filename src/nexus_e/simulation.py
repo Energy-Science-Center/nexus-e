@@ -2,7 +2,6 @@ import importlib
 import logging
 import os
 from abc import ABC, abstractmethod
-from dataclasses import asdict
 from datetime import datetime
 from typing import Protocol
 
@@ -48,10 +47,10 @@ class CoreModuleFactory(ModuleFactory):
             parameters["DB_user"] = self.settings.input_database_server.user
             parameters["DB_pwd"] = self.settings.input_database_server.password
             parameters["tpResolution"] = (
-                self.settings.modules.commons.resolution_in_days
+                self.settings.modules.commons["resolution_in_days"]
             )
             parameters["single_electric_node"] = (
-                self.settings.modules.commons.single_electric_node
+                self.settings.modules.commons["single_electric_node"]
             )
             parameters["results_folder"] = os.path.join(
                 self.settings.results.base_folder,
@@ -67,7 +66,7 @@ class CoreModuleFactory(ModuleFactory):
             parameters["scenario_description"] = self.settings.scenario.description
             parameters["execution_date"] = self.settings.simulation.execution_date
             parameters["scenario_original_name"] = self.settings.scenario.original_name
-            parameters["single_electric_node"] = self.settings.modules.commons.single_electric_node
+            parameters["single_electric_node"] = self.settings.modules.commons["single_electric_node"]
             parameters["input_host"] = self.settings.input_database_server.host
             parameters["input_user"] = self.settings.input_database_server.user
             parameters["input_password"] = self.settings.input_database_server.password
@@ -134,7 +133,7 @@ class CorePluginFactory(ModuleFactory):
 
         # Prepare plugin parameters
         parameters: dict = plugin.get_default_parameters()
-        parameters.update(asdict(self.settings.modules.commons))
+        parameters.update(self.settings.modules.commons)
         parameters.update(module_config.parameters)
         parameters = {
             key: value

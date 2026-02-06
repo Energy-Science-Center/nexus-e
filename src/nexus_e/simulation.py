@@ -152,7 +152,7 @@ class Simulation:
         self.settings.modules.commons["execution_date"] = datetime.now().strftime(
             "%Y-%m-%dT%H-%M-%S"
         )
-        logging.info("Save simulation execution date in settings")
+        logging.warning("Add execution_date to modules commons parameters")
         config.write(self.settings)
 
         if self.settings.results.create_new_simulation_results_folder:

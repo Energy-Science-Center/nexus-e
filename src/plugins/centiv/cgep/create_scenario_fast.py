@@ -59,7 +59,7 @@ class Config():
     DB_pwd: str = "password"
     """Password for MySQL database"""
 
-    results_folder: str = "results"
+    results_path: str = "results"
     """Folder in which the results are stored"""
     
     idScenario: int = 5
@@ -1250,7 +1250,7 @@ class DataImport(object):
                     5: 2050,
                 }
                 results_folder = str(
-                    Path(config.results_folder) 
+                    Path(config.results_path) 
                     / f"CentIv_{idScenario_to_year[config.idScenario]}"
                 )
             # Create mappings subfolder
@@ -1332,7 +1332,7 @@ class DataImport(object):
                 5: 2050,
             }
             results_folder = str(
-                Path(config.results_folder) 
+                Path(config.results_path) 
                 / f"CentIv_{idScenario_to_year[config.idScenario]}"
             )
             os.makedirs(results_folder, exist_ok=True)

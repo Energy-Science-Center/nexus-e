@@ -6,9 +6,8 @@ from .Generation import group_n_rename, filter_by_country_and_format,get_country
 from ..results_context import get_years_simulated_by_centiv
 
 class Curtailments:
-    def __init__(self, postprocess_output_directory, simu_name, centIv_listyears):
+    def __init__(self, postprocess_output_directory, centIv_listyears):
         self.postprocess_output_directory = postprocess_output_directory
-        self.simu_name = simu_name
         self.centIv_listyears = centIv_listyears
 
     def get_curtailment_data(self,centIv_listyears):
@@ -191,14 +190,13 @@ class Curtailments:
 
         return
 
-def main(simulation: str):
+def main():
     postprocess_output_directory = "postprocess"
 
     centIv_listyears = get_years_simulated_by_centiv(Path())
 
     curtailments = Curtailments(
         postprocess_output_directory,
-        simulation,
         centIv_listyears
     )
     curtailments_dic = curtailments.get_curtailment_data(centIv_listyears,)

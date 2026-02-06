@@ -117,7 +117,6 @@ class Module:
 class Results:
     base_folder: str = "Results"
     create_new_simulation_results_folder: bool = True
-    simulation_folder: str = ""
 
 
 @dataclass

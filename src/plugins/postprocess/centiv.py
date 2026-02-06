@@ -93,17 +93,15 @@ class CentivPostprocess():
 
     def __init__(
         self,
-        results_base_path: str,
-        results_simulation_folder: str,
-        scenario_original_name: str,
+        results_path: str,
+        input_data_name: str,
         input_host: str,
         input_user: str,
         input_password: str,
         single_electric_node: bool,
     ):
-        self.__results_base_path = results_base_path
-        self.__results_simulation_folder = results_simulation_folder
-        self.__scenario_original_name = scenario_original_name
+        self.__results_path = results_path
+        self.__input_data_name = input_data_name
         self.__input_host = input_host
         self.__input_user = input_user
         self.__input_password = input_password
@@ -117,17 +115,12 @@ class CentivPostprocess():
         # We should get rid of this directory navigation in the future by
         # making the executed scripts usable with any path.
         current_directory = os.getcwd()
-        os.chdir(
-            os.path.join(
-                self.__results_base_path,
-                self.__results_simulation_folder
-            )
-        )
+        os.chdir(self.__results_path)
 
         try:
             logging.info("Executing Demand calculation")
             postprocess_demand.main(
-                database=self.__scenario_original_name,
+                database=self.__input_data_name,
                 host=self.__input_host,
                 user=self.__input_user,
                 password=self.__input_password
@@ -135,21 +128,16 @@ class CentivPostprocess():
             logging.info("DONE")
             
             logging.info("Executing Generation...")
-            postprocess_generation.main(
-                simulation=self.__results_simulation_folder
-            )
+            postprocess_generation.main()
             logging.info("DONE")
             
             logging.info("Executing Curtailments...")
-            postprocess_curtailments.main(
-                simulation=self.__results_simulation_folder
-            )
+            postprocess_curtailments.main()
             logging.info("DONE")
             
             logging.info("Executing Capacity...")
             postprocess_capacity.main(
-                simulation=self.__results_simulation_folder,
-                database=self.__scenario_original_name,
+                database=self.__input_data_name,
                 host=self.__input_host,
                 user=self.__input_user,
                 password=self.__input_password
@@ -158,15 +146,13 @@ class CentivPostprocess():
                 
             logging.info("Executing ElectricityPrice...")
             postprocess_electricity_price.main(
-                simulation=self.__results_simulation_folder,
                 single_electric_node=self.__single_electric_node,
             )
             logging.info("DONE")
             
             logging.info("Executing Storage...")
             postprocess_storage.main(
-                simulation=self.__results_simulation_folder,
-                database=self.__scenario_original_name,
+                database=self.__input_data_name,
                 host=self.__input_host,
                 user=self.__input_user,
                 password=self.__input_password
@@ -175,7 +161,7 @@ class CentivPostprocess():
             
             logging.info("Executing Revenue & Profit calculation")
             postprocess_revenue_profit.main(
-                database=self.__scenario_original_name,
+                database=self.__input_data_name,
                 host=self.__input_host,
                 user=self.__input_user,
                 password=self.__input_password
@@ -184,8 +170,7 @@ class CentivPostprocess():
             
             logging.info("Executing System Cost script")
             postprocess_system_costs.main(
-                simulation=self.__results_simulation_folder,
-                database=self.__scenario_original_name,
+                database=self.__input_data_name,
                 host=self.__input_host,
                 user=self.__input_user,
                 password=self.__input_password
@@ -194,8 +179,7 @@ class CentivPostprocess():
             
             logging.info("Executing Emission calculation")
             postprocess_emissions.main(
-                simulation=self.__results_simulation_folder,
-                database=self.__scenario_original_name,
+                database=self.__input_data_name,
                 host=self.__input_host,
                 user=self.__input_user,
                 password=self.__input_password
@@ -204,7 +188,7 @@ class CentivPostprocess():
             
             logging.info("Executing Cross Country Flow script")
             postprocess_cross_country_flow.main(
-                database=self.__scenario_original_name,
+                database=self.__input_data_name,
                 host=self.__input_host,
                 user=self.__input_user,
                 password=self.__input_password
@@ -213,7 +197,7 @@ class CentivPostprocess():
             
             logging.info("Executing Power Flow Map script")
             postprocess_power_flow_map.main(
-                database=self.__scenario_original_name,
+                database=self.__input_data_name,
                 host=self.__input_host,
                 user=self.__input_user,
                 password=self.__input_password

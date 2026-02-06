@@ -189,7 +189,6 @@ def get_storage_levels(
 def get_storage_capacities(
     centiv_years,
     simulation_postprocess_path,
-    simulation,
     database,
     year_dic,
     host: str,
@@ -385,7 +384,7 @@ def __get_battery_parameters() -> tuple[int, int, int]:
             e_max = 0
         return bat_inv, e_max, p_max
 
-def get_storage_cap_CH(simulation_postprocess_path, centIv_listyears, simu_name,DistIV,Storage_Cap_CH_centiv):
+def get_storage_cap_CH(simulation_postprocess_path, centIv_listyears, DistIV,Storage_Cap_CH_centiv):
 
     output_path = os.path.join(
         simulation_postprocess_path,
@@ -427,7 +426,7 @@ def get_storage_cap_CH(simulation_postprocess_path, centIv_listyears, simu_name,
         )
     )
 
-def main(simulation: str, database: str, host: str, user: str, password: str):
+def main(database: str, host: str, user: str, password: str):
     os.path.abspath(os.curdir)
     simulation_postprocess_path = "postprocess"
 
@@ -445,7 +444,6 @@ def main(simulation: str, database: str, host: str, user: str, password: str):
     Storage_Cap_CH_centiv = get_storage_capacities(
         centiv_years,
         simulation_postprocess_path,
-        simulation,
         database,
         year_dic,
         host=host,
@@ -455,7 +453,6 @@ def main(simulation: str, database: str, host: str, user: str, password: str):
     get_storage_cap_CH(
         simulation_postprocess_path,
         centiv_years,
-        simulation,
         DistIV,
         Storage_Cap_CH_centiv
     )

@@ -49,7 +49,7 @@ def group_by_month(dataframe: pd.DataFrame):
 
 
 class GenerationPerUnit:
-    def __init__(self, year: int, simulation: str):
+    def __init__(self, year: int):
         self.__original_generation_per_unit = pd.read_excel(
             os.path.join(
                 f"CentIv_{year}",
@@ -98,13 +98,11 @@ class EmissionCreator:
     # for all years, for all countries
     def __init__(
         self,
-        simulation: str,
         database: str,
         host: str,
         user: str,
         password: str
     ):
-        self.simulation = simulation
         self.database = database
         self.host = host
         self.user = user
@@ -130,7 +128,6 @@ class EmissionCreator:
 
             generation_reader = GenerationPerUnit(
                 year=year,
-                simulation=self.simulation
             )
             # get CO2 rate form input DB
             self.generator_data = return_GeneratorData_from_InputDB(
@@ -246,14 +243,12 @@ class EmissionCreator:
         df.to_csv(os.path.join(output_path, filename))
 
 def main(
-    simulation: str,
     database: str,
     host: str,
     user: str,
     password: str,
 ):
     emissions_creator = EmissionCreator(
-        simulation=simulation,
         database=database,
         host=host,
         user=user,

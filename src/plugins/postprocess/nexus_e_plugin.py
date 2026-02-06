@@ -2,7 +2,6 @@ from dataclasses import dataclass, asdict
 import logging
 import os
 import pandas as pd
-import pathlib
 import shutil
 
 from nexus_e_interface import Plugin, Scenario
@@ -12,8 +11,8 @@ from .legacy import moveToMysql
 
 @dataclass
 class Parameters:
-    results_base_path: str = ""
-    results_simulation_folder: str = ""
+    results_path: str = ""
+    input_data_name: str = ""
     plot_config_file_path: str = ""
     centiv: bool = False
     cascades: bool = False
@@ -28,7 +27,6 @@ class Parameters:
     output_port: str = "3307"
     output_user: str = ""
     output_password: str = ""
-    scenario_original_name: str = ""
     single_electric_node: bool = False
 
 class NexusePlugin(Plugin):
@@ -47,8 +45,7 @@ class NexusePlugin(Plugin):
             parameters["output_password"] = parameters["input_password"]
         self.__parameters = Parameters(**parameters)
         self.__simulation_results = SimulationResults(
-            results_folder = self.__parameters.results_base_path,
-            simulation_name = self.__parameters.results_simulation_folder
+            results_path = self.__parameters.results_path,
         )
 
     def run(self) -> None:
@@ -59,9 +56,8 @@ class NexusePlugin(Plugin):
             )
         if self.__parameters.centiv:
             centiv_postprocess = CentivPostprocess(
-                results_base_path=self.__parameters.results_base_path,
-                results_simulation_folder=self.__parameters.results_simulation_folder,
-                scenario_original_name=self.__parameters.scenario_original_name,
+                results_path=self.__parameters.results_path,
+                input_data_name=self.__parameters.input_data_name,
                 input_host=self.__parameters.input_host,
                 input_user=self.__parameters.input_user,
                 input_password=self.__parameters.input_password,
@@ -70,7 +66,6 @@ class NexusePlugin(Plugin):
             centiv_postprocess.run()
         if self.__parameters.cascades:
             cascades_postprocess = CascadesPostprocess(
-                self.__parameters.results_simulation_folder,
                 self.__simulation_results.postprocess_path
             )
             cascades_postprocess.run()
@@ -80,7 +75,7 @@ class NexusePlugin(Plugin):
 
     def write_metadata(self):
         metadata = self.__simulation_results.get_metadata(
-            scenario_description = self.__parameters.scenario_description
+            scenario_description = self.__parameters.scenario_description,
         )
         self.__simulation_results.write_csv_in_postprocess(
             data_to_write = metadata,
@@ -121,14 +116,8 @@ class NexusePlugin(Plugin):
 
 class SimulationResults():
 
-    def __init__(self, results_folder: str, simulation_name: str):
-        self.__results_folder = results_folder
-        self.__simulation_name = simulation_name
-        self.__path = os.path.join(
-            pathlib.Path(),
-            self.__results_folder,
-            self.__simulation_name
-        )
+    def __init__(self, results_path: str):
+        self.__path = results_path
         self.__postprocess_output_folder = os.path.join(
             self.__path,
             "postprocess"
@@ -142,7 +131,10 @@ class SimulationResults():
     def postprocess_path(self):
         return self.__postprocess_output_folder
 
-    def get_metadata(self, scenario_description: str) -> pd.DataFrame:
+    def get_metadata(
+        self,
+        scenario_description: str = "",
+    ) -> pd.DataFrame:
         """
             Metadata fields: 
             - simulation_submission_time (Temporarily removed because this
@@ -154,14 +146,14 @@ class SimulationResults():
             Some fields are just placeholders, where we need to fill it up manually.
         """
         simulated_years = self.get_simulated_years()
-        scenario_short_name = self.__simulation_name
         output = pd.DataFrame.from_dict(
             {
                 # "simulation_submission_time": submission_time,
                 "reference_year": "2015", # could be left empty
                 "simulated_years": ",".join(map(str, simulated_years)),
                 "scenario_description": scenario_description,
-                "scenario_short_name": scenario_short_name
+                # scenario_short_name doesn't seem to be used but must exist
+                "scenario_short_name": ""
             },
             orient='index',
             columns=["info"]

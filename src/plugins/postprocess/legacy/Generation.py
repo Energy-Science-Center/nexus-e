@@ -225,13 +225,11 @@ class Generation:
     def __init__(
         self,
         postprocess_output_path,
-        simulation,
         models,
         centiv_years,
         distiv=True
     ):
         self.postprocess_output_path = postprocess_output_path
-        self.simulation = simulation
         self.models = models
         self.centiv_years = centiv_years
         self.distiv = distiv
@@ -957,7 +955,7 @@ class Generation:
                     print("---------------------------------------------------------")
                     print("")
 
-def main(simulation: str):
+def main():
     os.path.abspath(os.curdir)
     global postprocess_output_directory
     postprocess_output_directory = "postprocess"
@@ -1011,7 +1009,6 @@ def main(simulation: str):
 
     generation = Generation(
         postprocess_output_directory,
-        simulation,
         models,
         centiv_years,
         distiv=DistIV

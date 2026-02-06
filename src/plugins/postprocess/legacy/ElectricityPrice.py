@@ -19,7 +19,6 @@ def create_elprices(
     CentIvDirectory,
     flexeco_dir,
     simulation_postprocess_path,
-    simu_name,
     single_electric_node,
     elprices_dfs
 ):
@@ -192,7 +191,6 @@ def create_elprices(
 def write_annual_elprices(
     annual_elprices_dfs,
     simulation_postprocess_path,
-    simu_name
 ):
     for model in annual_elprices_dfs:
         # annual electricity price
@@ -206,7 +204,7 @@ def write_annual_elprices(
         )
 
 
-def main(simulation: str, single_electric_node: bool):
+def main(single_electric_node: bool):
     simulation_postprocess_path = "postprocess"
     centiv_years = get_years_simulated_by_centiv(Path())
     elprices_dfs = {}
@@ -219,5 +217,5 @@ def main(simulation: str, single_electric_node: bool):
         global flexeco_dir
         flexeco_dir = f"FlexEco_{year}"
   
-        create_elprices(year,CentIvDirectory,flexeco_dir,simulation_postprocess_path,simulation,single_electric_node,elprices_dfs)
-        write_annual_elprices(annual_elprices_dfs, simulation_postprocess_path, simulation)
+        create_elprices(year,CentIvDirectory,flexeco_dir,simulation_postprocess_path,single_electric_node,elprices_dfs)
+        write_annual_elprices(annual_elprices_dfs, simulation_postprocess_path)

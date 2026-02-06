@@ -27,8 +27,7 @@ from .legacy import generateGridExpansionMap as postprocess_cascades_grid_expans
 
 class CascadesPostprocess():
 
-    def __init__(self, results_simulation_folder: str, postprocess_path: str):
-        self.__results_simulation_fodler = results_simulation_folder
+    def __init__(self, postprocess_path: str):
         self.__postprocess_path = postprocess_path
 
     def run(self):
@@ -47,9 +46,7 @@ class CascadesPostprocess():
             logging.info("DONE")
 
             logging.info("Executing grid expansion map generation...")
-            postprocess_cascades_grid_expansion_map.main(
-                simulation=self.__results_simulation_fodler
-            )
+            postprocess_cascades_grid_expansion_map.main()
             logging.info("DONE")
 
         finally:

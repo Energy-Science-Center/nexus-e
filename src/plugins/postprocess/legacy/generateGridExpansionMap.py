@@ -5,7 +5,7 @@ import subprocess
 import glob
 
 
-def main(simulation: str):
+def main():
     module_directory = os.path.dirname(os.path.abspath(__file__))
 
     # Get a list of years

@@ -19,7 +19,6 @@ class Capacity:
     def __init__(
         self,
         simulation_postprocess_path,
-        simu_name,
         centIv_listyears,
         pv_inv,
         bat_inv,
@@ -31,7 +30,6 @@ class Capacity:
         password
     ):
         self.simulation_postprocess_path = simulation_postprocess_path
-        self.simu_name = simu_name
         self.centIv_listyears = centIv_listyears
         self.pv_inv = pv_inv
         self.bat_inv = bat_inv
@@ -315,7 +313,7 @@ class Capacity:
             )
         )
 
-def main(simulation: str, database: str, host: str, user: str, password: str):
+def main(database: str, host: str, user: str, password: str):
     simulation_postprocess_path = "postprocess"
 
     # read generator file
@@ -331,7 +329,6 @@ def main(simulation: str, database: str, host: str, user: str, password: str):
 
     capacity = Capacity(
         simulation_postprocess_path,
-        simulation,
         centIv_listyears,
         pv_inv,
         bat_inv,

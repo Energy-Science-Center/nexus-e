@@ -209,7 +209,6 @@ class AnnualDataCollectionAnnualized:
     def __init__(
         self,
         year,
-        simulation: str,
         database: str,
         output_path: str,
         centiv_only: bool,
@@ -219,7 +218,6 @@ class AnnualDataCollectionAnnualized:
         previous_object=None,
     ):
         self.year = year
-        self.simulation = simulation
         self.database = database
         self.centiv_only = centiv_only
         self.host = host
@@ -464,7 +462,7 @@ def discount_df(df, rate, ignore_columns=None):
 
 
 class OutputPreparerAnnualized:
-    def __init__(self, output_path: str, simulation: str):
+    def __init__(self, output_path: str):
         """
         This class is used to create the output files
         """
@@ -644,7 +642,7 @@ class OutputPreparerAnnualized:
         self.__prepare_outputs(df_costtyper_for_technologies, 'costtypes_per_technologies', technologies=False, add_columns_to_accumulation=['Technology', 'Cost Type'])
         return
 
-def main(simulation: str, database: str, host: str, user: str, password: str):
+def main(database: str, host: str, user: str, password: str):
     # output path
     output_path = os.path.join(
         "postprocess",
@@ -664,7 +662,6 @@ def main(simulation: str, database: str, host: str, user: str, password: str):
     for year in centiv_years:
         annualized_cost = AnnualDataCollectionAnnualized(
             year=year,
-            simulation=simulation,
             database=database,
             centiv_only= not has_distiv_results,
             output_path=output_path,
@@ -678,5 +675,4 @@ def main(simulation: str, database: str, host: str, user: str, password: str):
 
     OutputPreparerAnnualized(
         output_path=output_path,
-        simulation=simulation
     )

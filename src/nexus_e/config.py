@@ -102,8 +102,6 @@ class Scenario:
     create_a_copy: bool = True
     copy_name: str = "created_by_nexus_e"
     delete_copy_after_simulation: bool = True
-    output_name: str = ""
-    description: str = ""
     user_initials: str = "XX"
 
 
@@ -113,18 +111,10 @@ class Module:
     parameters: dict = field(default_factory=dict)
 
 
-
 @dataclass
 class Results:
     base_folder: str = "Results"
     create_new_simulation_results_folder: bool = True
-    simulation_folder: str = ""
-    plot_config_file_path: str = ""
-
-
-@dataclass
-class Simulation:
-    execution_date: str = "created_by_nexus_e"
 
 
 @dataclass
@@ -167,7 +157,6 @@ class Config:
     logging: Logging = field(default_factory=Logging)
     scenario: Scenario = field(default_factory=Scenario)
     results: Results = field(default_factory=Results)
-    simulation: Simulation = field(default_factory=Simulation)
     modules: Modules = field(default_factory=Modules)
 
     def parse(self, **config: dict):

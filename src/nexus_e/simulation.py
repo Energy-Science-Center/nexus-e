@@ -52,25 +52,18 @@ class CoreModuleFactory(ModuleFactory):
             parameters["single_electric_node"] = (
                 self.settings.modules.commons["single_electric_node"]
             )
-            parameters["results_folder"] = os.path.join(
-                self.settings.results.base_folder,
-                self.settings.results.simulation_folder,
-            )
+            parameters["results_path"] = self.settings.modules.commons["results_path"]
             parameters.update(module_config.parameters)
             return centiv.CentIvModule(parameters)
         elif module_config.name == "postprocess":
             parameters = {}
-            parameters["results_base_path"] = self.settings.results.base_folder
-            parameters["results_simulation_folder"] = self.settings.results.simulation_folder
-            parameters["plot_config_file_path"] = self.settings.results.plot_config_file_path
-            parameters["scenario_description"] = self.settings.scenario.description
-            parameters["execution_date"] = self.settings.simulation.execution_date
-            parameters["scenario_original_name"] = self.settings.scenario.original_name
+            parameters["results_path"] = self.settings.modules.commons["results_path"]
+            parameters["input_data_name"] = self.settings.scenario.copy_name
+            parameters["execution_date"] = self.settings.modules.commons["execution_date"]
             parameters["single_electric_node"] = self.settings.modules.commons["single_electric_node"]
             parameters["input_host"] = self.settings.modules.commons["input_data_host"]
             parameters["input_user"] = self.settings.modules.commons["input_data_user"]
             parameters["input_password"] = self.settings.modules.commons["input_data_password"]
-            parameters["output_name"] = self.settings.scenario.output_name
             parameters.update(module_config.parameters)
             return PostProcess(parameters)
         elif module_config.name == "update_investments":
@@ -79,10 +72,7 @@ class CoreModuleFactory(ModuleFactory):
             parameters["user"] = self.settings.modules.commons["input_data_user"]
             parameters["password"] = self.settings.modules.commons["input_data_password"]
             parameters["dbName"] = self.settings.scenario.copy_name
-            parameters["simulation_results_folder"] = os.path.join(
-                self.settings.results.base_folder,
-                self.settings.results.simulation_folder
-            )
+            parameters["simulation_results_folder"] = self.settings.modules.commons["results_path"]
             parameters.update(module_config.parameters)
             return UpdateInvestments(parameters)
         elif module_config.name == "upload_scenario":
@@ -157,10 +147,10 @@ class Simulation:
         self.settings = settings
 
     def run(self, module_factory: ModuleFactory):
-        self.settings.simulation.execution_date = datetime.now().strftime(
+        self.settings.modules.commons["execution_date"] = datetime.now().strftime(
             "%Y-%m-%dT%H-%M-%S"
         )
-        logging.info("Save simulation execution date in settings")
+        logging.warning("Add execution_date to modules commons parameters")
         config.write(self.settings)
 
         if self.settings.results.create_new_simulation_results_folder:
@@ -173,7 +163,7 @@ class Simulation:
             module.run()
 
     def __setup_results_folder(self):
-        timestamp = self.settings.simulation.execution_date
+        timestamp = self.settings.modules.commons["execution_date"]
         results_folder_name = f"{self.settings.scenario.original_name}_{timestamp}"
         results_folder_path = os.path.join(
             self.settings.results.base_folder, results_folder_name
@@ -181,6 +171,6 @@ class Simulation:
         logging.info(f"Setup results folder: {results_folder_path}")
         os.makedirs(results_folder_path, exist_ok=True)
 
-        self.settings.results.simulation_folder = results_folder_name
-        logging.info("Save results folder in settings")
+        self.settings.modules.commons["results_path"] = results_folder_path
+        logging.warning("Add results_path to modules commons parameters")
         config.write(self.settings)

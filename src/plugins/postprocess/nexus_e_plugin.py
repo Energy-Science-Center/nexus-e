@@ -1,4 +1,5 @@
 from dataclasses import dataclass, asdict
+from datetime import datetime
 import logging
 import os
 import pandas as pd
@@ -43,6 +44,14 @@ class NexusePlugin(Plugin):
             parameters["output_user"] = parameters["input_user"]
         if "output_password" not in parameters:
             parameters["output_password"] = parameters["input_password"]
+        if "output_name" not in parameters:
+            parameters["output_name"] = parameters["input_data_name"]
+            logging.warning(
+                (
+                    "No output_name given, defaulting to input_data_name: "
+                    + f"{parameters['output_name']}"
+                )
+            )
         self.__parameters = Parameters(**parameters)
         self.__simulation_results = SimulationResults(
             results_path = self.__parameters.results_path,

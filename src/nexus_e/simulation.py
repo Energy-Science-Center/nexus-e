@@ -59,13 +59,11 @@ class CoreModuleFactory(ModuleFactory):
             parameters = {}
             parameters["results_path"] = self.settings.modules.commons["results_path"]
             parameters["input_data_name"] = self.settings.scenario.copy_name
-            parameters["scenario_description"] = self.settings.scenario.description
             parameters["execution_date"] = self.settings.modules.commons["execution_date"]
             parameters["single_electric_node"] = self.settings.modules.commons["single_electric_node"]
             parameters["input_host"] = self.settings.modules.commons["input_data_host"]
             parameters["input_user"] = self.settings.modules.commons["input_data_user"]
             parameters["input_password"] = self.settings.modules.commons["input_data_password"]
-            parameters["output_name"] = self.settings.scenario.output_name
             parameters.update(module_config.parameters)
             return PostProcess(parameters)
         elif module_config.name == "update_investments":

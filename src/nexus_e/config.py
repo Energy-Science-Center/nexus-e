@@ -102,8 +102,6 @@ class Scenario:
     create_a_copy: bool = True
     copy_name: str = "created_by_nexus_e"
     delete_copy_after_simulation: bool = True
-    output_name: str = ""
-    description: str = ""
     user_initials: str = "XX"
 
 

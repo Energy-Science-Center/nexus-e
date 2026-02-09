@@ -1,0 +1,11 @@
+# Ignore everything
+*
+
+# Except this file
+!.gitignore
+
+# Except debuggers config
+!launch.json
+
+# Except the following code snippets
+!test.code-snippets

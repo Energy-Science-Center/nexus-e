@@ -12,9 +12,6 @@ wheels/
 # Slurm job files
 *.out
 
-# VS Code settings
-.vscode/**/*
-
 # Log files
 *.log
 

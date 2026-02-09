@@ -1,0 +1,8 @@
+# Ignore everything
+*
+
+# Except this file
+!.gitignore
+
+# Except debuggers config
+!launch.json

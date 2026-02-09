@@ -6,3 +6,6 @@
 
 # Except debuggers config
 !launch.json
+
+# Except the following code snippets
+!test.code-snippets

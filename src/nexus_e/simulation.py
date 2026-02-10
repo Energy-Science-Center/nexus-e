@@ -10,6 +10,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
 from plugins.centiv.cgep import create_scenario_fast as centiv
+from plugins.copy_database.nexus_e_plugin import NexusePlugin as CopyDatabase
 from plugins.postprocess.nexus_e_plugin import NexusePlugin as PostProcess
 from plugins.update_investments.nexus_e_plugin import NexusePlugin as UpdateInvestments
 from plugins.upload_scenario.nexus_e_plugin import NexusePlugin as ScenarioUploader
@@ -99,6 +100,11 @@ class CoreModuleFactory(ModuleFactory):
             parameters["dbName"] = self.settings.scenario.copy_name
             parameters.update(module_config.parameters)
             return RESDataUploader(config=parameters)
+        elif module_config.name == "copy_database":
+            parameters = {}
+            parameters.update(self.settings.modules.commons)
+            parameters.update(module_config.parameters)
+            return CopyDatabase(parameters=parameters)
         else:
             raise UnknownModule(module_config.name)
 

@@ -9,7 +9,7 @@ import logging
 import os
 
 from . import config
-from .simulation import Simulation, CoreModuleFactory
+from .simulation import Simulation, CorePluginFactory
 
 
 class App:
@@ -39,11 +39,11 @@ class App:
     def __run_simulation(cls, settings: config.Config):
         error = None
         try:
-            module_factory = CoreModuleFactory(
+            plugin_factory = CorePluginFactory(
                 settings=settings
             )
             simulation = Simulation(settings=settings)
-            simulation.run(module_factory=module_factory)
+            simulation.run(module_factory=plugin_factory)
 
         except Exception as e:
             error = e  # store the exception

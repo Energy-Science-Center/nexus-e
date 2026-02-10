@@ -1,15 +1,17 @@
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 import logging
-from pathlib import Path
 import nexus_e_interface
-import pandas as pd
 import numpy as np
+import pandas as pd
+from pathlib import Path
 import pymysql
 from sqlalchemy import JSON, Column, text, func
 from sqlmodel import Field, SQLModel, Session, create_engine, select
 
+from nexus_e_interface.plugin import Plugin
+
 @dataclass
-class Config:
+class Parameters:
     input_data_host: str = "localhost"
     input_data_user: str = "username"
     input_data_password: str = "password"
@@ -31,11 +33,13 @@ class Config:
 
 
 
-class RESDataUploader:
-    """
-    """
-    def __init__(self, config: dict, scenario: nexus_e_interface.Scenario = None):
-        self.__settings = Config(**config)
+class NexusePlugin(Plugin):
+    @classmethod
+    def get_default_parameters(cls) -> dict:
+        return asdict(Parameters())
+    
+    def __init__(self, parameters: dict, scenario: nexus_e_interface.Scenario | None = None):
+        self.__settings = Parameters(**parameters)
         
         # Copy database if requested
         if self.__settings.copy_database:

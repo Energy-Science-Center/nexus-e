@@ -15,7 +15,7 @@ from plugins.delete_database_copies.nexus_e_plugin import NexusePlugin as Delete
 from plugins.postprocess.nexus_e_plugin import NexusePlugin as PostProcess
 from plugins.update_investments.nexus_e_plugin import NexusePlugin as UpdateInvestments
 from plugins.upload_scenario.nexus_e_plugin import NexusePlugin as ScenarioUploader
-from plugins.upload_res_data import RESDataUploader
+from plugins.upload_res_data.upload_res_data import NexusePlugin as UploadResData
 from plugins.update_inv_costs.nexus_e_plugin import NexusePlugin as UpdateInvCosts
 
 from . import config
@@ -100,7 +100,7 @@ class CoreModuleFactory(ModuleFactory):
             parameters["input_data_password"] = self.settings.modules.commons["input_data_password"]
             parameters["input_data_name"] = self.settings.modules.commons["input_data_name"]
             parameters.update(module_config.parameters)
-            return RESDataUploader(config=parameters)
+            return UploadResData(parameters=parameters)
         elif module_config.name == "copy_database":
             parameters = {}
             parameters.update(self.settings.modules.commons)

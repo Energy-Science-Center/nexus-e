@@ -46,9 +46,9 @@ class Config:
     push_to_mysql: bool = True
     database_name: str = "project_date_version"
     database_author: str = "FirstName LastName"
-    host: str = "localhost"
-    user: str = "root"
-    password: str = "root"
+    input_data_host: str = "localhost"
+    input_data_user: str = "root"
+    input_data_password: str = "root"
     dump_file_path: str = "src/plugins/upload_scenario/schemas/Dump_STRUC_clean_v9.sql"
 
     include_flex_params: bool = False
@@ -154,9 +154,9 @@ class NexusePlugin(Plugin):
         self.my_sql_connector = MysqlConnector(
             push_to_mysql=self.settings.push_to_mysql,
             inputDB=inputDB,
-            host=self.settings.host,
-            user=self.settings.user,
-            password=self.settings.password,
+            host=self.settings.input_data_host,
+            user=self.settings.input_data_user,
+            password=self.settings.input_data_password,
             database_name=self.settings.database_name,
             dump_file_path=self.settings.dump_file_path,
             include_flex_params=self.settings.include_flex_params

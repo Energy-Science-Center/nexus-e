@@ -79,9 +79,9 @@ class CoreModuleFactory(ModuleFactory):
             return UpdateInvestments(parameters)
         elif module_config.name == "upload_scenario":
             parameters = {}
-            parameters["host"] = self.settings.modules.commons["input_data_host"]
-            parameters["user"] = self.settings.modules.commons["input_data_user"]
-            parameters["password"] = self.settings.modules.commons["input_data_password"]
+            parameters["input_data_host"] = self.settings.modules.commons["input_data_host"]
+            parameters["input_data_user"] = self.settings.modules.commons["input_data_user"]
+            parameters["input_data_password"] = self.settings.modules.commons["input_data_password"]
             parameters.update(module_config.parameters)
             return ScenarioUploader(parameters)
         elif module_config.name == "update_inv_costs":

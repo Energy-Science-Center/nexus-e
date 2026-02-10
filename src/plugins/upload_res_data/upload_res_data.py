@@ -4,18 +4,16 @@ from pathlib import Path
 import nexus_e_interface
 import pandas as pd
 import numpy as np
-import json
-import subprocess
 import pymysql
 from sqlalchemy import JSON, Column, text, func
 from sqlmodel import Field, SQLModel, Session, create_engine, select
 
 @dataclass
 class Config:
-    host: str = "localhost"
-    user: str = "username"
-    password: str = "password"
-    dbName: str = "database_name"
+    input_data_host: str = "localhost"
+    input_data_user: str = "username"
+    input_data_password: str = "password"
+    input_data_name: str = "database_name"
     upload_pv: bool = False
     pv_data_year: str = "weather year" # Options: 2016
     pv_data_scenario: str = "aggregation level"  # Options: 'full resolution', 'aggregated',
@@ -46,12 +44,12 @@ class RESDataUploader:
             self.__copy_database()
             target_db = self.__settings.new_dbName
         else:
-            target_db = self.__settings.dbName
+            target_db = self.__settings.input_data_name
         
-        logging.info(f"Connecting to database: {target_db} on host: {self.__settings.host}")
+        logging.info(f"Connecting to database: {target_db} on host: {self.__settings.input_data_host}")
         self.__engine = create_engine((
-            f"mysql+pymysql://{self.__settings.user}:{self.__settings.password}"
-            f"@{self.__settings.host}/{target_db}"))
+            f"mysql+pymysql://{self.__settings.input_data_user}:{self.__settings.input_data_password}"
+            f"@{self.__settings.input_data_host}/{target_db}"))
         
         # Dictionary to store GenName -> idProfile mapping for current upload session
         self.__genname_to_idprofile = {}
@@ -112,18 +110,18 @@ class RESDataUploader:
 
     def __copy_database(self):
         """Copy the original database to a new database name using SQL queries directly"""
-        original_db = self.__settings.dbName
+        original_db = self.__settings.input_data_name
         new_db = self.__settings.new_dbName
         
         logging.info(f"Copying database '{original_db}' to '{new_db}' directly...")
         
         try:
             # Create connection to MySQL server with timeout
-            logging.debug(f"Connecting to MySQL server {self.__settings.host}...")
+            logging.debug(f"Connecting to MySQL server {self.__settings.input_data_host}...")
             conn = pymysql.connect(
-                host=self.__settings.host,
-                user=self.__settings.user,
-                password=self.__settings.password,
+                host=self.__settings.input_data_host,
+                user=self.__settings.input_data_user,
+                password=self.__settings.input_data_password,
                 connect_timeout=30
             )
             cursor = conn.cursor()

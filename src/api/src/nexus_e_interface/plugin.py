@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Any
 from .scenario import Scenario
 
 class Plugin(ABC):
@@ -11,7 +12,7 @@ class Plugin(ABC):
     def __init__(self, scenario: Scenario | None, parameters: dict): ...
 
     @abstractmethod
-    def run(self) -> None: ...
+    def run(self) -> dict[str, Any]: ...
 
     @classmethod
     @abstractmethod

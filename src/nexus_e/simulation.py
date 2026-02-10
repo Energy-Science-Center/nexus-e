@@ -10,6 +10,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
 from plugins.centiv.cgep import create_scenario_fast as centiv
+from plugins.copy_database.nexus_e_plugin import NexusePlugin as CopyDatabase
 from plugins.postprocess.nexus_e_plugin import NexusePlugin as PostProcess
 from plugins.update_investments.nexus_e_plugin import NexusePlugin as UpdateInvestments
 from plugins.upload_scenario.nexus_e_plugin import NexusePlugin as ScenarioUploader
@@ -37,7 +38,7 @@ class CoreModuleFactory(ModuleFactory):
     def __init__(self, settings: config.Config):
         self.settings = settings
 
-    def get_module(self, module_config: config.Module) -> Module:
+    def get_module(self, module_config: config.Module) -> Module | Plugin:
         if module_config.name == "centiv":
             # First add module-wide parameters to avoid rewriting them in
             # the config file
@@ -99,6 +100,11 @@ class CoreModuleFactory(ModuleFactory):
             parameters["dbName"] = self.settings.scenario.copy_name
             parameters.update(module_config.parameters)
             return RESDataUploader(config=parameters)
+        elif module_config.name == "copy_database":
+            parameters = {}
+            parameters.update(self.settings.modules.commons)
+            parameters.update(module_config.parameters)
+            return CopyDatabase(parameters=parameters)
         else:
             raise UnknownModule(module_config.name)
 
@@ -150,7 +156,10 @@ class Simulation:
         self.settings.modules.commons["execution_date"] = datetime.now().strftime(
             "%Y-%m-%dT%H-%M-%S"
         )
-        logging.warning("Add execution_date to modules commons parameters")
+        logging.warning(
+            "Update common parameter execution_date "
+            f"with value {self.settings.modules.commons['execution_date']}"
+        )
         config.write(self.settings)
 
         if self.settings.results.create_new_simulation_results_folder:
@@ -160,7 +169,18 @@ class Simulation:
             logging.info(f"Run module: {module_config}")
             module: Module = module_factory.get_module(module_config)
             logging.info("Module created")
-            module.run()
+            updated_common_parameters: dict | None = module.run()
+            if updated_common_parameters:
+                updated_common_parameters = {
+                    k: v
+                    for k, v in updated_common_parameters.items()
+                    # None is not TOML serializable
+                    if v is not None
+                }
+                for k, v in updated_common_parameters.items():
+                    logging.warning(f"Update common parameter {k} with value: {v}")
+                self.settings.modules.commons.update(updated_common_parameters)
+                config.write(self.settings)
 
     def __setup_results_folder(self):
         timestamp = self.settings.modules.commons["execution_date"]
@@ -172,5 +192,8 @@ class Simulation:
         os.makedirs(results_folder_path, exist_ok=True)
 
         self.settings.modules.commons["results_path"] = results_folder_path
-        logging.warning("Add results_path to modules commons parameters")
+        logging.warning(
+            "Update common parameter results_path "
+            f"with value {results_folder_path}"
+        )
         config.write(self.settings)

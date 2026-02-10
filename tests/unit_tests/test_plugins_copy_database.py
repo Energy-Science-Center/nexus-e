@@ -1,4 +1,4 @@
-from src.nexus_e.database import DatabaseCopyNamer
+from src.plugins.copy_database.database import DatabaseCopyNamer
 
 
 class TestDatabase:

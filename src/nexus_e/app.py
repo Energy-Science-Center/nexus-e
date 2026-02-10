@@ -10,7 +10,6 @@ import os
 
 from . import config
 from .simulation import Simulation, CoreModuleFactory
-from .database import MySQLDatabaseContext, DatabaseCopyNamer
 
 
 class App:
@@ -40,27 +39,6 @@ class App:
     def __run_simulation(cls, settings: config.Config):
         error = None
         try:
-            database_context = MySQLDatabaseContext(
-                host=settings.modules.commons["input_data_host"],
-                port=settings.modules.commons["input_data_port"],
-                username=settings.modules.commons["input_data_user"],
-                password=settings.modules.commons["input_data_password"],
-            )
-            if settings.scenario.create_a_copy:
-                logging.info(f"Copy database: {settings.scenario.original_name}")
-                name_generator = DatabaseCopyNamer(
-                    settings.scenario.user_initials
-                )
-                database_copy_name = name_generator.create_copy_name(
-                    settings.scenario.original_name
-                )
-                database_context.copy_database(
-                    settings.scenario.original_name, database_copy_name
-                )
-                logging.info(f"New database created: {database_copy_name}")
-                settings.scenario.copy_name = database_copy_name
-                config.write(settings)
-
             module_factory = CoreModuleFactory(
                 settings=settings
             )
@@ -74,14 +52,6 @@ class App:
                 exc_info=True
             )
             raise e
-
-        finally:
-            if settings.scenario.delete_copy_after_simulation:
-                logging.info(
-                    f"Delete database: {settings.scenario.copy_name}"
-                )
-                database_context.drop_database(settings.scenario.copy_name)
-                logging.info(f"Database deleted: {settings.scenario.copy_name}")
 
         # The error is handled this way because on the Euler cluster,
         # I want the error to still appear in the SLURM log and error files.

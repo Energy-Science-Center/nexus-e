@@ -8,6 +8,7 @@ import logging
 import os
 import re
 import subprocess
+from typing import Any
 
 import mysql
 import mysql.connector
@@ -93,7 +94,8 @@ class NexusePlugin(Plugin):
     def __init__(self, parameters: dict, scenario: Scenario | None = None):
         self.settings = Config(**parameters)
 
-    def run(self) -> None:
+    def run(self) -> dict[str, Any]:
+        output = {}
         # Load the data
         self.data_loader = DataLoader(
             excel_file_path=self.settings.excel_file_path
@@ -163,6 +165,8 @@ class NexusePlugin(Plugin):
         logging.info("Push data to database...")
         self.my_sql_connector.push_DB_to_mysql()
         logging.info("Done")
+        output["input_data_name"] = self.settings.database_name
+        return output
 
     def __create_excel(
         self,

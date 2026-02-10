@@ -6,7 +6,8 @@ import json
 import re
 import logging
 
-from nexus_e.database import MYSQL_DATABASE_NAME_MAX_LENGTH
+MYSQL_DATABASE_NAME_MAX_LENGTH = 64
+"""MySQL maximum length for database names."""
 
 def main(
     simulation_postprocess_path: str,

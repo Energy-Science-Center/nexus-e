@@ -87,10 +87,10 @@ class CoreModuleFactory(ModuleFactory):
         elif module_config.name == "update_inv_costs":
             from plugins.update_inv_costs import InvCostDataUpdater
             parameters = {}
-            parameters["host"] = self.settings.modules.commons["input_data_host"]
-            parameters["user"] = self.settings.modules.commons["input_data_user"]
-            parameters["password"] = self.settings.modules.commons["input_data_password"]
-            parameters["dbName"] = self.settings.modules.commons["input_data_name"]
+            parameters["input_data_host"] = self.settings.modules.commons["input_data_host"]
+            parameters["input_data_user"] = self.settings.modules.commons["input_data_user"]
+            parameters["input_data_password"] = self.settings.modules.commons["input_data_password"]
+            parameters["input_data_name"] = self.settings.modules.commons["input_data_name"]
             parameters.update(module_config.parameters)
             return InvCostDataUpdater(config=parameters)
         elif module_config.name == "upload_res_data":

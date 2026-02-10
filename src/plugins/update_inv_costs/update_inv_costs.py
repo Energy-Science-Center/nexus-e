@@ -9,10 +9,10 @@ from nexus_e import simulation
 
 @dataclass
 class Config:
-    host: str = "localhost"
-    user: str = "username"
-    password: str = "password"
-    dbName: str = "database_name"
+    input_data_host: str = "localhost"
+    input_data_user: str = "username"
+    input_data_password: str = "password"
+    input_data_name: str = "database_name"
     cost_scenario: Literal["Low", "Reference", "High"] = "Reference"
     
 
@@ -37,9 +37,9 @@ class InvCostDataUpdater(simulation.Module):
         # Add connection timeout to fail faster - increased for slow networks
         # Disable SSL/TLS to avoid handshake hangs
         connection_string = (
-            f"mysql+mysqlconnector://{self.__settings.user}:"
-            f"{self.__settings.password}@{self.__settings.host}/"
-            f"{self.__settings.dbName}?connect_timeout=10&"
+            f"mysql+mysqlconnector://{self.__settings.input_data_user}:"
+            f"{self.__settings.input_data_password}@{self.__settings.input_data_host}/"
+            f"{self.__settings.input_data_name}?connect_timeout=10&"
             f"ssl_disabled=true&use_pure=true"
         )
         self.__engine = create_engine(

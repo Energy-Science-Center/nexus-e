@@ -16,6 +16,7 @@ from plugins.postprocess.nexus_e_plugin import NexusePlugin as PostProcess
 from plugins.update_investments.nexus_e_plugin import NexusePlugin as UpdateInvestments
 from plugins.upload_scenario.nexus_e_plugin import NexusePlugin as ScenarioUploader
 from plugins.upload_res_data import RESDataUploader
+from plugins.update_inv_costs.update_inv_costs import NexusePlugin as UpdateInvCosts
 
 from . import config
 
@@ -85,14 +86,13 @@ class CoreModuleFactory(ModuleFactory):
             parameters.update(module_config.parameters)
             return ScenarioUploader(parameters)
         elif module_config.name == "update_inv_costs":
-            from plugins.update_inv_costs import InvCostDataUpdater
             parameters = {}
             parameters["input_data_host"] = self.settings.modules.commons["input_data_host"]
             parameters["input_data_user"] = self.settings.modules.commons["input_data_user"]
             parameters["input_data_password"] = self.settings.modules.commons["input_data_password"]
             parameters["input_data_name"] = self.settings.modules.commons["input_data_name"]
             parameters.update(module_config.parameters)
-            return InvCostDataUpdater(config=parameters)
+            return UpdateInvCosts(parameters=parameters)
         elif module_config.name == "upload_res_data":
             parameters = {}
             parameters["host"] = self.settings.modules.commons["input_data_host"]

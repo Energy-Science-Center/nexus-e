@@ -1,1 +1,0 @@
-from .upload_res_data import RESDataUploader

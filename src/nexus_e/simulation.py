@@ -16,7 +16,7 @@ from plugins.postprocess.nexus_e_plugin import NexusePlugin as PostProcess
 from plugins.update_investments.nexus_e_plugin import NexusePlugin as UpdateInvestments
 from plugins.upload_scenario.nexus_e_plugin import NexusePlugin as ScenarioUploader
 from plugins.upload_res_data import RESDataUploader
-from plugins.update_inv_costs.update_inv_costs import NexusePlugin as UpdateInvCosts
+from plugins.update_inv_costs.nexus_e_plugin import NexusePlugin as UpdateInvCosts
 
 from . import config
 

@@ -44,11 +44,11 @@ class CoreModuleFactory(ModuleFactory):
             # First add module-wide parameters to avoid rewriting them in
             # the config file
             parameters = {}
-            parameters["DB_host"] = self.settings.modules.commons["input_data_host"]
-            parameters["DB_name"] = self.settings.modules.commons["input_data_name"]
-            parameters["DB_user"] = self.settings.modules.commons["input_data_user"]
-            parameters["DB_pwd"] = self.settings.modules.commons["input_data_password"]
-            parameters["tpResolution"] = (
+            parameters["input_data_host"] = self.settings.modules.commons["input_data_host"]
+            parameters["input_data_name"] = self.settings.modules.commons["input_data_name"]
+            parameters["input_data_user"] = self.settings.modules.commons["input_data_user"]
+            parameters["input_data_password"] = self.settings.modules.commons["input_data_password"]
+            parameters["resolution_in_days"] = (
                 self.settings.modules.commons["resolution_in_days"]
             )
             parameters["single_electric_node"] = (

@@ -1,5 +1,6 @@
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 import logging
+from typing import Any
 
 from .database import DatabaseCopyNamer, MySQLDatabaseContext
 
@@ -18,6 +19,8 @@ class Parameters:
     """MySQL server password."""
     input_data_name: str = ""
     """Name of the database to be copied."""
+    database_copies: list[dict[str, str]] = field(default_factory=list)
+    """List of copied and original databases names to append the new copy to."""
     forced_copy_name: str = ""
     """Force the name given to the database copy."""
     user_initials: str = ""
@@ -27,6 +30,10 @@ class Parameters:
     """
 
 class NexusePlugin(Plugin):
+    """
+    This plugin creates a copy of the MySQL database whose name is given by
+    the input_data_name parameter.
+    """
 
     @classmethod
     def get_default_parameters(cls) -> dict:
@@ -40,7 +47,8 @@ class NexusePlugin(Plugin):
         }
         self.__parameters = Parameters(**parameters)
 
-    def run(self) -> None:
+    def run(self) -> dict[str, Any]:
+        output = {}
         if self.__parameters.forced_copy_name:
             database_copy_name = self.__parameters.forced_copy_name
         else:
@@ -61,4 +69,15 @@ class NexusePlugin(Plugin):
             self.__parameters.input_data_name, database_copy_name
         )
         logging.info(f"New database created: {database_copy_name}")
+        output["input_data_name"] = database_copy_name
+        output["database_copies"] = (
+            self.__parameters.database_copies.copy()
+        )
+        output["database_copies"].append(
+            {
+                "copy_name": database_copy_name,
+                "original_name": self.__parameters.input_data_name
+            }
+        )
+        return output
         

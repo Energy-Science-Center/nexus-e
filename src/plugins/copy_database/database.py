@@ -28,8 +28,7 @@ USER_INITIALS_MAX_LENGTH = 4
 
 class MySQLDatabaseContext:
     def __init__(self, host: str, port: str, username: str, password: str):
-        """A MySQLDatabaseCopier is constructed with a database server
-        connection's credentials.
+        """Used to connect to a MySQL server and copy databases there.
 
         Args:
             host: server's URL

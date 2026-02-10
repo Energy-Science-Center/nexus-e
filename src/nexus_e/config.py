@@ -97,15 +97,6 @@ class Logging:
 
 
 @dataclass
-class Scenario:
-    original_name: str = ""
-    create_a_copy: bool = True
-    copy_name: str = "created_by_nexus_e"
-    delete_copy_after_simulation: bool = True
-    user_initials: str = "XX"
-
-
-@dataclass
 class Module:
     name: str = ""
     parameters: dict = field(default_factory=dict)
@@ -155,7 +146,6 @@ class Config:
     """
 
     logging: Logging = field(default_factory=Logging)
-    scenario: Scenario = field(default_factory=Scenario)
     results: Results = field(default_factory=Results)
     modules: Modules = field(default_factory=Modules)
 

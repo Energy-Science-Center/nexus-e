@@ -1,3 +1,10 @@
+# Copy Database
+[[modules]]
+name = "copy_database"
+[modules.parameters]
+user_initials = "XX"
+
+
 # Run CentIv for year 2050
 [[modules]]
 name = "centiv"
@@ -11,3 +18,9 @@ name = "postprocess"
 [modules.parameters]
 centiv = true
 move_to_mysql = true
+
+
+# Delete database copies
+[[modules]]
+name = "delete_database_copies"
+[modules.parameters]

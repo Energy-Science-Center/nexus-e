@@ -1,9 +1,15 @@
+# Copy Database
+[[modules]]
+name = "copy_database"
+[modules.parameters]
+user_initials = "XX"
+
+
 # Run CentIv for year 2020
 [[modules]]
 name = "centiv"
 [modules.parameters]
 idScenario = 2
-timeperiods = 48
 # Update investments from CentIv 2020
 [[modules]]
 name = "update_investments"
@@ -18,7 +24,6 @@ scenYear = 2020
 name = "centiv"
 [modules.parameters]
 idScenario = 5
-timeperiods = 48
 # Update investments from CentIv 2050
 [[modules]]
 name = "update_investments"
@@ -34,3 +39,9 @@ name = "postprocess"
 [modules.parameters]
 centiv = true
 move_to_mysql = true
+
+
+# Delete database copies
+[[modules]]
+name = "delete_database_copies"
+[modules.parameters]

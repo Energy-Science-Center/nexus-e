@@ -20,9 +20,9 @@ class Parameters:
     move_to_mysql: bool = False
     scenario_description: str = ""
     execution_date: str = ""
-    input_host: str = ""
-    input_user: str = ""
-    input_password: str = ""
+    input_data_host: str = ""
+    input_data_user: str = ""
+    input_data_password: str = ""
     output_name: str = ""
     output_host: str = ""
     output_port: str = "3307"
@@ -37,13 +37,13 @@ class NexusePlugin(Plugin):
 
     def __init__(self, parameters: dict, scenario: Scenario | None = None):
         if "output_host" not in parameters:
-            parameters["output_host"] = parameters["input_host"]
+            parameters["output_host"] = parameters["input_data_host"]
         if "output_port" not in parameters:
             logging.warning("Default output database port is set to 3307 for legacy reasons.")
         if "output_user" not in parameters:
-            parameters["output_user"] = parameters["input_user"]
+            parameters["output_user"] = parameters["input_data_user"]
         if "output_password" not in parameters:
-            parameters["output_password"] = parameters["input_password"]
+            parameters["output_password"] = parameters["input_data_password"]
         if "output_name" not in parameters:
             parameters["output_name"] = parameters["input_data_name"]
             logging.warning(
@@ -67,9 +67,9 @@ class NexusePlugin(Plugin):
             centiv_postprocess = CentivPostprocess(
                 results_path=self.__parameters.results_path,
                 input_data_name=self.__parameters.input_data_name,
-                input_host=self.__parameters.input_host,
-                input_user=self.__parameters.input_user,
-                input_password=self.__parameters.input_password,
+                input_host=self.__parameters.input_data_host,
+                input_user=self.__parameters.input_data_user,
+                input_password=self.__parameters.input_data_password,
                 single_electric_node=self.__parameters.single_electric_node,
             )
             centiv_postprocess.run()

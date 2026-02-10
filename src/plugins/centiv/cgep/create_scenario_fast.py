@@ -47,16 +47,16 @@ from .save_results import saveVarParDualsCsv, saveSelectedStats, saveMappingFile
 @dataclass
 class Config():
     # This is where defaults are mentioned.
-    DB_host: str = "localhost"
+    input_data_host: str = "localhost"
     """Server on which database is hosted"""
 
-    DB_name: str = "scenario_name"
+    input_data_name: str = "scenario_name"
     """Name of MySQL database"""
     
-    DB_user: str = "user"
+    input_data_user: str = "user"
     """User Name for MySQL database"""
     
-    DB_pwd: str = "password"
+    input_data_password: str = "password"
     """Password for MySQL database"""
 
     results_path: str = "results"
@@ -169,7 +169,7 @@ class Config():
     equalexportsimports_required: bool = False
     """Flag for whether we require the total annual exports to equal the total annual imports"""
     
-    tpResolution: int = 1
+    resolution_in_days: int = 1
     """Resolution of simulated timeperiods"""
     
     disableREStarget: bool = False
@@ -1909,7 +1909,7 @@ class DataImport(object):
         reserves_timeseries = merge_dict(SCR, TCR)
 
         #9.Trim time series data using resolution config.tpResolution
-        res_change = ChangeResolution(config.timeperiods, config.tpResolution)
+        res_change = ChangeResolution(config.timeperiods, config.resolution_in_days)
         res_change.remap_hours_dict_in_dict(renewables_timeseries)
         res_change.remap_hours_dict_in_dict(fuelprice_timeseries)
         res_change.remap_hours_dict_in_dict(fuelpriceSELL_timeseries)
@@ -2222,7 +2222,7 @@ class DataImport(object):
             {k:self.generators[k]['E_ini'] for k in hydro_Dam},
             {k:renewables_timeseries[k] for k in hydro_Dam},
             {k:self.generators[k]['eta_dis'] for k in hydro_Dam},
-            config.tpResolution)
+            config.resolution_in_days)
 
         #12.3.2...Set up hydro pumped constraints (for all pumped storages in CH and abroad except daily storages)
         hydro.set_hydro_power_Pumped(hydro_Pumped_notdaily,
@@ -2234,7 +2234,7 @@ class DataImport(object):
             {k:renewables_timeseries[k] for k in hydro_Pumped_notdaily},
             {k:self.generators[k]['eta_ch'] for k in hydro_Pumped_notdaily},
             {k:self.generators[k]['eta_dis'] for k in hydro_Pumped_notdaily},
-            config.tpResolution)
+            config.resolution_in_days)
         
         #12.3.3...Set up hydro pumped constraints for daily storages
         hydro.set_hydro_power_Pumped_daily(hydro_Pumped_CH_daily,
@@ -2246,7 +2246,7 @@ class DataImport(object):
             {k:renewables_timeseries[k] for k in hydro_Pumped_CH_daily},
             {k:self.generators[k]['eta_ch'] for k in hydro_Pumped_CH_daily},
             {k:self.generators[k]['eta_dis'] for k in hydro_Pumped_CH_daily},
-            config.tpResolution)
+            config.resolution_in_days)
         #hydro.set_min_pumping(hydro_Pumped_CH, config.tpResolution)
 
         #12.3.4...Set up battery constraints
@@ -2286,7 +2286,7 @@ class DataImport(object):
                 {k:-self.generators[k]['Pmin']/baseMVA for k in candidates_P2X},
                 {k:self.generators[k]['Pmax_methdac']/baseMVA for k in candidates_P2X},
                 {k:self.generators[k]['Emax_h2stor']/baseMVA for k in candidates_P2X})
-            P2X1.set_H2_balance(config.tpResolution, 
+            P2X1.set_H2_balance(config.resolution_in_days, 
                 config.maxdailyH2withdrawal_p2g2p,
                 config.maxdailyH2injection_p2g2p)
             P2X1.set_H2_constraints({k:self.generators[k]['Conv_elzr'] for k in candidates_P2X},
@@ -2299,7 +2299,7 @@ class DataImport(object):
             if self.H2profileId is None or np.isnan(self.H2profileId):
                 P2X1.set_H2_annually_demand_inequality(candidates_P2X,
                     config.targetH2/baseMVA,
-                    config.tpResolution)
+                    config.resolution_in_days)
             else:
                 P2X1.set_H2_hourly_demand_inequality(candidates_P2X,
                     {k:H2demand_timeseries[k]['H2Demand']/baseMVA for k in range(self.timeperiods)})
@@ -2307,7 +2307,7 @@ class DataImport(object):
                 # The synthetic gas target is in GWh so x 1000
                 P2X1.set_CH4_annually_demand_inequality(candidates_P2X,
                     config.targetCH4*1000/baseMVA,
-                    config.tpResolution)
+                    config.resolution_in_days)
             else:
                 P2X1.set_CH4_hourly_demand_inequality(candidates_P2X,
                     {k:CH4demand_timeseries[k]['CH4Demand']*1000/baseMVA for k in range(self.timeperiods)})
@@ -2378,15 +2378,15 @@ class DataImport(object):
         no_reserves_generators = list(set(non_swiss_gens + non_dispatchable_gens + candidates_batteries + p2x + net))
         reserves.set_no_reserves(no_reserves_generators)
 
-        hydro.set_hydro_power_dam_reserves(reserves, hydro_Dam_CH, config.tpResolution)
-        hydro.set_hydro_power_Pumped_reserves(reserves, hydro_Pumped_CH_notdaily, config.tpResolution)
-        hydro.set_hydro_power_Pumped_daily_reserves(reserves, hydro_Pumped_CH_daily, config.tpResolution)
+        hydro.set_hydro_power_dam_reserves(reserves, hydro_Dam_CH, config.resolution_in_days)
+        hydro.set_hydro_power_Pumped_reserves(reserves, hydro_Pumped_CH_notdaily, config.resolution_in_days)
+        hydro.set_hydro_power_Pumped_daily_reserves(reserves, hydro_Pumped_CH_daily, config.resolution_in_days)
         cg.set_FRR_RR(reserves, GENS=nuclear_CH_exist)
         cg_CH_noUC.set_FRR_RR_Linear(reserves, GENS=conv_CH_and_biomassCH_and_geothermalCH)
         CH_nuclear_invest.set_FRR_RR_Nuclear(reserves, GENS=nuclear_CH_candidate)
         existing_batteries_CH = [item for item in existing_batteries if item not in non_swiss_gens]
-        batteries1.set_battery_daily_reserves(reserves, existing_batteries_CH, config.tpResolution)
-        batteries2.set_battery_daily_reserves_invest(reserves, candidates_batteries, config.tpResolution)
+        batteries1.set_battery_daily_reserves(reserves, existing_batteries_CH, config.resolution_in_days)
+        batteries2.set_battery_daily_reserves_invest(reserves, candidates_batteries, config.resolution_in_days)
 
         #12.6...Set up total system reserve constraints
         reserves.set_system_reserve_constraints(
@@ -2518,7 +2518,7 @@ class DataImport(object):
                 heatpump_demand={k: self.adjusted_heatpumpload.get(k, [0.0]*int(self.timeperiods)) for k in self.bus_id},  # <-- series fallback
                 baseMVA=baseMVA,
                 num_days=self.days,
-                tpRes=config.tpResolution
+                tpRes=config.resolution_in_days
             )
             
             #nodal balance at each bus
@@ -2532,11 +2532,11 @@ class DataImport(object):
                 print(".....TSO-DSO flows are NOT limited")
             #set total annual exports to equal total annual imports
             if config.equalexportsimports_required: 
-                DCPF.set_equal_annual_exportimport(cross_border_lines_CH, config.tpResolution)
+                DCPF.set_equal_annual_exportimport(cross_border_lines_CH, config.resolution_in_days)
             if config.winterNetImport != 0:
                 DCPF.set_net_winter_import_limit(
                     cross_border_lines_CH, 
-                    config.tpResolution, 
+                    config.resolution_in_days, 
                     config.winterNetImport)
 
             print("     Current RES Target is {}"
@@ -2547,7 +2547,7 @@ class DataImport(object):
                     candidates_nondisp,
                     existing_pv_CH, existing_wind_CH,
                     config.targetRES,
-                    config.tpResolution,
+                    config.resolution_in_days,
                     baseMVA)
             print("PV generators: ", pv_CH)
             print("Existing PV generators: ", pv_existing)
@@ -2568,7 +2568,7 @@ class DataImport(object):
                     rooftop_pv_CH_exist,
                     rooftop_pv_CH_cand,
                     config.targetRESPV,
-                    config.tpResolution,
+                    config.resolution_in_days,
                     baseMVA,
                     oversize_factor=1.009
                 )
@@ -2577,12 +2577,12 @@ class DataImport(object):
                 DCPF.set_rooftop_PV_target(
                     rooftop_pv_CH,
                     config.targetRESPV,
-                    config.tpResolution,
+                    config.resolution_in_days,
                     baseMVA,
                     oversize_factor=1.009
                 )
             #Set CO2 limits
-            opt.set_co2limit(swiss_gens, swiss_NET_gens, {k:self.generators[k]['CO2Rate'] for k in ALL_swiss_gens}, config.targetCO2, config.tpResolution, baseMVA)
+            opt.set_co2limit(swiss_gens, swiss_NET_gens, {k:self.generators[k]['CO2Rate'] for k in ALL_swiss_gens}, config.targetCO2, config.resolution_in_days, baseMVA)
             #14.XSet up the objective function
             #The objective function is nested within the DC power flow formulation because depending on whether we have
             #negative demand, i.e. distiv injections, we need to assign a cost to the injections the TSO uses from the DSO
@@ -2593,7 +2593,7 @@ class DataImport(object):
                     {k:co2price_timeseries[k] for k in combined_list},
                     {k:self.generators[k]['CO2Rate'] for k in combined_list}, 
                     {k:self.generators[k]['VOM_Cost'] for k in combined_list},
-                    config.tpResolution, 
+                    config.resolution_in_days, 
                     baseMVA)                                                         +
                 P2X1.get_operational_costs_P2G2P_disagg(candidates_P2X,
                     {k:fuelprice_timeseries[k] for k in candidates_P2X},
@@ -2602,7 +2602,7 @@ class DataImport(object):
                     {k:self.generators[k]['CO2Rate'] for k in candidates_P2X},
                     {k:self.generators[k]['VOM_Cost'] for k in candidates_P2X},
                     {k:self.generators[k]['VOM_methdac'] for k in candidates_P2X},
-                    config.tpResolution, 
+                    config.resolution_in_days, 
                     baseMVA)                                                                   +
                 NET1.get_operational_costs_NET_disagg(candidates_NET,
                     {k:fuelprice_timeseries[k] for k in candidates_NET},
@@ -2610,15 +2610,15 @@ class DataImport(object):
                     {k:co2price_timeseries[k] for k in candidates_NET},
                     {k:self.generators[k]['CO2Rate'] for k in candidates_NET}, 
                     {k:self.generators[k]['VOM_Cost'] for k in candidates_NET},
-                    config.tpResolution, 
+                    config.resolution_in_days, 
                     baseMVA)                                                         +                    
                 P2X1.get_import_costs_P2G2P_disagg(candidates_P2X,  
                     {k:h2importprice_timeseries[k] for k in candidates_P2X},
                     {k:ch4importprice_timeseries[k] for k in candidates_P2X},
-                    config.tpResolution, 
+                    config.resolution_in_days, 
                     baseMVA)                                                                   + 
                 DCPF.get_lossload_cost(config.loadShedding_cost*baseMVA, 
-                    config.tpResolution)                                                         +
+                    config.resolution_in_days)                                                         +
                 cg.get_operational_costs_conv_disagg(nuclear_CH_exist,
                     {k:self.generators[k]['StartCost'] for k in nuclear_CH_exist},
                     {k:fuelprice_timeseries[k] for k in nuclear_CH_exist},
@@ -2626,7 +2626,7 @@ class DataImport(object):
                     {k:co2price_timeseries[k] for k in nuclear_CH_exist},
                     {k:self.generators[k]['CO2Rate'] for k in nuclear_CH_exist},
                     {k:self.generators[k]['VOM_Cost'] for k in nuclear_CH_exist},
-                    config.tpResolution, 
+                    config.resolution_in_days, 
                     baseMVA)                                                                   +
                 cg_CH_noUC.get_investment_cost_convCHlinear({k:self.generators[k]['Pmax']/baseMVA for k in candidates_nonuclear},
                     {k:self.generators[k]['InvCost']*baseMVA for k in candidates_nonuclear},
@@ -2646,7 +2646,7 @@ class DataImport(object):
                     trafo_candidates,
                     OHL_candidates)                        +
                 DCPF.get_cost_distIv_injection({k:self.buses[k]['PayInjection']*baseMVA for k in self.bus_id}, 
-                    config.tpResolution)                                                         +
+                    config.resolution_in_days)                                                         +
                 batteries2.get_investment_cost_batt({k:self.generators[k]['InvCost']*baseMVA for k in candidates_batteries},
                     {k:self.generators[k]['FOM_Cost']*baseMVA for k in candidates_batteries})  +
                 P2X1.get_investment_cost_P2X({k:self.generators[k]['InvCost']*baseMVA for k in candidates_P2X},
@@ -2659,16 +2659,16 @@ class DataImport(object):
                     {k:self.generators[k]['FOM_Cost']*baseMVA for k in candidates_P2X})        - 
                 P2X1.get_CH4_revenue(candidates_P2X, 
                     {k:fuelpriceSELL_timeseries[k] for k in candidates_P2X}, 
-                    config.tpResolution,
+                    config.resolution_in_days,
                     baseMVA)                                                         - 
                 P2X1.get_H2_revenue(candidates_P2X, 
                     {k:h2priceSELL_timeseries[k] for k in candidates_P2X}, 
-                    config.tpResolution, 
+                    config.resolution_in_days, 
                     baseMVA)                                                         - 
                 P2X1.get_CO2_revenue(candidates_P2X, 
                     {k:co2price_timeseries[k] for k in candidates_P2X}, 
                     {k:self.generators[k]['Conv_methdac_co2'] for k in candidates_P2X},
-                    config.tpResolution, 
+                    config.resolution_in_days, 
                     baseMVA))
         else:
             print('.... No buses with negative demand')
@@ -2699,7 +2699,7 @@ class DataImport(object):
                         heatpump_demand={k:self.adjusted_heatpumpload.get(k, [0.0]*int(self.timeperiods)) for k in self.bus_id},
                         baseMVA=baseMVA,
                         num_days=self.days, 
-                        tpRes=config.tpResolution)
+                        tpRes=config.resolution_in_days)
             #nodal balance at each bus
             DCPF.connect_buses(line_start=line_idFromBus, line_end=line_idToBus, type = line_type, gen_nodes=gen_idBus, loss_factor = line_loss_factor, single_electric_node=config.single_electric_node, buses_CH = buses_CH, bus_neighbor_NTC_rep = bus_neighbor_NTC_rep, bus_neighbor_no_NTC_rep = bus_neighbor_no_NTC_rep)
             # TSO-DSO trafo power limit
@@ -2710,11 +2710,11 @@ class DataImport(object):
                 print(".....TSO-DSO flows are NOT limited")
             #set total annual exports to equal total annual imports
             if config.equalexportsimports_required:
-                DCPF.set_equal_annual_exportimport(cross_border_lines_CH, config.tpResolution)
+                DCPF.set_equal_annual_exportimport(cross_border_lines_CH, config.resolution_in_days)
             if config.winterNetImport != 0:
                 DCPF.set_net_winter_import_limit(
                     cross_border_lines_CH, 
-                    config.tpResolution, 
+                    config.resolution_in_days, 
                     config.winterNetImport)
 
             print("     Current RES Target is {}"
@@ -2726,7 +2726,7 @@ class DataImport(object):
                         candidates_nondisp,
                         existing_pv_CH, existing_wind_CH,
                         config.targetRES,
-                        config.tpResolution,
+                        config.resolution_in_days,
                         baseMVA)
                 else:
                     logging.warning('Including nuclear in RES target calculation!')
@@ -2736,7 +2736,7 @@ class DataImport(object):
                         nuclear_CH_candidate,
                         existing_pv_CH, existing_wind_CH,
                         config.targetRES,
-                        config.tpResolution,
+                        config.resolution_in_days,
                         baseMVA)
                         
             print("PV generators: ", pv_CH)
@@ -2758,7 +2758,7 @@ class DataImport(object):
                     rooftop_pv_CH_exist,
                     rooftop_pv_CH_cand,
                     config.targetRESPV,
-                    config.tpResolution,
+                    config.resolution_in_days,
                     baseMVA,
                     oversize_factor=1.009
                 )
@@ -2767,12 +2767,12 @@ class DataImport(object):
                 DCPF.set_rooftop_PV_target(
                     rooftop_pv_CH,
                     config.targetRESPV,
-                    config.tpResolution,
+                    config.resolution_in_days,
                     baseMVA,
                     oversize_factor=1.009
                 )
             #Set CO2 limits
-            opt.set_co2limit(swiss_gens, swiss_NET_gens, {k:self.generators[k]['CO2Rate'] for k in ALL_swiss_gens}, config.targetCO2, config.tpResolution, baseMVA)
+            opt.set_co2limit(swiss_gens, swiss_NET_gens, {k:self.generators[k]['CO2Rate'] for k in ALL_swiss_gens}, config.targetCO2, config.resolution_in_days, baseMVA)
             #14.XSet up the objective function
             #The objective function is nested within the DC power flow formulation because depending on whether we have
             #negative demand, i.e. distiv injections, we need to assign a cost to the injections the TSO uses from the DSO
@@ -2783,7 +2783,7 @@ class DataImport(object):
                     {k:co2price_timeseries[k] for k in combined_list},
                     {k:self.generators[k]['CO2Rate'] for k in combined_list}, 
                     {k:self.generators[k]['VOM_Cost'] for k in combined_list},
-                    config.tpResolution, 
+                    config.resolution_in_days, 
                     baseMVA)                                                                   +
                 P2X1.get_operational_costs_P2G2P_disagg(candidates_P2X,
                     {k:fuelprice_timeseries[k] for k in candidates_P2X},
@@ -2792,7 +2792,7 @@ class DataImport(object):
                     {k:self.generators[k]['CO2Rate'] for k in candidates_P2X},
                     {k:self.generators[k]['VOM_Cost'] for k in candidates_P2X},
                     {k:self.generators[k]['VOM_methdac'] for k in candidates_P2X},
-                    config.tpResolution, 
+                    config.resolution_in_days, 
                     baseMVA)                                                                   +
                 NET1.get_operational_costs_NET_disagg(candidates_NET,
                     {k:fuelprice_timeseries[k] for k in candidates_NET},
@@ -2800,15 +2800,15 @@ class DataImport(object):
                     {k:co2price_timeseries[k] for k in candidates_NET},
                     {k:self.generators[k]['CO2Rate'] for k in candidates_NET}, 
                     {k:self.generators[k]['VOM_Cost'] for k in candidates_NET},
-                    config.tpResolution, 
+                    config.resolution_in_days, 
                     baseMVA)                                                                   +                    
                 P2X1.get_import_costs_P2G2P_disagg(candidates_P2X,  
                     {k:h2importprice_timeseries[k] for k in candidates_P2X},
                     {k:ch4importprice_timeseries[k] for k in candidates_P2X},
-                    config.tpResolution, 
+                    config.resolution_in_days, 
                     baseMVA)                                                                   +   
                 DCPF.get_lossload_cost(config.loadShedding_cost*baseMVA, 
-                    config.tpResolution)                                                         +
+                    config.resolution_in_days)                                                         +
                 cg.get_operational_costs_conv_disagg(nuclear_CH_exist,
                     {k:self.generators[k]['StartCost'] for k in nuclear_CH_exist},
                     {k:fuelprice_timeseries[k] for k in nuclear_CH_exist},
@@ -2816,7 +2816,7 @@ class DataImport(object):
                     {k:co2price_timeseries[k] for k in nuclear_CH_exist},
                     {k:self.generators[k]['CO2Rate'] for k in nuclear_CH_exist},
                     {k:self.generators[k]['VOM_Cost'] for k in nuclear_CH_exist},
-                    config.tpResolution, 
+                    config.resolution_in_days, 
                     baseMVA)                                                                   +
                 cg_CH_noUC.get_investment_cost_convCHlinear({k:self.generators[k]['Pmax']/baseMVA for k in candidates_nonuclear},
                     {k:self.generators[k]['InvCost']*baseMVA for k in candidates_nonuclear},
@@ -2847,16 +2847,16 @@ class DataImport(object):
                     {k:self.generators[k]['FOM_Cost']*baseMVA for k in candidates_P2X})     - 
                 P2X1.get_CH4_revenue(candidates_P2X, 
                     {k:fuelpriceSELL_timeseries[k] for k in candidates_P2X}, 
-                    config.tpResolution,
+                    config.resolution_in_days,
                     baseMVA)                                                         - 
                 P2X1.get_H2_revenue(candidates_P2X, 
                     {k:h2priceSELL_timeseries[k] for k in candidates_P2X}, 
-                    config.tpResolution, 
+                    config.resolution_in_days, 
                     baseMVA)                                                         - 
                 P2X1.get_CO2_revenue(candidates_P2X, 
                     {k:co2price_timeseries[k] for k in candidates_P2X}, 
                     {k:self.generators[k]['Conv_methdac_co2'] for k in candidates_P2X},
-                    config.tpResolution, 
+                    config.resolution_in_days, 
                     baseMVA))
 
         duration_log_dict['13_14'] = (time.time() - time_restarted)/60
@@ -3493,7 +3493,7 @@ class DataImport(object):
                     rooftop_pv_CH_exist,
                     rooftop_pv_CH_cand,
                     config.targetRESPV,
-                    config.tpResolution,
+                    config.resolution_in_days,
                     baseMVA
                 )
             else:
@@ -3501,7 +3501,7 @@ class DataImport(object):
                 DCPF.set_rooftop_PV_target(
                     rooftop_pv_CH,
                     config.targetRESPV,
-                    config.tpResolution,
+                    config.resolution_in_days,
                     baseMVA
                 )
             DCPF.activate_PV_target()
@@ -3854,7 +3854,7 @@ class DataImport(object):
             storage_value_pumps_daily_CH_LP = {}
             for i in hydro_Pumped_CH_daily:
                 if i in hourly_inflows_pumps_daily:
-                    storage_value_pumps_daily_CH_LP[i] = list(res_change.expand_soc_array(hydro.get_battery_state(i)*baseMVA/config.tpResolution))# MWh        
+                    storage_value_pumps_daily_CH_LP[i] = list(res_change.expand_soc_array(hydro.get_battery_state(i)*baseMVA/config.resolution_in_days))# MWh        
             df_storage3CH = pd.DataFrame.from_dict(storage_value_pumps_daily_CH_LP)  
               
             res.saveExportsImportsMultiple_Excel([df_storageCH,df_storage2CH,df_storage3CH],['DamLevel_hourly_CH','PumpLevel_hourly_CH','DailyPumpLevel_hourly_CH'],'Reservoirs_hourly_CH_LP.xlsx')
@@ -4660,10 +4660,10 @@ class CentIvModule(Plugin):
         start_time = time.time()
         print("Starting MySQLConnect" + 70 * "-")
         self.model.MySQLConnect(
-            self.config.DB_host,
-            self.config.DB_name,
-            self.config.DB_user,
-            self.config.DB_pwd)
+            self.config.input_data_host,
+            self.config.input_data_name,
+            self.config.input_data_user,
+            self.config.input_data_password)
         duration_dict['MySQLConnect'] = time.time() - start_time
         logging.debug('MySQLConnect took ' + str(duration_dict['MySQLConnect']) + ' minutes')
 

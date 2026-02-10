@@ -1,22 +1,23 @@
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 import logging
 from pathlib import Path
-from typing import Literal
-
+from nexus_e_interface.scenario import Scenario
 import pandas as pd
 from sqlmodel import Field, SQLModel, Session, create_engine, select, text
-from nexus_e import simulation
+from typing import Literal
+
+from nexus_e_interface.plugin import Plugin
 
 @dataclass
-class Config:
-    host: str = "localhost"
-    user: str = "username"
-    password: str = "password"
-    dbName: str = "database_name"
+class Parameters:
+    input_data_host: str = "localhost"
+    input_data_user: str = "username"
+    input_data_password: str = "password"
+    input_data_name: str = "database_name"
     cost_scenario: Literal["Low", "Reference", "High"] = "Reference"
     
 
-class InvCostDataUpdater(simulation.Module):
+class NexusePlugin(Plugin):
     """
     Updates investment cost data in the database using cost data from CSV files.
     
@@ -28,8 +29,12 @@ class InvCostDataUpdater(simulation.Module):
     - Converts currencies using configurable conversion factors from CSV
     - Maps generator types to cost data technology categories
     """
-    def __init__(self, config: dict):
-        self.__settings = Config(**config)
+    @classmethod
+    def get_default_parameters(cls) -> dict:
+        return asdict(Parameters())
+
+    def __init__(self, parameters: dict, scenario: Scenario | None = None):
+        self.__settings = Parameters(**parameters)
         
         # Suppress verbose MySQL connector logs
         logging.getLogger('mysql.connector').setLevel(logging.WARNING)
@@ -37,9 +42,9 @@ class InvCostDataUpdater(simulation.Module):
         # Add connection timeout to fail faster - increased for slow networks
         # Disable SSL/TLS to avoid handshake hangs
         connection_string = (
-            f"mysql+mysqlconnector://{self.__settings.user}:"
-            f"{self.__settings.password}@{self.__settings.host}/"
-            f"{self.__settings.dbName}?connect_timeout=10&"
+            f"mysql+mysqlconnector://{self.__settings.input_data_user}:"
+            f"{self.__settings.input_data_password}@{self.__settings.input_data_host}/"
+            f"{self.__settings.input_data_name}?connect_timeout=10&"
             f"ssl_disabled=true&use_pure=true"
         )
         self.__engine = create_engine(

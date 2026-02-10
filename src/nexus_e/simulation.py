@@ -1,21 +1,13 @@
+from abc import ABC, abstractmethod
+from datetime import datetime
 import importlib
 import logging
 import os
-from abc import ABC, abstractmethod
-from datetime import datetime
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session
 from typing import Protocol
 
 from nexus_e_interface import Plugin, Scenario
-from sqlalchemy import create_engine
-from sqlalchemy.orm import Session
-
-from plugins.centiv.cgep import create_scenario_fast as centiv
-from plugins.copy_database.nexus_e_plugin import NexusePlugin as CopyDatabase
-from plugins.delete_database_copies.nexus_e_plugin import NexusePlugin as DeleteDatabaseCopies
-from plugins.postprocess.nexus_e_plugin import NexusePlugin as PostProcess
-from plugins.update_investments.nexus_e_plugin import NexusePlugin as UpdateInvestments
-from plugins.upload_scenario.nexus_e_plugin import NexusePlugin as ScenarioUploader
-from plugins.upload_res_data import RESDataUploader
 
 from . import config
 
@@ -35,86 +27,6 @@ class ModuleFactory(ABC):
     def get_module(self, module_config: config.Module) -> Module: ...
 
 
-class CoreModuleFactory(ModuleFactory):
-    def __init__(self, settings: config.Config):
-        self.settings = settings
-
-    def get_module(self, module_config: config.Module) -> Module | Plugin:
-        if module_config.name == "centiv":
-            # First add module-wide parameters to avoid rewriting them in
-            # the config file
-            parameters = {}
-            parameters["DB_host"] = self.settings.modules.commons["input_data_host"]
-            parameters["DB_name"] = self.settings.modules.commons["input_data_name"]
-            parameters["DB_user"] = self.settings.modules.commons["input_data_user"]
-            parameters["DB_pwd"] = self.settings.modules.commons["input_data_password"]
-            parameters["tpResolution"] = (
-                self.settings.modules.commons["resolution_in_days"]
-            )
-            parameters["single_electric_node"] = (
-                self.settings.modules.commons["single_electric_node"]
-            )
-            parameters["results_path"] = self.settings.modules.commons["results_path"]
-            parameters.update(module_config.parameters)
-            return centiv.CentIvModule(parameters)
-        elif module_config.name == "postprocess":
-            parameters = {}
-            parameters["results_path"] = self.settings.modules.commons["results_path"]
-            parameters["input_data_name"] = self.settings.modules.commons["input_data_name"]
-            parameters["execution_date"] = self.settings.modules.commons["execution_date"]
-            parameters["single_electric_node"] = self.settings.modules.commons["single_electric_node"]
-            parameters["input_host"] = self.settings.modules.commons["input_data_host"]
-            parameters["input_user"] = self.settings.modules.commons["input_data_user"]
-            parameters["input_password"] = self.settings.modules.commons["input_data_password"]
-            parameters.update(module_config.parameters)
-            return PostProcess(parameters)
-        elif module_config.name == "update_investments":
-            parameters = {}
-            parameters["host"] = self.settings.modules.commons["input_data_host"]
-            parameters["user"] = self.settings.modules.commons["input_data_user"]
-            parameters["password"] = self.settings.modules.commons["input_data_password"]
-            parameters["dbName"] = self.settings.modules.commons["input_data_name"]
-            parameters["simulation_results_folder"] = self.settings.modules.commons["results_path"]
-            parameters.update(module_config.parameters)
-            return UpdateInvestments(parameters)
-        elif module_config.name == "upload_scenario":
-            parameters = {}
-            parameters["host"] = self.settings.modules.commons["input_data_host"]
-            parameters["user"] = self.settings.modules.commons["input_data_user"]
-            parameters["password"] = self.settings.modules.commons["input_data_password"]
-            parameters.update(module_config.parameters)
-            return ScenarioUploader(parameters)
-        elif module_config.name == "update_inv_costs":
-            from plugins.update_inv_costs import InvCostDataUpdater
-            parameters = {}
-            parameters["host"] = self.settings.modules.commons["input_data_host"]
-            parameters["user"] = self.settings.modules.commons["input_data_user"]
-            parameters["password"] = self.settings.modules.commons["input_data_password"]
-            parameters["dbName"] = self.settings.modules.commons["input_data_name"]
-            parameters.update(module_config.parameters)
-            return InvCostDataUpdater(config=parameters)
-        elif module_config.name == "upload_res_data":
-            parameters = {}
-            parameters["host"] = self.settings.modules.commons["input_data_host"]
-            parameters["user"] = self.settings.modules.commons["input_data_user"]
-            parameters["password"] = self.settings.modules.commons["input_data_password"]
-            parameters["dbName"] = self.settings.modules.commons["input_data_name"]
-            parameters.update(module_config.parameters)
-            return RESDataUploader(config=parameters)
-        elif module_config.name == "copy_database":
-            parameters = {}
-            parameters.update(self.settings.modules.commons)
-            parameters.update(module_config.parameters)
-            return CopyDatabase(parameters=parameters)
-        elif module_config.name == "delete_database_copies":
-            parameters = {}
-            parameters.update(self.settings.modules.commons)
-            parameters.update(module_config.parameters)
-            return DeleteDatabaseCopies(parameters=parameters)
-        else:
-            raise UnknownModule(module_config.name)
-
-
 class CorePluginFactory(ModuleFactory):
     def __init__(self, settings: config.Config):
         self.settings = settings
@@ -130,7 +42,7 @@ class CorePluginFactory(ModuleFactory):
         plugin: Plugin = plugin_module.NexusePlugin
 
         # Prepare plugin parameters
-        parameters: dict = plugin.get_default_parameters()
+        parameters = {}
         parameters.update(self.settings.modules.commons)
         parameters.update(module_config.parameters)
         parameters = {
@@ -150,7 +62,11 @@ class CorePluginFactory(ModuleFactory):
         )
         scenario = Scenario(Session(engine))
 
-        output = plugin(scenario, parameters)
+        output = object.__new__(plugin_module.NexusePlugin)
+        output.__init__(
+            parameters=parameters,
+            scenario=scenario
+        )
         return output
 
 

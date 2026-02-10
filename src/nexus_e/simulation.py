@@ -70,11 +70,11 @@ class CoreModuleFactory(ModuleFactory):
             return PostProcess(parameters)
         elif module_config.name == "update_investments":
             parameters = {}
-            parameters["host"] = self.settings.modules.commons["input_data_host"]
-            parameters["user"] = self.settings.modules.commons["input_data_user"]
-            parameters["password"] = self.settings.modules.commons["input_data_password"]
-            parameters["dbName"] = self.settings.modules.commons["input_data_name"]
-            parameters["simulation_results_folder"] = self.settings.modules.commons["results_path"]
+            parameters["input_data_host"] = self.settings.modules.commons["input_data_host"]
+            parameters["input_data_user"] = self.settings.modules.commons["input_data_user"]
+            parameters["input_data_password"] = self.settings.modules.commons["input_data_password"]
+            parameters["input_data_name"] = self.settings.modules.commons["input_data_name"]
+            parameters["results_path"] = self.settings.modules.commons["results_path"]
             parameters.update(module_config.parameters)
             return UpdateInvestments(parameters)
         elif module_config.name == "upload_scenario":

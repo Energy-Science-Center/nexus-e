@@ -9,14 +9,14 @@ import nexus_e_interface.tables as tables
 
 @dataclass
 class Config:
-    host: str = ""
-    user: str = ""
-    password: str = ""
-    dbName: str = ""
+    input_data_host: str = ""
+    input_data_user: str = ""
+    input_data_password: str = ""
+    input_data_name: str = ""
     startyear: int = 2020
     endyear: int = 2020
     scenYear: int = 2
-    simulation_results_folder: str = ""
+    results_path: str = ""
     matlab_engine: str = "matlab"
 
 
@@ -37,21 +37,21 @@ class NexusePlugin(Plugin):
             "startyear": self.config.startyear,
             "endyear": self.config.endyear,
             "scenYear": self.config.scenYear,
-            "dbName": self.config.dbName
+            "dbName": self.config.input_data_name
         }
         engine.update_investments(
             engine.workspace["parameters"],
             engine.database(
-                self.config.dbName,
-                self.config.user,
-                self.config.password,
+                self.config.input_data_name,
+                self.config.input_data_user,
+                self.config.input_data_password,
                 "Vendor",
                 "MySQL",
                 "Server",
-                self.config.host,
+                self.config.input_data_host,
             ),
             os.path.join(
-                self.config.simulation_results_folder,
+                self.config.results_path,
                 f"CentIv_{self.config.scenYear}"
             ),
             nargout=0
@@ -70,8 +70,8 @@ class NexusePlugin(Plugin):
     def __get_scenario_id(self):
         session=Session(create_engine(
                 "mysql+pymysql://"
-                + f"{self.config.user}:{self.config.password}"
-                + f"@{self.config.host}/{self.config.dbName}"
+                + f"{self.config.input_data_user}:{self.config.input_data_password}"
+                + f"@{self.config.input_data_host}/{self.config.input_data_name}"
         ))
         statement = (
             select(tables.ScenarioConfiguration.idScenario)

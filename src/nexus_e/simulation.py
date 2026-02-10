@@ -130,7 +130,7 @@ class CorePluginFactory(ModuleFactory):
         plugin: Plugin = plugin_module.NexusePlugin
 
         # Prepare plugin parameters
-        parameters: dict = plugin.get_default_parameters()
+        parameters = {}
         parameters.update(self.settings.modules.commons)
         parameters.update(module_config.parameters)
         parameters = {

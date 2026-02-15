@@ -27,7 +27,7 @@ More information on the Nexus-e platform can be found on our website <https://ne
 - [License](#license)
 
 ## Installation
-Read our [Quickstart](https://gitlab.com/energy_science_center/nexus-e/nexus-e/-/wikis/Setup) article.
+Read our [Quickstart](https://gitlab.com/energy_science_center/nexus-e/nexus-e/-/wikis/quickstart) article.
 
 ## Usage
 Check the [wiki](https://gitlab.com/energy_science_center/nexus-e/nexus-e/-/wikis/home).

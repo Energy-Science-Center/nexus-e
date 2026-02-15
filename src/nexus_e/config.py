@@ -116,11 +116,12 @@ class Modules:
             "input_data_port": "",
             "input_data_user": "",
             "input_data_password": "",
+            "input_data_name": "",
             "resolution_in_days": 1,
             "single_electric_node": False,
         }
     )
-    playlist_name: str = "centiv_2050"
+    playlist_name: str = "nothing"
 
 
 @dataclass

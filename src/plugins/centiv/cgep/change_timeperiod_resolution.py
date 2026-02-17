@@ -1,5 +1,23 @@
 import numpy as np
 
+def extend_hourly_timeseries(timeseries, timeperiods, hydrodrought=False):
+    if timeperiods > len(timeseries):
+        if hydrodrought:
+            temp = (timeseries * (timeperiods // len(timeseries)))[:timeperiods-len(timeseries)]
+            drought_timeseries = [x * 0.8 for x in temp] # MP: this is a simple way to create a drought timeseries, by reducing the values of the original timeseries by 20%
+            extended_timeseries = np.concatenate((timeseries, drought_timeseries))
+        else:
+            extended_timeseries = (timeseries * (timeperiods // len(timeseries) + 1))[:timeperiods]
+        return extended_timeseries
+    return timeseries
+
+def extend_daily_timeseries(timeseries, timeperiods):
+    timeperiods_days = timeperiods // 24
+    if (timeperiods_days) > len(timeseries):
+        extended_timeseries = (timeseries * (timeperiods_days // len(timeseries) + 1))[:timeperiods_days]
+        return extended_timeseries
+    return timeseries
+
 class ChangeResolution:
     def __init__(self, numperiods, tpResolution):
         self.tpResolution = tpResolution

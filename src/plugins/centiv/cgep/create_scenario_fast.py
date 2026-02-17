@@ -39,7 +39,7 @@ from .gen_H2DAC_invest_empty import P2XInvest_Empty
 from .gen_NET_invest import NETInvest
 from .gen_NET_invest_empty import NETInvest_Empty
 from .ext2int import ext2int
-from .change_timeperiod_resolution import ChangeResolution
+from .change_timeperiod_resolution import ChangeResolution, extend_hourly_timeseries, extend_daily_timeseries
 from .save_results import SaveResults
 from .save_results import saveVarParDualsCsv, saveSelectedStats, saveMappingFiles
 
@@ -111,6 +111,9 @@ class Config():
     
     timeperiods: int = 8760
     """Number of simulated timeperiods"""
+
+    numberOfYears: int = 1
+    """Number of years to be simulated (for multi-year simulations)"""
     
     battDIS: float = 0.00054
     """Battery self-discharge
@@ -1449,16 +1452,16 @@ class DataImport(object):
         for Id, row in enumerate(self.gens_busnodes):
             if row['type'] != 'Refueling': #we treat nuclear reactors differently
                 if row['timeSeries'] and row['type'] == 'WindGen':
-                    ts = json.loads(row['timeSeries'])
+                    ts = extend_hourly_timeseries(json.loads(row['timeSeries']), self.timeperiods)
                     renewables_timeseries.update({Id:{k:round(ts[k],2) for k in range(self.timeperiods)}})
                 elif row['timeSeries'] and row['type'] == 'SolarGen':
-                    ts = json.loads(row['timeSeries'])
+                    ts = extend_hourly_timeseries(json.loads(row['timeSeries']), self.timeperiods)
                     renewables_timeseries.update({Id:{k:round(ts[k],2) for k in range(self.timeperiods)}})
                 elif row['timeSeries'] and row['type'] == 'Water':
-                    ts = json.loads(row['timeSeries'])
+                    ts = extend_hourly_timeseries(json.loads(row['timeSeries']), self.timeperiods, True)
                     renewables_timeseries.update({Id:{k:ts[k] for k in range(self.timeperiods)}})
                 elif row['timeSeries'] and row['type'] == 'Gen':
-                    ts = json.loads(row['timeSeries'])
+                    ts = extend_hourly_timeseries(json.loads(row['timeSeries']), self.timeperiods)
                     renewables_timeseries.update({Id:{k:round(ts[k],2) for k in range(self.timeperiods)}})
                 else:
                     renewables_timeseries.update({Id:{k:0 for k in range(self.timeperiods)}})  #list with zeroes with the same length
@@ -1483,7 +1486,7 @@ class DataImport(object):
         #...5.2 Fill in a dictionary with refueling schedule of nuclear reactors
         for Id, row in enumerate(self.gens_busnodes):
             if row['type'] == 'Refueling':
-                ts = json.loads(row['timeSeries'])
+                ts = extend_hourly_timeseries(json.loads(row['timeSeries']), self.timeperiods)
                 self.nuclear_availability_timeseries.update({Id:{k:ts[k] for k in range(len(ts))}})
                 
         for key,row in self.nuclear_availability_timeseries.items():
@@ -1504,7 +1507,7 @@ class DataImport(object):
             else:
                 for _, row2 in enumerate(self.profiles):
                     if row['FuelPrice_mult_idProfile'] == row2['idProfile']:
-                        ts = json.loads(row2['timeSeries'])
+                        ts = extend_hourly_timeseries(json.loads(row2['timeSeries']), self.timeperiods)
                         fuelprice_timeseries.update({Id:{k:ts[k]*row['FuelPrice'] for k in range(self.timeperiods)}})
         for Id, row in enumerate(self.generators):
             if row['CO2Price_mult_idProfile'] is None:
@@ -1512,7 +1515,7 @@ class DataImport(object):
             else:
                 for _, row2 in enumerate(self.profiles):
                     if row['CO2Price_mult_idProfile'] == row2['idProfile']:
-                        ts = json.loads(row2['timeSeries'])
+                        ts = extend_hourly_timeseries(json.loads(row2['timeSeries']), self.timeperiods)
                         co2price_timeseries.update({Id:{k:ts[k]*row['CO2Price'] for k in range(self.timeperiods)}})
         #P2G2P-related time series
         for Id, row in enumerate(self.generators):
@@ -1524,7 +1527,7 @@ class DataImport(object):
                 else:
                     for _, row2 in enumerate(self.profiles):
                        if row['H2Price_sell_mult_idProfile'] == row2['idProfile']:
-                        ts = json.loads(row2['timeSeries'])
+                        ts = extend_hourly_timeseries(json.loads(row2['timeSeries']), self.timeperiods)
                         h2priceSELL_timeseries.update({Id:{k:ts[k]*row['H2Price_sell'] for k in range(self.timeperiods)}}) 
         for Id, row in enumerate(self.generators):
             if row['Technology'] != 'P2G2P':
@@ -1535,7 +1538,7 @@ class DataImport(object):
                 else:
                     for _, row2 in enumerate(self.profiles):
                        if row['FuelPrice_sell_mult_idProfile'] == row2['idProfile']:
-                        ts = json.loads(row2['timeSeries'])
+                        ts = extend_hourly_timeseries(json.loads(row2['timeSeries']), self.timeperiods)
                         fuelpriceSELL_timeseries.update({Id:{k:ts[k]*row['FuelPrice_sell'] for k in range(self.timeperiods)}}) 
         for Id, row in enumerate(self.generators):
             if row['Technology'] != 'P2G2P':
@@ -1546,7 +1549,7 @@ class DataImport(object):
                 else:
                     for _, row2 in enumerate(self.profiles):
                        if row['H2Price_import_mult_idProfile'] == row2['idProfile']:
-                        ts = json.loads(row2['timeSeries'])
+                        ts = extend_hourly_timeseries(json.loads(row2['timeSeries']), self.timeperiods)
                         h2importprice_timeseries.update({Id:{k:ts[k]*row['H2Price_import'] for k in range(self.timeperiods)}}) 
         for Id, row in enumerate(self.generators):
             if row['Technology'] != 'P2G2P':
@@ -1557,21 +1560,21 @@ class DataImport(object):
                 else:
                     for _, row2 in enumerate(self.profiles):
                        if row['CH4Price_import_mult_idProfile'] == row2['idProfile']:
-                        ts = json.loads(row2['timeSeries'])
+                        ts = extend_hourly_timeseries(json.loads(row2['timeSeries']), self.timeperiods)
                         ch4importprice_timeseries.update({Id:{k:ts[k]*row['CH4Price_import'] for k in range(self.timeperiods)}}) 
         if self.H2profileId is None or np.isnan(self.H2profileId):
             H2demand_timeseries.update({k:{'H2Demand':config.targetH2/8760} for k in range(self.timeperiods)})
         else:
             for Id, row in enumerate(self.profiles):
                 if row['idProfile'] == self.H2profileId:
-                    ts = json.loads(row['timeSeries'])
+                    ts = extend_hourly_timeseries(json.loads(row['timeSeries']), self.timeperiods)
                     H2demand_timeseries.update({k:{'H2Demand':ts[k]*config.targetH2} for k in range(self.timeperiods)})
         if self.CH4profileId is None or np.isnan(self.CH4profileId):
             CH4demand_timeseries.update({k:{'CH4Demand':config.targetCH4/8760} for k in range(self.timeperiods)})
         else:
             for Id, row in enumerate(self.profiles):
                 if row['idProfile'] == self.CH4profileId:
-                    ts = json.loads(row['timeSeries'])
+                    ts = extend_hourly_timeseries(json.loads(row['timeSeries']), self.timeperiods)
                     CH4demand_timeseries.update({k:{'CH4Demand':ts[k]*config.targetCH4} for k in range(self.timeperiods)})
         
         
@@ -1585,14 +1588,14 @@ class DataImport(object):
             dsm_pshift_hourly.update({row['idIntBus']:row['DemandShare'] * row['DSM_PowerShift_Hrly'] * 1000}) # the value in the DB is in GW
             dsm_eshift_daily.update({row['idIntBus']:row['DemandShare'] * row['DSM_EnergyShift_Daily'] * 1000 * 2}) # the value in the DB is in GWh
             if row['timeSeries'] :
-                ts = json.loads(row['timeSeries'])
+                ts = extend_hourly_timeseries(json.loads(row['timeSeries']), self.timeperiods)
                 eload_timeseries.update({(row['idIntBus']):{k:ts[k] for k in range(self.timeperiods)}}) # the multiplier "* row['DemandShare']" was removed. timeSeries already contains the final value of the demand.
             else:
                 eload_timeseries.update({(row['idIntBus']):{k:0 for k in range(self.timeperiods)}})  #list with zeroes with the same length ....
         emobilityload_timeseries = {}
         for Id, row in enumerate(self.emobilityloads_busnodes):
             if row['timeSeries'] :
-                ts = json.loads(row['timeSeries'])
+                ts = extend_hourly_timeseries(json.loads(row['timeSeries']), self.timeperiods)
                 emobilityload_timeseries.update({(row['idIntBus']):{k:ts[k] for k in range(self.timeperiods)}}) # the multiplier "* row['DemandShare']" was removed. timeSeries already contains the final value of the demand.
             else:
                 emobilityload_timeseries.update({(row['idIntBus']):{k:0 for k in range(self.timeperiods)}})  #list with zeroes with the same length .... 
@@ -1602,20 +1605,20 @@ class DataImport(object):
         emob_pdownshift_hourly = {}
         for Id, row in enumerate(self.emobilityloadsEFlex_busnodes):
             if row['timeSeries'] :
-                ts = json.loads(row['timeSeries'])
-                emob_eshift_daily.update({(row['idIntBus']):{k:ts[k] for k in range(int(self.timeperiods/24))}})
+                ts = extend_daily_timeseries(json.loads(row['timeSeries']), self.timeperiods)
+                emob_eshift_daily.update({(row['idIntBus']):{k:ts[k] for k in range(int(self.timeperiods//24))}})
                 
             else: 
-                emob_eshift_daily.update({(row['idIntBus']):{k:0 for k in range(int(self.timeperiods/24))}})
+                emob_eshift_daily.update({(row['idIntBus']):{k:0 for k in range(int(self.timeperiods//24))}})
         for Id, row in enumerate(self.emobilityloadsPUp_busnodes):
             if row['timeSeries'] :
-                ts = json.loads(row['timeSeries'])
+                ts = extend_hourly_timeseries(json.loads(row['timeSeries']), self.timeperiods)
                 emob_pupshift_hourly.update({(row['idIntBus']):{k:ts[k] for k in range(self.timeperiods)}})
             else:
                 emob_pupshift_hourly.update({(row['idIntBus']):{k:0 for k in range(self.timeperiods)}})
         for Id, row in enumerate(self.emobilityloadsPDown_busnodes):
             if row['timeSeries'] :
-                ts = json.loads(row['timeSeries'])
+                ts = extend_hourly_timeseries(json.loads(row['timeSeries']), self.timeperiods)
                 emob_pdownshift_hourly.update({(row['idIntBus']):{k:ts[k] for k in range(self.timeperiods)}})
             else: 
                 emob_pdownshift_hourly.update({(row['idIntBus']):{k:0 for k in range(self.timeperiods)}})
@@ -1626,7 +1629,7 @@ class DataImport(object):
         heatpumpload_timeseries_flexibleportion = {}
         for Id, row in enumerate(self.heatpumploads_busnodes):
             if row['timeSeries'] :
-                ts = json.loads(row['timeSeries'])
+                ts = extend_hourly_timeseries(json.loads(row['timeSeries']), self.timeperiods)
                 heatpumpload_timeseries.update({(row['idIntBus']):{k:ts[k]*(1-self.HPFlexiblePercentage) for k in range(self.timeperiods)}}) # the multiplier "*(1-self.HPFlexiblePercentage)" indicates how much inflexible load should be kept in the HP load timeseries
                 uncontrolled_heatpumpload_timeseries.update({(row['idIntBus']):{k:ts[k] for k in range(self.timeperiods)}}) # we keep a version of the provided uncontrolled demand, JG: this should be the full original HP load before any shifting
                 heatpumpload_timeseries_flexibleportion.update({(row['idIntBus']):{k:ts[k]*(self.HPFlexiblePercentage) for k in range(self.timeperiods)}}) # JG: here the multiplier "*(self.HPFlexiblePercentage)" indicates how much flexible load should be kept in the HP load timeseries
@@ -1640,13 +1643,13 @@ class DataImport(object):
             heatpump_pmax_hourly.update({row['idIntBus']:row['value']}) # the value in the DB is in MW
         for Id, row in enumerate(self.heatpumploadsECumulMax_busnodes):
             if row['timeSeries'] :
-                ts = json.loads(row['timeSeries'])
+                ts = extend_hourly_timeseries(json.loads(row['timeSeries']), self.timeperiods)
                 heatpump_ecumulmax_hourly.update({(row['idIntBus']):{k:ts[k]*(self.HPFlexiblePercentage) for k in range(self.timeperiods)}})
             else:
                 heatpump_ecumulmax_hourly.update({(row['idIntBus']):{k:0 for k in range(self.timeperiods)}})
         for Id, row in enumerate(self.heatpumploadsECumulMin_busnodes):
             if row['timeSeries'] :
-                ts = json.loads(row['timeSeries'])
+                ts = extend_hourly_timeseries(json.loads(row['timeSeries']), self.timeperiods)
                 heatpump_ecumulmin_hourly.update({(row['idIntBus']):{k:ts[k]*(self.HPFlexiblePercentage) for k in range(self.timeperiods)}})
             else: 
                 heatpump_ecumulmin_hourly.update({(row['idIntBus']):{k:0 for k in range(self.timeperiods)}})
@@ -1654,7 +1657,7 @@ class DataImport(object):
         H2load_timeseries = {}
         for Id, row in enumerate(self.H2loads_busnodes):
             if row['timeSeries'] :
-                ts = json.loads(row['timeSeries'])
+                ts = extend_hourly_timeseries(json.loads(row['timeSeries']), self.timeperiods)
                 H2load_timeseries.update({(row['idIntBus']):{k:ts[k] for k in range(self.timeperiods)}}) # the multiplier "* row['DemandShare']" was removed. timeSeries already contains the final value of the demand.
             else:
                 H2load_timeseries.update({(row['idIntBus']):{k:0 for k in range(self.timeperiods)}})  #list with zeroes with the same length .... 
@@ -1844,7 +1847,7 @@ class DataImport(object):
         distiv_inj_timeseries = {}
         for Id, row in enumerate(self.distivinj_busnodes):
             if row['timeSeries']:
-                ts = json.loads(row['timeSeries'])
+                ts = extend_hourly_timeseries(json.loads(row['timeSeries']), self.timeperiods)
                 distiv_inj_timeseries.update({(row['internalBusId']):{k:ts[k] for k in range(self.timeperiods)}}) #{k:ts[k] for k in range(self.timeperiods)}}
             else:
                 distiv_inj_timeseries.update({(row['internalBusId']):{k:0 for k in range(self.timeperiods)}})
@@ -1876,7 +1879,7 @@ class DataImport(object):
         TCR_UP = {}
         TCR_DN = {}
         for _, row in enumerate(self.reserves_timeseries):
-            ts = json.loads(row['timeSeries'])
+            ts = extend_hourly_timeseries(json.loads(row['timeSeries']), self.timeperiods)
             if row['name'] == 'CH_Reserve_Secondary_UP':
                 SCR_UP.update({i:{'FRRupReq':ts[i]} for i in range(len(ts))})
             if row['name'] == 'CH_Reserve_Secondary_DN':
@@ -4646,6 +4649,9 @@ class CentIvModule(Plugin):
 
     def __init__(self, parameters: dict, scenario: Scenario | None = None):
         self.config = Config(**parameters)
+        self.config.timeperiods = self.config.timeperiods * self.config.numberOfYears
+        self.timeperiods = self.config.timeperiods
+        print("Number of timeperiods: " + str(self.config.timeperiods) + " resultin in " + str(self.config.timeperiods//8760) + " years.")
         self.model = DataImport(self.config.timeperiods)
 
     def run(self) -> None:

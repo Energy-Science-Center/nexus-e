@@ -3,11 +3,9 @@ from datetime import datetime
 import importlib
 import logging
 import os
-from sqlalchemy import create_engine
-from sqlalchemy.orm import Session
 from typing import Protocol
 
-from nexus_e_interface import Plugin, Scenario
+from nexus_e_interface import Plugin, Scenario, DataContext
 
 from . import config
 
@@ -51,16 +49,16 @@ class CorePluginFactory(ModuleFactory):
             if key in plugin.get_default_parameters()
         }
 
-        # Create database session
-        engine = create_engine(
-            "mysql+pymysql://"
-            f"{self.settings.modules.commons['input_data_user']}"
-            f":{self.settings.modules.commons['input_data_password']}"
-            f"@{self.settings.modules.commons['input_data_host']}"
-            f":{self.settings.modules.commons['input_data_port']}"
-            f"/{self.settings.modules.commons['input_data_name']}"
+        # Prepare data access
+        input_data = DataContext(
+            type="mysql",
+            host= self.settings.modules.commons["input_data_host"],
+            port= self.settings.modules.commons["input_data_port"],
+            user= self.settings.modules.commons["input_data_user"],
+            password= self.settings.modules.commons["input_data_password"],
+            name= self.settings.modules.commons["input_data_name"],
         )
-        scenario = Scenario(Session(engine))
+        scenario = Scenario(data_context=input_data)
 
         output = object.__new__(plugin_module.NexusePlugin)
         output.__init__(

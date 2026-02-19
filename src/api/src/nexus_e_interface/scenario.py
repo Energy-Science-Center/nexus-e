@@ -1,4 +1,6 @@
-from sqlalchemy import select
+from dataclasses import dataclass
+from typing import Literal
+from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session
 from sqlalchemy.engine import ScalarResult
 from .tables import (
@@ -43,17 +45,43 @@ from .tables import (
     Workforce,
 )
 
+@dataclass
+class DataContext():
+    type: Literal["mysql"] = "mysql"
+    name: str = ""
+    host: str = ""
+    port: str = ""
+    user: str = ""
+    password: str = ""
 
 class Scenario:
-    def __init__(self, session: Session):
-        """Initialize the Scenario repository with an injected session."""
-        self.__session: Session = session
+    def __init__(self, data_context: DataContext):
+        """Initialize the Scenario repository with an injected data context."""
+        self.__data_context = data_context
 
     def __get_table(self, table_class) -> ScalarResult:
         """Helper method to query a specific table."""
-        if not self.__session:
-            raise RuntimeError("Session is not active. Provide a valid session.")
-        return [row.__dict__ for row in self.__session.scalars(select(table_class)).all()]
+        with self.__session as session:
+            return [row.__dict__ for row in session.scalars(select(table_class)).all()]
+    
+    def __create_session(self) -> Session:
+        """Return an active session to interact with sql databases"""
+        if self.__data_context.type == "mysql":
+            output = Session(
+                create_engine(
+                    "mysql+pymysql://"
+                    f"{self.__data_context.user}"
+                    f":{self.__data_context.password}"
+                    f"@{self.__data_context.host}"
+                    f":{self.__data_context.port}"
+                    f"/{self.__data_context.name}"
+                )
+            )
+        return output
+
+    @property
+    def __session(self) -> Session:
+        return self.__create_session()
 
     # Properties for each table
     @property

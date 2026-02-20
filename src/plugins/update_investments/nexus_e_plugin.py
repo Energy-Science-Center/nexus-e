@@ -1,8 +1,7 @@
 from dataclasses import dataclass, asdict
 import os
 
-from sqlalchemy import create_engine, select
-from sqlalchemy.orm import Session
+from sqlalchemy import select
 
 from nexus_e_interface import Plugin, Scenario
 import nexus_e_interface.tables as tables
@@ -67,17 +66,10 @@ class NexusePlugin(Plugin):
             )
         
     def __get_scenario_id(self):
-        session=Session(create_engine(
-                "mysql+pymysql://"
-                + f"{self.__data_context.user}:{self.__data_context.password}"
-                + f"@{self.__data_context.host}/{self.__data_context.name}"
-        ))
-        statement = (
+        result = self.scenario.execute(
             select(tables.ScenarioConfiguration.idScenario)
             .where(tables.ScenarioConfiguration.Year == self.config.scenYear)
-        )
-        result = session.scalar(statement)
-        session.close()
+        ).first()
         if result is None:
             raise ValueError(
                 f"No scenario found for year {self.config.scenYear}."

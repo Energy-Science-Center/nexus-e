@@ -1,4 +1,5 @@
 from dataclasses import dataclass, replace
+import logging
 from typing import Literal
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session
@@ -79,7 +80,21 @@ class Scenario:
             )
         return output
     
+    def execute(self, statement) -> ScalarResult:
+        """
+        Execute a SQLAlchemy statement on the SQL database given by DataContext
+        at class creation.
+        """
+        with self.__session as session, session.begin():
+            # Probably vulnerable to SQL injection
+            return session.execute(statement).scalars()
+    
     def get_data_context(self) -> DataContext:
+        logging.warning((
+            "The direct use of data context is discouraged and will be "
+            "deprecated. Please consider using Scenario.execute() with "
+            "SQLAlchemy statements instead."
+        ))
         return replace(self.__data_context)
     
     @property

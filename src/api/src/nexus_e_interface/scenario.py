@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Literal
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session
@@ -78,7 +78,10 @@ class Scenario:
                 )
             )
         return output
-
+    
+    def get_data_context(self) -> DataContext:
+        return replace(self.__data_context)
+    
     @property
     def __session(self) -> Session:
         return self.__create_session()

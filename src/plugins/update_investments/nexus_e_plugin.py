@@ -9,10 +9,6 @@ import nexus_e_interface.tables as tables
 
 @dataclass
 class Config:
-    input_data_host: str = ""
-    input_data_user: str = ""
-    input_data_password: str = ""
-    input_data_name: str = ""
     startyear: int = 2020
     endyear: int = 2020
     scenYear: int = 2
@@ -25,9 +21,12 @@ class NexusePlugin(Plugin):
     def get_default_parameters(cls) -> dict:
         return asdict(Config())
 
-    def __init__(self, parameters: dict, scenario: Scenario | None = None):
+    def __init__(self, parameters: dict, scenario: Scenario):
         self.scenario = scenario
         self.config = Config(**parameters)
+        self.__data_context = scenario.get_data_context()
+        if self.__data_context.type != "mysql":
+            raise ValueError("update_investments only works with a MySQL database")
 
     def run(self) -> None:
         engine = self.__get_matlab_engine(self.config.matlab_engine)
@@ -37,18 +36,18 @@ class NexusePlugin(Plugin):
             "startyear": self.config.startyear,
             "endyear": self.config.endyear,
             "scenYear": self.config.scenYear,
-            "dbName": self.config.input_data_name
+            "dbName": self.__data_context.name
         }
         engine.update_investments(
             engine.workspace["parameters"],
             engine.database(
-                self.config.input_data_name,
-                self.config.input_data_user,
-                self.config.input_data_password,
+                self.__data_context.name,
+                self.__data_context.user,
+                self.__data_context.password,
                 "Vendor",
                 "MySQL",
                 "Server",
-                self.config.input_data_host,
+                self.__data_context.host,
             ),
             os.path.join(
                 self.config.results_path,
@@ -70,8 +69,8 @@ class NexusePlugin(Plugin):
     def __get_scenario_id(self):
         session=Session(create_engine(
                 "mysql+pymysql://"
-                + f"{self.config.input_data_user}:{self.config.input_data_password}"
-                + f"@{self.config.input_data_host}/{self.config.input_data_name}"
+                + f"{self.__data_context.user}:{self.__data_context.password}"
+                + f"@{self.__data_context.host}/{self.__data_context.name}"
         ))
         statement = (
             select(tables.ScenarioConfiguration.idScenario)

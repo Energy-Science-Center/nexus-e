@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from dataclasses import asdict
 from datetime import datetime
 import importlib
 import logging
@@ -50,15 +51,7 @@ class CorePluginFactory(ModuleFactory):
         }
 
         # Prepare data access
-        input_data = DataContext(
-            type="mysql",
-            host= self.settings.modules.commons["input_data_host"],
-            port= self.settings.modules.commons["input_data_port"],
-            user= self.settings.modules.commons["input_data_user"],
-            password= self.settings.modules.commons["input_data_password"],
-            name= self.settings.modules.commons["input_data_name"],
-        )
-        scenario = Scenario(data_context=input_data)
+        scenario = Scenario(data_context=self.settings.data_context)
 
         output = object.__new__(plugin_module.NexusePlugin)
         output.__init__(
@@ -89,23 +82,42 @@ class Simulation:
             logging.info(f"Run module: {module_config}")
             module: Module = module_factory.get_module(module_config)
             logging.info("Module created")
-            updated_common_parameters: dict | None = module.run()
-            if updated_common_parameters:
-                updated_common_parameters = {
-                    k: v
-                    for k, v in updated_common_parameters.items()
-                    # None is not TOML serializable
-                    if v is not None
-                }
-                for k, v in updated_common_parameters.items():
-                    logging.warning(f"Update common parameter {k} with value: {v}")
-                self.settings.modules.commons.update(updated_common_parameters)
-                config.write(self.settings)
+            updated_parameters: dict | None = module.run()
+            if not updated_parameters:
+                continue
+            updated_parameters = {
+                k: v
+                for k, v in updated_parameters.items()
+                # None is not TOML serializable
+                if v is not None
+            }
+            if "data_context" in updated_parameters:
+                self.__modify_data_context(updated_parameters["data_context"])
+                del updated_parameters["data_context"]
+            for k, v in updated_parameters.items():
+                logging.warning(f"Update common parameter {k} with value: {v}")
+            self.settings.modules.commons.update(updated_parameters)
+            config.write(self.settings)
+
+    def __modify_data_context(self, context_modifications: dict):
+        modified_context = asdict(self.settings.data_context)
+        modified_context.update(context_modifications)
+        new_data_context = DataContext(**modified_context)
+
+        if new_data_context != self.settings.data_context:
+            for secret in ["user", "password"]:
+                if secret in context_modifications:
+                    context_modifications[secret] = "******"
+            logging.warning(
+                f"Update data context with: {context_modifications}"
+            )
+            self.settings.data_context = new_data_context
+
 
     def __setup_results_folder(self):
         timestamp = self.settings.modules.commons["execution_date"]
         results_folder_name = (
-            f"{self.settings.modules.commons['input_data_name']}_{timestamp}"
+            f"{self.settings.data_context.name}_{timestamp}"
         )
         results_folder_path = os.path.join(
             self.settings.results.base_folder, results_folder_name

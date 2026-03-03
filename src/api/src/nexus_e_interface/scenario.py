@@ -1,6 +1,10 @@
-from sqlalchemy import select
+from dataclasses import dataclass, replace
+import logging
+from typing import Literal
+from sqlalchemy import create_engine, select, ScalarResult, Engine
 from sqlalchemy.orm import Session
-from sqlalchemy.engine import ScalarResult
+from sqlalchemy_utils import database_exists, create_database
+
 from .tables import (
     BusConfiguration,
     BusData,
@@ -41,71 +45,125 @@ from .tables import (
     TransformerConfiguration,
     TransformerData,
     Workforce,
+    Base,
 )
 
+@dataclass
+class DataContext():
+    type: Literal["mysql", "sqlite"] = "mysql"
+    name: str = ""
+    host: str = ""
+    port: str = ""
+    user: str = ""
+    password: str = ""
 
 class Scenario:
-    def __init__(self, session: Session):
-        """Initialize the Scenario repository with an injected session."""
-        self.__session: Session = session
+    def __init__(self, data_context: DataContext):
+        """Initialize the Scenario repository with an injected data context."""
+        self.__data_context = data_context
 
     def __get_table(self, table_class) -> ScalarResult:
         """Helper method to query a specific table."""
-        if not self.__session:
-            raise RuntimeError("Session is not active. Provide a valid session.")
-        return [row.__dict__ for row in self.__session.scalars(select(table_class)).all()]
+        with self.__new_session as session:
+            return [row.__dict__ for row in session.scalars(select(table_class)).all()]
+        
+    @property
+    def __new_session(self) -> Session:
+        return Session(self.__create_engine())
+    
+    def __create_engine(self) -> Engine:
+        """Return an active session to interact with sql databases"""
+        if self.__data_context.type == "mysql":
+            output = create_engine(
+                "mysql+pymysql://"
+                f"{self.__data_context.user}"
+                f":{self.__data_context.password}"
+                f"@{self.__data_context.host}"
+                f":{self.__data_context.port}"
+                f"/{self.__data_context.name}"
+            )
+        elif self.__data_context.type == "sqlite":
+            output = create_engine(f"sqlite:///{self.__data_context.name}")
+        return output
+    
+    def execute(self, statement) -> ScalarResult:
+        """
+        Execute a SQLAlchemy statement on the SQL database given by DataContext
+        at class creation.
+        """
+        with self.__new_session as session, session.begin():
+            # Probably vulnerable to SQL injection
+            return session.execute(statement).scalars()
+    
+    def get_data_context(self) -> DataContext:
+        logging.warning((
+            "The direct use of data context is discouraged and will be "
+            "deprecated. Please consider using Scenario.execute() with "
+            "SQLAlchemy statements instead."
+        ))
+        return replace(self.__data_context)
+    
+    def create_new_database(self) -> None:
+        if database_exists(self.__create_engine().url):
+            logging.warning(
+                f"Database {self.__data_context.name} already exists."
+            )
+            return
+        create_database(self.__create_engine().url)
+        Base.metadata.create_all(self.__create_engine())
+
 
     # Properties for each table
     @property
-    def bus_configurations(self) -> ScalarResult:
+    def busconfiguration(self) -> ScalarResult:
         return self.__get_table(BusConfiguration)
 
     @property
-    def bus_data(self) -> ScalarResult:
+    def busdata(self) -> ScalarResult:
         return self.__get_table(BusData)
 
     @property
-    def cent_flex_potential(self) -> ScalarResult:
+    def centflexpotential(self) -> ScalarResult:
         return self.__get_table(CentFlexPotential)
 
     @property
-    def db_info(self) -> ScalarResult:
+    def dbinfo(self) -> ScalarResult:
         return self.__get_table(DBInfo)
 
     @property
-    def dist_ab_gen_costs(self) -> ScalarResult:
+    def distabgencosts(self) -> ScalarResult:
         return self.__get_table(DistABGenCosts)
 
     @property
-    def dist_flex_potential(self) -> ScalarResult:
+    def distflexpotential(self) -> ScalarResult:
         return self.__get_table(DistFlexPotential)
 
     @property
-    def dist_gen_config_info(self) -> ScalarResult:
+    def distgenconfiginfo(self) -> ScalarResult:
         return self.__get_table(DistGenConfigInfo)
 
     @property
-    def dist_gen_configuration(self) -> ScalarResult:
+    def distgenconfiguration(self) -> ScalarResult:
         return self.__get_table(DistGenConfiguration)
 
     @property
-    def dist_gen_data(self) -> ScalarResult:
+    def distgendata(self) -> ScalarResult:
         return self.__get_table(DistGenData)
 
     @property
-    def dist_profiles(self) -> ScalarResult:
+    def distprofiles(self) -> ScalarResult:
         return self.__get_table(DistProfiles)
 
     @property
-    def dist_region_by_gen_type_data(self) -> ScalarResult:
+    def distregionbygentypedata(self) -> ScalarResult:
         return self.__get_table(DistRegionByGenTypeData)
 
     @property
-    def dist_region_by_irrad_level_data(self) -> ScalarResult:
+    def distregionbyirradleveldata(self) -> ScalarResult:
         return self.__get_table(DistRegionByIrradLevelData)
 
     @property
-    def dist_region_data(self) -> ScalarResult:
+    def distregiondata(self) -> ScalarResult:
         return self.__get_table(DistRegionData)
 
     @property
@@ -121,35 +179,35 @@ class Scenario:
         return self.__get_table(FlexProfilesHP)
 
     @property
-    def fuel_prices(self) -> ScalarResult:
+    def fuelprices(self) -> ScalarResult:
         return self.__get_table(FuelPrices)
 
     @property
-    def gen_config_info(self) -> ScalarResult:
+    def genconfiginfo(self) -> ScalarResult:
         return self.__get_table(GenConfigInfo)
 
     @property
-    def gen_configuration(self) -> ScalarResult:
+    def genconfiguration(self) -> ScalarResult:
         return self.__get_table(GenConfiguration)
 
     @property
-    def gen_configuration_extra(self) -> ScalarResult:
+    def genconfiguration_extra(self) -> ScalarResult:
         return self.__get_table(GenConfigurationExtra)
 
     @property
-    def gen_data(self) -> ScalarResult:
+    def gendata(self) -> ScalarResult:
         return self.__get_table(GenData)
 
     @property
-    def gen_type_data(self) -> ScalarResult:
+    def gentypedata(self) -> ScalarResult:
         return self.__get_table(GenTypeData)
 
     @property
-    def line_configuration(self) -> ScalarResult:
+    def lineconfiguration(self) -> ScalarResult:
         return self.__get_table(LineConfiguration)
 
     @property
-    def line_data(self) -> ScalarResult:
+    def linedata(self) -> ScalarResult:
         return self.__get_table(LineData)
 
     @property
@@ -157,27 +215,27 @@ class Scenario:
         return self.__get_table(LoadProfiles)
 
     @property
-    def load_config_info(self) -> ScalarResult:
+    def loadconfiginfo(self) -> ScalarResult:
         return self.__get_table(LoadConfigInfo)
 
     @property
-    def load_configuration(self) -> ScalarResult:
+    def loadconfiguration(self) -> ScalarResult:
         return self.__get_table(LoadConfiguration)
 
     @property
-    def load_data(self) -> ScalarResult:
+    def loaddata(self) -> ScalarResult:
         return self.__get_table(LoadData)
 
     @property
-    def markets_configuration(self) -> ScalarResult:
+    def marketsconfiguration(self) -> ScalarResult:
         return self.__get_table(MarketsConfiguration)
 
     @property
-    def network_config_info(self) -> ScalarResult:
+    def networkconfiginfo(self) -> ScalarResult:
         return self.__get_table(NetworkConfigInfo)
 
     @property
-    def profile_data(self) -> ScalarResult:
+    def profiledata(self) -> ScalarResult:
         return self.__get_table(ProfileData)
 
     @property
@@ -185,22 +243,21 @@ class Scenario:
         return self.__get_table(Projections)
 
     @property
-    def scenario_configuration(self) -> ScalarResult:
+    def scenarioconfiguration(self) -> ScalarResult:
         return self.__get_table(ScenarioConfiguration)
 
     @property
-    def security_ref(self) -> ScalarResult:
-        if not self.__session:
+    def securityref(self) -> ScalarResult:
+        if not self.__new_session:
             raise RuntimeError("Session is not active. Provide a valid session.")
         output = {
-            "DNS_vals": self.__session.scalars(select(SecurityRef.DNS_vals)).first(),
-            "NLF_vals": self.__session.scalars(select(SecurityRef.NLF_vals)).first(),
+            "DNS_vals": self.__new_session.scalars(select(SecurityRef.DNS_vals)).first(),
+            "NLF_vals": self.__new_session.scalars(select(SecurityRef.NLF_vals)).first(),
         }
-        print({key: len(value) for key, value in output.items()})
         return [output]
 
     @property
-    def swiss_annual_targets_config_info(self) -> ScalarResult:
+    def swiss_annual_targets_configinfo(self) -> ScalarResult:
         return self.__get_table(SwissAnnualTargetsConfigInfo)
 
     @property
@@ -208,11 +265,11 @@ class Scenario:
         return self.__get_table(SwissAnnualTargetsConfiguration)
 
     @property
-    def transformer_configuration(self) -> ScalarResult:
+    def transformerconfiguration(self) -> ScalarResult:
         return self.__get_table(TransformerConfiguration)
 
     @property
-    def transformer_data(self) -> ScalarResult:
+    def transformerdata(self) -> ScalarResult:
         return self.__get_table(TransformerData)
 
     @property

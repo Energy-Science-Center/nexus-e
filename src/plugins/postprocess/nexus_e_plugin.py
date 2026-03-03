@@ -1,5 +1,4 @@
 from dataclasses import dataclass, asdict
-from datetime import datetime
 import logging
 import os
 import pandas as pd
@@ -13,16 +12,12 @@ from .legacy import moveToMysql
 @dataclass
 class Parameters:
     results_path: str = ""
-    input_data_name: str = ""
     plot_config_file_path: str = ""
     centiv: bool = False
     cascades: bool = False
     move_to_mysql: bool = False
     scenario_description: str = ""
     execution_date: str = ""
-    input_data_host: str = ""
-    input_data_user: str = ""
-    input_data_password: str = ""
     output_name: str = ""
     output_host: str = ""
     output_port: str = "3307"
@@ -35,20 +30,23 @@ class NexusePlugin(Plugin):
     def get_default_parameters(cls) -> dict:
         return asdict(Parameters())
 
-    def __init__(self, parameters: dict, scenario: Scenario | None = None):
+    def __init__(self, parameters: dict, scenario: Scenario):
+        self.__data_context = scenario.get_data_context()
+        if self.__data_context.type != "mysql":
+            raise ValueError("postprocess only works with a MySQL database")
         if "output_host" not in parameters:
-            parameters["output_host"] = parameters["input_data_host"]
+            parameters["output_host"] = self.__data_context.host
         if "output_port" not in parameters:
             logging.warning("Default output database port is set to 3307 for legacy reasons.")
         if "output_user" not in parameters:
-            parameters["output_user"] = parameters["input_data_user"]
+            parameters["output_user"] = self.__data_context.user
         if "output_password" not in parameters:
-            parameters["output_password"] = parameters["input_data_password"]
+            parameters["output_password"] = self.__data_context.password
         if "output_name" not in parameters:
-            parameters["output_name"] = parameters["input_data_name"]
+            parameters["output_name"] = self.__data_context.name
             logging.warning(
                 (
-                    "No output_name given, defaulting to input_data_name: "
+                    "No output_name given, defaulting to data_context name: "
                     + f"{parameters['output_name']}"
                 )
             )
@@ -66,10 +64,10 @@ class NexusePlugin(Plugin):
         if self.__parameters.centiv:
             centiv_postprocess = CentivPostprocess(
                 results_path=self.__parameters.results_path,
-                input_data_name=self.__parameters.input_data_name,
-                input_host=self.__parameters.input_data_host,
-                input_user=self.__parameters.input_data_user,
-                input_password=self.__parameters.input_data_password,
+                input_data_name=self.__data_context.name,
+                input_host=self.__data_context.host,
+                input_user=self.__data_context.user,
+                input_password=self.__data_context.password,
                 single_electric_node=self.__parameters.single_electric_node,
             )
             centiv_postprocess.run()

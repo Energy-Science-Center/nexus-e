@@ -46,9 +46,6 @@ class Config:
     push_to_mysql: bool = True
     database_name: str = "project_date_version"
     database_author: str = "FirstName LastName"
-    input_data_host: str = "localhost"
-    input_data_user: str = "root"
-    input_data_password: str = "root"
     dump_file_path: str = "src/plugins/upload_scenario/schemas/Dump_STRUC_clean_v9.sql"
 
     include_flex_params: bool = False
@@ -91,8 +88,11 @@ class NexusePlugin(Plugin):
     def get_default_parameters(cls) -> dict:
         return asdict(Config())
 
-    def __init__(self, parameters: dict, scenario: Scenario | None = None):
+    def __init__(self, parameters: dict, scenario: Scenario):
         self.settings = Config(**parameters)
+        self.__data_context = scenario.get_data_context()
+        if self.__data_context.type != "mysql":
+            raise ValueError("upload_scenario only works with a MySQL database")
 
     def run(self) -> dict[str, Any]:
         output = {}
@@ -154,9 +154,9 @@ class NexusePlugin(Plugin):
         self.my_sql_connector = MysqlConnector(
             push_to_mysql=self.settings.push_to_mysql,
             inputDB=inputDB,
-            host=self.settings.input_data_host,
-            user=self.settings.input_data_user,
-            password=self.settings.input_data_password,
+            host=self.__data_context.host,
+            user=self.__data_context.user,
+            password=self.__data_context.password,
             database_name=self.settings.database_name,
             dump_file_path=self.settings.dump_file_path,
             include_flex_params=self.settings.include_flex_params
@@ -165,7 +165,7 @@ class NexusePlugin(Plugin):
         logging.info("Push data to database...")
         self.my_sql_connector.push_DB_to_mysql()
         logging.info("Done")
-        output["input_data_name"] = self.settings.database_name
+        output["data_context"] = {"name": self.settings.database_name}
         return output
 
     def __create_excel(

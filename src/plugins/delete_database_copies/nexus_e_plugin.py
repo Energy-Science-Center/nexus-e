@@ -10,35 +10,30 @@ from .database import MySQLDatabaseContext
 
 @dataclass
 class Parameters:
-    input_data_host: str = ""
-    """MySQL server hostname."""
-    input_data_port: str = "3306"
-    """MySQL server port."""
-    input_data_user: str = ""
-    """MySQL server username."""
-    input_data_password: str = ""
-    """MySQL server password."""
     database_copies: list[dict[str, str]] = field(default_factory=list)
     """
     List of copied databases names to delete alongside their source database.
     """
     delete_all_copies: bool = True
     """Allow to delete all copies given by database_copies."""
-    reset_original_input_data_name: bool = True
-    """Allow to update input_data_name back to the original database name."""
+    reset_original_data_context_name: bool = True
+    """Allow to update data_context name back to the original database name."""
 
 class NexusePlugin(Plugin):
     @classmethod
     def get_default_parameters(cls) -> dict:
         return asdict(Parameters())
     
-    def __init__(self, parameters: dict, scenario: Scenario | None = None):
+    def __init__(self, parameters: dict, scenario: Scenario):
         parameters = {
             key: value
             for key, value in parameters.items()
             if key in NexusePlugin.get_default_parameters()
         }
         self.__parameters = Parameters(**parameters)
+        self.__data_context = scenario.get_data_context()
+        if self.__data_context.type != "mysql":
+            raise ValueError("delete_database_copies only works with a MySQL database")
 
     def run(self) -> dict[str, Any]:
         if len(self.__parameters.database_copies) == 0:
@@ -49,10 +44,10 @@ class NexusePlugin(Plugin):
         }
         if self.__parameters.delete_all_copies:
             database_server = MySQLDatabaseContext(
-                host=self.__parameters.input_data_host,
-                port=self.__parameters.input_data_port,
-                username=self.__parameters.input_data_user,
-                password=self.__parameters.input_data_password,
+                host=self.__data_context.host,
+                port=self.__data_context.port,
+                username=self.__data_context.user,
+                password=self.__data_context.password,
             )
             for database_copy in self.__parameters.database_copies:
                 logging.info(
@@ -63,16 +58,16 @@ class NexusePlugin(Plugin):
                 )
                 output["database_copies"].remove(database_copy)
                 logging.info("DONE")
-        if self.__parameters.reset_original_input_data_name:
+        if self.__parameters.reset_original_data_context_name:
             copy_names = [
                 copy["copy_name"] for copy in self.__parameters.database_copies
             ]
             original_names = [
                 copy["original_name"] for copy in self.__parameters.database_copies
             ]
-            first_original_name = [
+            first_original_name = set(
                 name for name in original_names if name not in copy_names
-            ]
+            )
             if len(first_original_name) == 0:
                 logging.warning(
                     (
@@ -90,5 +85,5 @@ class NexusePlugin(Plugin):
                     )
                 )
             else:
-                output["input_data_name"] = first_original_name[0]
+                output["data_context"] = {"name": first_original_name.pop()}
         return output

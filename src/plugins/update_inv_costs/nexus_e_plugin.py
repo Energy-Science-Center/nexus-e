@@ -10,10 +10,6 @@ from nexus_e_interface.plugin import Plugin
 
 @dataclass
 class Parameters:
-    input_data_host: str = "localhost"
-    input_data_user: str = "username"
-    input_data_password: str = "password"
-    input_data_name: str = "database_name"
     cost_scenario: Literal["Low", "Reference", "High"] = "Reference"
     
 
@@ -33,8 +29,11 @@ class NexusePlugin(Plugin):
     def get_default_parameters(cls) -> dict:
         return asdict(Parameters())
 
-    def __init__(self, parameters: dict, scenario: Scenario | None = None):
+    def __init__(self, parameters: dict, scenario: Scenario):
         self.__settings = Parameters(**parameters)
+        self.__data_context = scenario.get_data_context()
+        if self.__data_context.type != "mysql":
+            raise ValueError("update_inv_costs only works with a MySQL database")
         
         # Suppress verbose MySQL connector logs
         logging.getLogger('mysql.connector').setLevel(logging.WARNING)
@@ -42,9 +41,9 @@ class NexusePlugin(Plugin):
         # Add connection timeout to fail faster - increased for slow networks
         # Disable SSL/TLS to avoid handshake hangs
         connection_string = (
-            f"mysql+mysqlconnector://{self.__settings.input_data_user}:"
-            f"{self.__settings.input_data_password}@{self.__settings.input_data_host}/"
-            f"{self.__settings.input_data_name}?connect_timeout=10&"
+            f"mysql+mysqlconnector://{self.__data_context.user}:"
+            f"{self.__data_context.password}@{self.__data_context.host}/"
+            f"{self.__data_context.name}?connect_timeout=10&"
             f"ssl_disabled=true&use_pure=true"
         )
         self.__engine = create_engine(

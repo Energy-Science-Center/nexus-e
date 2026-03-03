@@ -47,18 +47,6 @@ from .save_results import saveVarParDualsCsv, saveSelectedStats, saveMappingFile
 @dataclass
 class Config():
     # This is where defaults are mentioned.
-    input_data_host: str = "localhost"
-    """Server on which database is hosted"""
-
-    input_data_name: str = "scenario_name"
-    """Name of MySQL database"""
-    
-    input_data_user: str = "user"
-    """User Name for MySQL database"""
-    
-    input_data_password: str = "password"
-    """Password for MySQL database"""
-
     results_path: str = "results"
     """Folder in which the results are stored"""
     
@@ -4644,8 +4632,11 @@ class CentIvModule(Plugin):
     def get_default_parameters(cls) -> dict:
         return asdict(Config())
 
-    def __init__(self, parameters: dict, scenario: Scenario | None = None):
+    def __init__(self, parameters: dict, scenario: Scenario):
         self.config = Config(**parameters)
+        self.__data_context = scenario.get_data_context()
+        if self.__data_context.type != "mysql":
+            raise ValueError("CentIv only works with a MySQL database")
         self.model = DataImport(self.config.timeperiods)
 
     def run(self) -> None:
@@ -4660,10 +4651,11 @@ class CentIvModule(Plugin):
         start_time = time.time()
         print("Starting MySQLConnect" + 70 * "-")
         self.model.MySQLConnect(
-            self.config.input_data_host,
-            self.config.input_data_name,
-            self.config.input_data_user,
-            self.config.input_data_password)
+            host=self.__data_context.host,
+            database=self.__data_context.name,
+            user=self.__data_context.user,
+            password=self.__data_context.password
+        )
         duration_dict['MySQLConnect'] = time.time() - start_time
         logging.debug('MySQLConnect took ' + str(duration_dict['MySQLConnect']) + ' minutes')
 

@@ -31,6 +31,8 @@ from dataclasses import dataclass, asdict, field
 import tomli
 import tomli_w
 
+from nexus_e_interface import DataContext
+
 CONFIG_FILE_NAME = "config.toml"
 """The default config file name."""
 
@@ -112,11 +114,6 @@ class Results:
 class Modules:
     commons: dict[str, Any] = field(default_factory=lambda: 
         {
-            "input_data_host": "",
-            "input_data_port": "",
-            "input_data_user": "",
-            "input_data_password": "",
-            "input_data_name": "",
             "resolution_in_days": 1,
             "single_electric_node": False,
         }
@@ -148,6 +145,7 @@ class Config:
 
     logging: Logging = field(default_factory=Logging)
     results: Results = field(default_factory=Results)
+    data_context: DataContext = field(default_factory=DataContext)
     modules: Modules = field(default_factory=Modules)
 
     def parse(self, **config: dict):

@@ -14,7 +14,6 @@ run_tests:
         - apt-get install -y mariadb-server
         - apt-get install -y clang
     script:
-        - uv remove matlabengine
         - uv run pytest --junitxml=report.xml
     artifacts:
         when: always

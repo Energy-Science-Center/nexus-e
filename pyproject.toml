@@ -7,7 +7,6 @@ requires-python = "==3.10.12"
 dependencies = [
     "cryptography>=44.0.2",
     "h5py==3.11.0",
-    "matlabengine==23.2.3",
     "mesa==2.3.4",
     "nexus-e-interface",
     "mysql-connector-python>=9.2.0",
@@ -28,7 +27,7 @@ dependencies = [
 
 [project.optional-dependencies]
 matlab = [
-    "matlabengine<=24.0.0",
+    "matlabengine==23.2.3",
 ]
 
 [dependency-groups]

@@ -25,6 +25,7 @@ Running this script asks the user if a default config file should be written.
 """
 
 import os
+from pathlib import Path
 from typing import Any, List
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, asdict, field
@@ -188,10 +189,18 @@ def write_default_config_file(
     config_file: ConfigFile = TomlFile(CONFIG_FILE_NAME),
 ):
     """The default config is created by directly instantiating a Config() object."""
+
+    if Path("config.toml").exists():
+        if input("Overwrite config file? [Y/n]: ") not in "Yy":
+            return
+
     default_config = Config()
+    print()
+    print("Please enter the input database server credentials you want to use.")
+    print("If you're part of the Nexus-e team, you can use our MySQL server: https://unlimited.ethz.ch/spaces/WikiNexusE/pages/406917252/MySQL+server")
+    default_config.data_context.host = input("  host: ")
+    default_config.data_context.port = input("  port: ")
+    default_config.data_context.user = input("  user: ")
+    default_config.data_context.password = input("  password: ")
+    default_config.data_context.name = input("  database: ")
     write(default_config, config_file)
-
-
-if __name__ == "__main__":
-    if input("Write default config file? [Y/n]: ") in "Yy":
-        write_default_config_file()

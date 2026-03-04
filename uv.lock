@@ -837,7 +837,6 @@ source = { editable = "." }
 dependencies = [
     { name = "cryptography" },
     { name = "h5py" },
-    { name = "matlabengine" },
     { name = "mesa" },
     { name = "mysql-connector-python" },
     { name = "nexus-e-interface" },
@@ -870,8 +869,7 @@ dev = [
 requires-dist = [
     { name = "cryptography", specifier = ">=44.0.2" },
     { name = "h5py", specifier = "==3.11.0" },
-    { name = "matlabengine", specifier = "==23.2.3" },
-    { name = "matlabengine", marker = "extra == 'matlab'", specifier = "<=24.0.0" },
+    { name = "matlabengine", marker = "extra == 'matlab'", specifier = "==23.2.3" },
     { name = "mesa", specifier = "==2.3.4" },
     { name = "mysql-connector-python", specifier = ">=9.2.0" },
     { name = "nexus-e-interface", editable = "src/api" },

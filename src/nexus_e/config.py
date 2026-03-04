@@ -114,11 +114,11 @@ class Results:
 class Modules:
     commons: dict[str, Any] = field(default_factory=lambda: 
         {
-            "resolution_in_days": 1,
-            "single_electric_node": False,
+            "resolution_in_days": 8,
+            "single_electric_node": True,
         }
     )
-    playlist_name: str = "nothing"
+    playlist_name: str = "end_to_end_test"
 
 
 @dataclass

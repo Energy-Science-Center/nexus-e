@@ -1,0 +1,85 @@
+# Upload one scenario from Excel file to MySQL database
+[[modules]]
+name = "upload_scenario"
+[modules.parameters]
+excel_file_path = "src/data/source_excel/Nexuse_DB-Input_v48_TYNDP24-DE09_CentIvPV_xbNTC_NoSwissGrid.xlsx"
+push_to_mysql = true
+database_name = "end_to_end_test"
+database_author = "XX"
+dump_file_path = "src/plugins/upload_scenario/schemas/Dump_STRUC_clean_v9.sql"
+
+include_flex_params = true
+demand_profiles_path = "src/data/nodal_demand_profiles/Nexuse_DB-Input_v48_TYNDP24-DE09_NoEVflex_NoHeatPumps"
+
+include_tyndp24 = false
+tyndp24_data_path = "src/data/TYNDP24_datasets/TYNDP24_nbc"
+tyndp24_scope = "nbc"
+tyndp24_policy = "DE"
+tyndp24_climate_year = 2009
+
+ntc_type = "modelResults"
+
+use_new_line_types = true
+preset_line_types = true
+new_line_types = "AC"
+
+config_years = ["2018", "2020", "2030", "2040", "2050"]
+config_years_int = [2018, 2020, 2030, 2040, 2050]
+
+create_excel = false
+excel_file_target_path = "output.xlsx"
+
+include_branch_sheet = true
+
+update_only_specific_columns = false
+columns_to_update = { branch = ["line_id", "start_year", "S_max_win (MVA)"] }
+
+
+# Copy Database
+[[modules]]
+name = "copy_database"
+[modules.parameters]
+user_initials = "XX"
+
+
+# Upload Res Data
+[[modules]]
+name = "upload_res_data"
+[modules.parameters]
+
+
+# Update Inv Costs
+[[modules]]
+name = "update_inv_costs"
+[modules.parameters]
+cost_scenario = "Reference"
+
+
+# Run CentIv for year 2020
+[[modules]]
+name = "centiv"
+[modules.parameters]
+idScenario = 2
+timeperiods = 48
+
+# Update investments from CentIv 2020
+[[modules]]
+name = "update_investments"
+[modules.parameters]
+startyear = 2
+endyear = 5
+scenYear = 2020
+
+
+# Run simulation postprocess
+[[modules]]
+name = "postprocess"
+[modules.parameters]
+centiv = true
+move_to_mysql = true
+
+
+# Delete database copies
+[[modules]]
+name = "delete_database_copies"
+[modules.parameters]

@@ -1,0 +1,55 @@
+# Using TYNDP2024 data
+
+The data for the new TYNDP2024 Distributed Energy scenario using the reference 2009 weather year are now ready and tested. The Matlab-based process for creating MySQL databases is ready and Jared has completed many test simulations. To create a new database, you simply need to follow these steps:
+
+## Edit ‘upload_parameters.json’ (saved in "Shared\\DBcreation\\upload_parameters.json") to define the following:
+
+1. names of the MySQL databases you want to create
+2. names of the main input Excel files you want to use
+3. names of the CSVs folders you want to use
+4. leave ‘CalliopeInput_Filename’ blank
+5. set 'use_calliope_CH_electrolysis_demand' to false
+
+## Execute in Matlab the DB creation command that uses the new v14 DB creation code:
+
+```matlab
+UploadDatabases(@addNexusExcel2dataBase_multiyear_v14)
+```
+
+Note that this process uses the new nodal-hourly loads and flexibility parameters defined in the folder of CSVs (see [Nodal-hourly load](/wiki/scenarios/nodal-hourly-load.qmd) for more details) along with the main excel input file.
+
+Jared has already setup the following versions of these input files
+
+## Main Excel input file
+
+- `Nexuse_DB-Input_v48_TYNDP24-DE09_CentIvPV_xbAC.xlsx` : models cross border lines as AC connectors (like we have always done it)
+- `Nexuse_DB-Input_v48_TYNDP24-DE09_CentIvPV_xbNTC.xlsx` : models cross border lines as NTC connectors. This new feature is recommended, and it also represents the NTC limits going in each direction. See [Cross border connectors as NTCs](/wiki/scenarios/ntc.qmd) for more information.
+
+## CSVs of nodal-hourly loads and flexibility parameters
+
+- `Nexuse_DB-Input_v48_TYNDP24-DE09_WithEVflex_DemandProfiles` : allows EV demand flexibility
+- `Nexuse_DB-Input_v48_TYNDP24-DE09_NoEVflex_DemandProfiles` : does NOT allow EV demand flexibility
+- Each folder must include the CSVs for each load type (4 types) and each year (5 years) -\> 20 CSV files, as well as each EV flexibility parameter (3 parameters) and each HP flexibility parameter (3 parameters) for each year -\> 30 CSV files. For a total of 50 CSV files.
+- Any new demand types should follow a similar structure.
+- At the moment, specifying the CSVs with ‘NoEVflex’ is the only way to turn off EV demand flexibility. This is done in these files by setting the parameter values for daily flexible energy (`XXXX_eMobility_Flex_FE_NodalDaily_MWh.csv`) to zeros. No other modification is necessary to accomplish this.
+- A future update could allow the user to turn EV flexibility off as a control switch in the main run script.
+
+No other TYNDP scenario will be setup for use with the Matlab-based DB creation process. Now, with the Python-based DB creation process the user can simply indicate which combination of TYNDP scenario / weather year / grid version they desire. However, **the Calliope data are not yet available with this process**. See more info in [Modelling all EU](/wiki/scenarios/europe.qmd).
+
+Jared has already created the four MySQL databases, anyone can feel free to use these for their own testing
+
+- `nexuse_s9_250321_ty24_evf_xbntc` (NTC lines, with EV flexibility)
+- `nexuse_s9_250321_ty24_noevf_xbntc` (NTC lines, no EV flexibility)
+- `nexuse_s9_250321_ty24_evf_xbac` (AC lines, with EV flexibility)
+- `nexuse_s9_250321_ty24_noevf_xbac` (AC lines, no EV flexibility)
+
+Jared has also already completed several simulations, the links for the results are:
+
+| Sim details | Link |
+|-------------|------|
+| 2050, 8-day, NTC lines, No EV flex | https://nexus-e.org/results/2025-03-22t02-36-54_tyndp24_8day_2050_noevflex_xbntc |
+| 2050, 2-day, NTC lines, With EV flex | https://nexus-e.org/results/2025-03-22t10-05-02_tyndp24_2day_2050_evflex_xbntc |
+| 2050, 1-day, NTC lines, With EV flex | https://nexus-e.org/results/2025-03-21t21-52-28_tyndp24_1day_2050_evflex_xbntc |
+| 2020-2050, 8-day, NTC lines, No EV flex | https://nexus-e.org/results/2025-03-22t08-49-20_tyndp24_8day_2020-2050_noevflex_xbntc |
+| 2020-2050, 2-day, NTC lines, With EV flex | https://nexus-e.org/results/2025-03-23t12-30-08_tyndp24_2day_2020-2050_evflex_xbntc |
+

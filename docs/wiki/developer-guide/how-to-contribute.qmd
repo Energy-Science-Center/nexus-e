@@ -1,0 +1,19 @@
+## Start with an issue
+
+[Github Issues](https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/creating-an-issue) are used to design and discuss a potential feature, or a fix. When starting working on a development, make sure to have a corresponding open issue. You can pick an existing issue to start working on it or you can create an issue corresponding to your needs.
+
+## Fork the repository
+
+We ask contributors to [fork the repository](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo) and work from their fork.
+
+## Create a new branch
+
+Create a new branch out of the latest `main` branch. Name the branch such that it's relevant to the issue you are working on.
+
+## Implement your solution
+
+If you need to write code to implement your solution please do so with [writing tests](tests.qmd) in a [TDD](https://www.youtube.com/watch?v=B1j6k2j2eJg) fashion, keeping in mind the [SOLID principles](solid-principles.qmd), and by applying our [style guide](style-guide.qmd).
+
+## Open a Pull Request
+
+Open a [pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request) for your branch into the `main` branch and assign a reviewer for your code to be reviewed. If relevant, please provide a database name to be used to see the effects of your branch. Once your Pull Request has been reviewed and approved, you can merge it. Congratulations!

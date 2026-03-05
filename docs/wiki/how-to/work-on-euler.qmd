@@ -1,0 +1,174 @@
+> **Note:** This page was created by Ali using Claude. It has not been fully tested on a fresh computer, so some steps may need adjustment.
+
+## Connecting to Euler and Setting Up Nexus-e
+This guide walks you through connecting to the ETH Euler cluster, setting up SSH keys for GitLab, and cloning the Nexus-e repository — all within VSCode.
+
+### Why do we need this?
+If we want to run simulations or jobs on Euler (ETH's high-performance computing cluster), we need to connect to it first. There are several ways to do this, but VS Code is recommended because it provides a more integrated experience.
+
+### Reminder
+Connecting to the Euler cluster requires you to either be within the ETH network or connected via the **ETH VPN**.
+
+
+## Overview: SSH Keys in This Setup
+This guide involves two separate SSH keys, which serve different purposes:
+
+| Key | Direction | Purpose | Required? |
+|-----|-----------|---------|-----------|
+| **Euler key** | Your local machine → Euler | Passwordless login to the cluster | Optional (password works) |
+| **GitLab key** | Euler → GitLab | Clone and push repositories from Euler | Required for SSH cloning |
+
+You can complete Part 1 using just your ETH password — no SSH key needed. The keys come into play in Parts 1b and 2.
+
+## Part 1: Connect to Euler via VSCode
+
+No SSH key is needed for this step. You will log in with your ETH username and password.
+
+### Prerequisites
+
+You need the **Remote - SSH** extension installed in VSCode. If you don't have it:
+
+1. Open Extensions (`Ctrl+Shift+X`)
+2. Search for "Remote - SSH"
+3. Install the extension by Microsoft
+
+### Steps to Connect
+
+1. **Open a new VSCode window**
+   - `File` → `New Window` (or `Ctrl+Shift+N`)
+
+2. **Open the Remote Connection menu**
+   - Click the green remote indicator in the bottom-left corner of VSCode
+   - Or press `F1` and type `Remote-SSH: Connect to Host`
+
+3. **Connect to Host**
+   - Select **"Connect to Host..."**
+   - Enter: `username@euler.ethz.ch` (replace `username` with your ETH username)
+
+4. **Enter your password**
+   - When prompted, enter your ETH password
+
+5. **Done!**
+   - Once connected, you can open folders on Euler and work remotely
+
+### Using the Terminal
+
+To open a terminal in VSCode while connected to Euler:
+
+1. Click on the top menu **Terminal**
+2. Click on **New Terminal**
+
+This will open a terminal session directly on Euler where you can run commands, submit jobs, etc.
+
+
+## Part 1b: (Optional) Set Up Passwordless Login to Euler
+If you find it inconvenient to enter your ETH password every time you connect, you can set up an SSH key on your **local machine** and register it with Euler. This is optional but recommended for regular use.
+
+### 1. Check for an Existing SSH Key on Your Local Machine
+
+Open a terminal **on your local machine** (not on Euler) and run:
+
+```bash
+ls -la ~/.ssh/
+```
+
+Look for files like `id_ed25519` or `id_rsa`. If they exist, skip to step 3.
+
+### 2. Generate a New SSH Key on Your Local Machine
+
+```bash
+ssh-keygen -t ed25519 -C "your_email@ethz.ch"
+```
+
+Press **Enter** to accept the default file location. You can optionally set a passphrase or leave it empty.
+
+### 3. Copy Your Public Key to Euler
+
+```bash
+ssh-copy-id username@euler.ethz.ch
+```
+
+Enter your ETH password when prompted. After this, VSCode and terminal connections to Euler will no longer require a password.
+
+
+## Part 2: Set Up an SSH Key on Euler for GitLab
+
+To clone repositories from GitLab, **Euler itself** needs its own SSH key registered with your GitLab account. This is separate from any key on your local machine — it is a one-time setup done from within the Euler terminal.
+
+### 1. Check for an Existing SSH Key on Euler
+
+In the **Euler terminal** (via VSCode or any SSH session), run:
+
+```bash
+ls -la ~/.ssh/
+```
+
+Look for files like `id_ed25519` or `id_rsa`. If they exist, skip to step 3.
+
+### 2. Generate a New SSH Key on Euler
+
+```bash
+ssh-keygen -t ed25519 -C "your_email@ethz.ch"
+```
+
+Press **Enter** to accept the default file location. You can optionally set a passphrase or leave it empty.
+
+### 3. Copy Your Public Key
+
+```bash
+cat ~/.ssh/id_ed25519.pub
+```
+
+Copy the entire output to your clipboard.
+
+### 4. Add the Key to GitLab
+
+1. Go to **GitLab → Avatar (top right) → Preferences → SSH Keys**
+2. Paste your public key into the **Key** field
+3. Give it a recognizable title (e.g., `Euler cluster`)
+4. Click **Add key**
+
+### 5. Test the Connection
+
+```bash
+ssh -T git@gitlab.com
+```
+
+You should see:
+
+```
+Welcome to GitLab, @yourusername!
+```
+
+
+## Part 3: Clone the Nexus-e Repository
+
+Once your SSH key is set up, clone the repository into your desired location on Euler:
+
+```bash
+git clone git@gitlab.com:energy_science_center/nexus-e/nexus-e.git
+```
+
+If you prefer HTTPS (no SSH key required), you can use:
+
+```bash
+git clone https://gitlab.com/energy_science_center/nexus-e/nexus-e.git
+```
+
+> **Note:** If you have two-factor authentication (2FA) enabled on GitLab, HTTPS cloning requires a **Personal Access Token** instead of your password. Generate one at **GitLab → Preferences → Access Tokens**.
+
+## Part 4: Open the Repository in VSCode
+
+Once cloned, you can open the repository folder directly in VSCode:
+
+1. In VSCode, go to **File → Open Folder**
+2. Navigate to the cloned `nexus-e` directory on Euler
+3. Click **OK**
+
+You now have the full repository available in the VSCode Explorer, with an integrated terminal connected to Euler for running simulations and jobs.
+
+## Further Help
+
+- [ETH Euler cluster documentation](https://scicomp.ethz.ch/wiki/Euler)
+- [GitLab SSH key documentation](https://docs.gitlab.com/ee/user/ssh.html)
+- [VSCode Remote - SSH documentation](https://code.visualstudio.com/docs/remote/ssh)

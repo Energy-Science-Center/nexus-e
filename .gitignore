@@ -40,5 +40,3 @@ src/plugins/upload_res_data/pv_data/**/*.csv
 src/plugins/upload_res_data/wind_data/**/*.csv
 src/plugins/upload_res_data/alpine_PV_data/**/*.csv
 src/plugins/upload_res_data/ror_data/**/*.csv
-
-docs

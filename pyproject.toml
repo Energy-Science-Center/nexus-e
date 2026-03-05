@@ -34,6 +34,10 @@ matlab = [
 dev = [
     "pytest>=8.3.5",
 ]
+doc = [
+    "quarto>=0.1.0",
+    "quartodoc>=0.11.1",
+]
 
 [tool.uv.sources]
 nexus-e-interface = { workspace = true }

@@ -1,0 +1,180 @@
+> **WARNING**: This page is deprecated and will be replaced by an automatically produced reference guide.
+
+The available modules that can be added to a Nexus-e modules playlist file.
+
+## Upload scenario
+
+### Decription
+
+This module's main purpose is to create a MySQL database containing the data needed by Nexus-e simulations and read from an Excel file.
+
+### Features
+
+* Upload scenarios from Excel files to MySQL databases
+* Can inject TYNDP24 data
+* Can inject nodal hourly demands
+* Can re-export scenario as Excel file
+
+See [Upload a scenario](/wiki/scenarios/upload.qmd)
+
+### Configuration
+
+The full list of parameters can be found in `nexus_e/core_modules/scenario_upload.py` in the `Config` class.
+
+Injected parameters from `config.toml`:
+
+* `host` \<- `input_database_server.host`
+* `user` \<- `input_database_server.user`
+* `password`\<- `input_database_server.password`
+
+### How to use in a module playlist
+
+```toml
+[[modules]]
+name = "scenario_upload"
+[modules.parameters]
+excel_file_path = "src/data/source_excel/input.xlsx"
+push_to_mysql = true
+database_name = "project_date_version"
+database_author = "FirstName LastName"
+dump_file_path = "src/plugins/upload_scenario/schemas/Dump_STRUC_clean_v9.sql"
+
+include_flex_params = false
+demand_profiles_path = "src/data/source_excel/Nexuse_DB-Input_v47_TYNDP22-GA08_CentIvPV_base_DemandProfiles"
+
+include_tyndp24 = false
+tyndp24_data_path = "src/data/TYNDP24_datasets/TYNDP24_nbc"
+tyndp24_scope = "nbc"
+tyndp24_policy = "DE"
+tyndp24_climate_year = 2009
+
+ntc_type = 4
+
+use_new_line_types = true
+preset_line_types = true
+new_line_types = "AC"
+
+config_years = ["2018", "2020", "2030", "2040", "2050"]
+config_years_int = [2018, 2020, 2030, 2040, 2050]
+
+create_excel = false
+excel_file_target_path = "output.xlsx"
+
+include_branch_sheet = true
+
+update_only_specific_columns = false
+columns_to_update = { branch = ["line_id", "start_year", "S_max_win (MVA)"] }
+```
+
+## CentIv
+
+### Decription
+
+This module's purpose is to co-optimize generation investment and operational decisions on the transmission system level. The module provides results with high temporal (hourly) and spatial (nodal) resolution from the perspective of a centralized decision-maker.
+
+### Features
+
+* Solve optimization problem build from a given scenario in the Nexus-e MySQL format
+* Export its results
+
+### Configuration
+
+The full list of parameters can be found in `src/plugins/centiv/cgep/create_scenario_fast.py` in the `Config` class. For regular simulations you might only want to specify the simulated year, which corresponds to the `idScenario` parameter with the following mapping.
+
+* 2 = 2020
+* 3 = 2030
+* 4 = 2040
+* 5 = 2050
+
+Injected parameters from `config.toml`:
+
+* `DB_host` \<- `input_database_server.host`
+* `DB_name` \<- `scenario.copy_name`
+* `DB_user` \<- `input_database_server.user`
+* `DB_pwd` \<- `input_database_server.password`
+* `tpResolution` \<- `commons.resolution_in_days`
+* `results_folder` \<- `results.base_folder` + `results.simulation_folder`
+
+### How to use in a module playlist
+
+```toml
+# Run CentIv for year 2050
+[[modules]]
+name = "centiv"
+[modules.parameters]
+idScenario = 5
+```
+
+## Update investment
+
+### Decription
+
+Update the MySQL scenario database with investments results from a CentIv simulation. Must be run after a CentIv simulation if other years are simulated afterwards. This should eventually be merged into CentIv execution.
+
+### Features
+
+* Updates MySQl scenario database with some CentIv results
+
+### Configuration
+
+The full list of parameters can be found in `nexus_e/core_modules/update_investments.py` in the `Config` class. There are three important parameters:
+
+* `startyear` \<- first simulated year **id** (see `idScenario` parameter of the CentIv modules) of the **whole** Nexus-e simulation
+* `endyear` \<- last simulated year **id** (see `idScenario` parameter of the CentIv modules) of the **whole** Nexus-e simulation
+* `scenYear` \<- year of the results to be uploaded
+
+Injected parameters from `config.toml`:
+
+* `host` \<- `input_database_server.host`
+* `user` \<- `input_database_server.user`
+* `password`\<- `input_database_server.password`
+* `dbName` \<- `scenario.copy_name`
+* `simulation_results_folder` \<- `results.base_folder` + `results.simulation_folder`
+
+### How to use in a module playlist
+
+```toml
+# Update investments from CentIv 2020
+[[modules]]
+name = "update_investments"
+[modules.parameters]
+startyear = 2
+endyear = 5
+scenYear = 2020
+```
+
+## Post-process
+
+### Decription
+
+This module can postprocess the results from CentIv and Cascades and make them available to a webviewer. This should eventually be extracted into the different modules as it should be their responsibility to handle their results.
+
+### Features
+
+* upload data expected by Nexus-e webviewer in a new MySQL database
+
+### Configuration
+
+All this module's parameters are given by `config.toml`. It uses:
+
+* `results.base_folder`
+* `results.simulation_folder`
+* `results.plot_config_file_path`
+* `postprocess.centiv`
+* `postprocess.cascades`
+* `postprocess.move_to_mysql`
+* `scenario.description`
+* `scenario.output_name`
+* `simulation.execution_date`
+* `output_database_server.host`
+* `output_database_server.port`
+* `output_database_server.user`
+* `output_database_server.password`
+
+### How to use in a module playlist
+
+```toml
+# Run simulation postprocess
+[[modules]]
+name = "postprocess"
+```

@@ -1,3 +1,5 @@
+<img src="logo.png" width="220"> 
+
 **An integrated energy systems modelling platform** | [nexus-e.org](https://nexus-e.org/)
 
 ## Description

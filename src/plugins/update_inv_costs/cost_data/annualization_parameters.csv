@@ -1,8 +1,0 @@
-Technology,WACC,Lifetime,Source
-WindOn,0.05,30,
-PV-roof,0.043,30,
-PV-alpine,0.05,30,
-PV_Openfield,0.05,30,
-GasCC-Syn,0.05,30,
-GasCC-CCS,0.05,30,
-Battery-TSO,0.05,10,https://www.zhaw.ch/de/forschung/projekt/76261

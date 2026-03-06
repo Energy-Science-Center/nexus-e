@@ -1,0 +1,1804 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>output-files – Nexus-e</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../wiki/discussions/scenario-lifecycle.html" rel="next">
+<link href="../../wiki/discussions/performance-analysis.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-4d9afe2b8d18ee9fa5d0d57b5ed4214d.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-007a8609411f977ffbfe52380a417f90.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-6b74d00bf9800a17f7fea13582486bf4.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-007a8609411f977ffbfe52380a417f90.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar docked nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Nexus-e</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="../../wiki/home.html" aria-current="page"> 
+<span class="menu-text">Wiki</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../wiki/discussions/input-data-analysis.html">Discussions</a></li><li class="breadcrumb-item"><a href="../../wiki/discussions/output-files.html">Output files</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../wiki/home.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wiki</span></a>
+  </div>
+</li>
+        <li class="px-0"><hr class="sidebar-divider hi "></li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Get started</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../wiki/get-started/install.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Install</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../wiki/get-started/run.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Run</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../wiki/get-started/configure.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Configure</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../wiki/get-started/modules.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Modules</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Scenarios</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../wiki/scenarios/upload.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Upload a scenario</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../wiki/scenarios/tyndp24.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">TYNDP24</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../wiki/scenarios/nodal-hourly-load.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Nodal hourly load</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../wiki/scenarios/ntc.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">NTC</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../wiki/scenarios/europe.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Europe</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">How-to</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../wiki/how-to/work-on-euler.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Work on Euler</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../wiki/how-to/start-parallel-runs-on-euler.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Start parallel runs on Euler</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Discussions</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../wiki/discussions/input-data-analysis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Input data analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../wiki/discussions/performance-analysis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Performance analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../wiki/discussions/output-files.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Output files</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../wiki/discussions/scenario-lifecycle.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Scenario lifecycle</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">Developer guide</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../wiki/developer-guide/how-to-contribute.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">How to contribute</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../wiki/developer-guide/tests.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Write tests</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../wiki/developer-guide/style-guide.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Style guide</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../wiki/developer-guide/solid-principles.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">SOLID principles</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#output-files-generated-by-create_scenario_fast.py" id="toc-output-files-generated-by-create_scenario_fast.py" class="nav-link active" data-scroll-target="#output-files-generated-by-create_scenario_fast.py">Output Files Generated by create_scenario_fast.py</a>
+  <ul class="collapse">
+  <li><a href="#output-location" id="toc-output-location" class="nav-link" data-scroll-target="#output-location">Output Location</a>
+  <ul class="collapse">
+  <li><a href="#investmentrun_runyear---first-stage-investment-optimization" id="toc-investmentrun_runyear---first-stage-investment-optimization" class="nav-link" data-scroll-target="#investmentrun_runyear---first-stage-investment-optimization">1. <strong><code>InvestmentRun_&lt;RUNYEAR&gt;/</code></strong> - First Stage (Investment Optimization)</a></li>
+  <li><a href="#centiv_runyear---second-stage-operational-optimization-with-fixed-investments-plus-files-used-for-the-webviewer" id="toc-centiv_runyear---second-stage-operational-optimization-with-fixed-investments-plus-files-used-for-the-webviewer" class="nav-link" data-scroll-target="#centiv_runyear---second-stage-operational-optimization-with-fixed-investments-plus-files-used-for-the-webviewer">2. <strong><code>CentIv_&lt;RUNYEAR&gt;/</code></strong> - Second Stage (Operational Optimization with Fixed Investments plus files used for the Webviewer)</a></li>
+  </ul></li>
+  <li><a href="#overview" id="toc-overview" class="nav-link" data-scroll-target="#overview">Overview</a>
+  <ul class="collapse">
+  <li><a href="#category-a-mapping-files-section-0" id="toc-category-a-mapping-files-section-0" class="nav-link" data-scroll-target="#category-a-mapping-files-section-0">Category A: Mapping Files (Section 0)</a></li>
+  <li><a href="#category-b-post-processed-result-files-sections-1-12" id="toc-category-b-post-processed-result-files-sections-1-12" class="nav-link" data-scroll-target="#category-b-post-processed-result-files-sections-1-12">Category B: Post-Processed Result Files (Sections 1-12)</a></li>
+  <li><a href="#category-c-raw-model-internals-section-13" id="toc-category-c-raw-model-internals-section-13" class="nav-link" data-scroll-target="#category-c-raw-model-internals-section-13">Category C: Raw Model Internals (Section 13)</a></li>
+  </ul></li>
+  <li><a href="#category-a-mapping-files" id="toc-category-a-mapping-files" class="nav-link" data-scroll-target="#category-a-mapping-files">Category A: Mapping Files</a></li>
+  <li><a href="#mapping-files" id="toc-mapping-files" class="nav-link" data-scroll-target="#mapping-files">0. Mapping Files</a>
+  <ul class="collapse">
+  <li><a href="#why-mapping-files-are-needed" id="toc-why-mapping-files-are-needed" class="nav-link" data-scroll-target="#why-mapping-files-are-needed">Why Mapping Files Are Needed</a></li>
+  <li><a href="#complete-data-files" id="toc-complete-data-files" class="nav-link" data-scroll-target="#complete-data-files">Complete Data Files</a></li>
+  <li><a href="#mapping-files-forward-and-reverse" id="toc-mapping-files-forward-and-reverse" class="nav-link" data-scroll-target="#mapping-files-forward-and-reverse">Mapping Files (Forward and Reverse)</a></li>
+  </ul></li>
+  <li><a href="#category-b-post-processed-result-files" id="toc-category-b-post-processed-result-files" class="nav-link" data-scroll-target="#category-b-post-processed-result-files">Category B: Post-Processed Result Files</a></li>
+  <li><a href="#investment-stage-decision-files" id="toc-investment-stage-decision-files" class="nav-link" data-scroll-target="#investment-stage-decision-files">1. Investment Stage Decision Files</a>
+  <ul class="collapse">
+  <li><a href="#transmission-lines" id="toc-transmission-lines" class="nav-link" data-scroll-target="#transmission-lines">Transmission Lines</a></li>
+  <li><a href="#generation-units" id="toc-generation-units" class="nav-link" data-scroll-target="#generation-units">Generation Units</a></li>
+  <li><a href="#power-to-gas-to-power-p2g2p-systems" id="toc-power-to-gas-to-power-p2g2p-systems" class="nav-link" data-scroll-target="#power-to-gas-to-power-p2g2p-systems">Power-to-Gas-to-Power (P2G2P) Systems</a></li>
+  </ul></li>
+  <li><a href="#demand-files" id="toc-demand-files" class="nav-link" data-scroll-target="#demand-files">2. Demand Files</a>
+  <ul class="collapse">
+  <li><a href="#switzerland-ch" id="toc-switzerland-ch" class="nav-link" data-scroll-target="#switzerland-ch">Switzerland (CH)</a></li>
+  <li><a href="#neighboring-countries" id="toc-neighboring-countries" class="nav-link" data-scroll-target="#neighboring-countries">Neighboring Countries</a></li>
+  <li><a href="#all-regions" id="toc-all-regions" class="nav-link" data-scroll-target="#all-regions">All Regions</a></li>
+  <li><a href="#demand-shifting-flexibility" id="toc-demand-shifting-flexibility" class="nav-link" data-scroll-target="#demand-shifting-flexibility">Demand Shifting &amp; Flexibility</a></li>
+  <li><a href="#demand-shift-components" id="toc-demand-shift-components" class="nav-link" data-scroll-target="#demand-shift-components">Demand Shift Components</a></li>
+  <li><a href="#flexibility-constraints" id="toc-flexibility-constraints" class="nav-link" data-scroll-target="#flexibility-constraints">Flexibility Constraints</a></li>
+  <li><a href="#additional-demand-files" id="toc-additional-demand-files" class="nav-link" data-scroll-target="#additional-demand-files">Additional Demand Files</a></li>
+  </ul></li>
+  <li><a href="#generation-output-files" id="toc-generation-output-files" class="nav-link" data-scroll-target="#generation-output-files">4. Generation Output Files</a>
+  <ul class="collapse">
+  <li><a href="#all-generators-countries" id="toc-all-generators-countries" class="nav-link" data-scroll-target="#all-generators-countries">All Generators &amp; Countries</a></li>
+  <li><a href="#country-specific-generation-aggregation" id="toc-country-specific-generation-aggregation" class="nav-link" data-scroll-target="#country-specific-generation-aggregation">Country-Specific Generation Aggregation</a></li>
+  <li><a href="#switzerland-monthlytotal-generation" id="toc-switzerland-monthlytotal-generation" class="nav-link" data-scroll-target="#switzerland-monthlytotal-generation">Switzerland Monthly/Total Generation</a></li>
+  <li><a href="#neighboring-countries-monthly-generation" id="toc-neighboring-countries-monthly-generation" class="nav-link" data-scroll-target="#neighboring-countries-monthly-generation">Neighboring Countries Monthly Generation</a></li>
+  <li><a href="#generation-costs" id="toc-generation-costs" class="nav-link" data-scroll-target="#generation-costs">Generation Costs</a></li>
+  </ul></li>
+  <li><a href="#price-files" id="toc-price-files" class="nav-link" data-scroll-target="#price-files">5. Price Files</a>
+  <ul class="collapse">
+  <li><a href="#electricity-prices" id="toc-electricity-prices" class="nav-link" data-scroll-target="#electricity-prices">Electricity Prices</a></li>
+  <li><a href="#reserve-prices" id="toc-reserve-prices" class="nav-link" data-scroll-target="#reserve-prices">Reserve Prices</a></li>
+  <li><a href="#res-premium-price" id="toc-res-premium-price" class="nav-link" data-scroll-target="#res-premium-price">RES Premium Price</a></li>
+  </ul></li>
+  <li><a href="#reserve-requirement-files" id="toc-reserve-requirement-files" class="nav-link" data-scroll-target="#reserve-requirement-files">6. Reserve Requirement Files</a></li>
+  <li><a href="#storage-level-files" id="toc-storage-level-files" class="nav-link" data-scroll-target="#storage-level-files">7. Storage Level Files</a>
+  <ul class="collapse">
+  <li><a href="#dam-pumped-hydro-storage" id="toc-dam-pumped-hydro-storage" class="nav-link" data-scroll-target="#dam-pumped-hydro-storage">Dam &amp; Pumped Hydro Storage</a></li>
+  <li><a href="#battery-storage" id="toc-battery-storage" class="nav-link" data-scroll-target="#battery-storage">Battery Storage</a></li>
+  <li><a href="#hydrogen-storage-p2g2p" id="toc-hydrogen-storage-p2g2p" class="nav-link" data-scroll-target="#hydrogen-storage-p2g2p">Hydrogen Storage (P2G2P)</a></li>
+  </ul></li>
+  <li><a href="#cross-border-flow-files" id="toc-cross-border-flow-files" class="nav-link" data-scroll-target="#cross-border-flow-files">8. Cross-Border Flow Files</a>
+  <ul class="collapse">
+  <li><a href="#switzerland-importsexports" id="toc-switzerland-importsexports" class="nav-link" data-scroll-target="#switzerland-importsexports">Switzerland Imports/Exports</a></li>
+  <li><a href="#all-branch-flows" id="toc-all-branch-flows" class="nav-link" data-scroll-target="#all-branch-flows">All Branch Flows</a></li>
+  </ul></li>
+  <li><a href="#power-to-gas-to-power-p2g2p-files" id="toc-power-to-gas-to-power-p2g2p-files" class="nav-link" data-scroll-target="#power-to-gas-to-power-p2g2p-files">9. Power-to-Gas-to-Power (P2G2P) Files</a>
+  <ul class="collapse">
+  <li><a href="#market-interactions" id="toc-market-interactions" class="nav-link" data-scroll-target="#market-interactions">Market Interactions</a></li>
+  <li><a href="#p2g2p-components" id="toc-p2g2p-components" class="nav-link" data-scroll-target="#p2g2p-components">P2G2P Components</a></li>
+  <li><a href="#p2g2p-economics" id="toc-p2g2p-economics" class="nav-link" data-scroll-target="#p2g2p-economics">P2G2P Economics</a></li>
+  <li><a href="#p2g2p-variables" id="toc-p2g2p-variables" class="nav-link" data-scroll-target="#p2g2p-variables">P2G2P Variables</a></li>
+  </ul></li>
+  <li><a href="#curtailment-load-shedding-files" id="toc-curtailment-load-shedding-files" class="nav-link" data-scroll-target="#curtailment-load-shedding-files">10. Curtailment &amp; Load Shedding Files</a></li>
+  <li><a href="#aggregate-scalar-files" id="toc-aggregate-scalar-files" class="nav-link" data-scroll-target="#aggregate-scalar-files">11. Aggregate &amp; Scalar Files</a>
+  <ul class="collapse">
+  <li><a href="#res-production" id="toc-res-production" class="nav-link" data-scroll-target="#res-production">RES Production</a></li>
+  <li><a href="#demand-scalar" id="toc-demand-scalar" class="nav-link" data-scroll-target="#demand-scalar">Demand Scalar</a></li>
+  </ul></li>
+  <li><a href="#generator-summary-files-for-external-models" id="toc-generator-summary-files-for-external-models" class="nav-link" data-scroll-target="#generator-summary-files-for-external-models">12. Generator Summary Files (for External Models)</a></li>
+  <li><a href="#category-c-raw-model-internals" id="toc-category-c-raw-model-internals" class="nav-link" data-scroll-target="#category-c-raw-model-internals">Category C: Raw Model Internals</a></li>
+  <li><a href="#raw-model-internals-both-folders---direct-pyomo-exports" id="toc-raw-model-internals-both-folders---direct-pyomo-exports" class="nav-link" data-scroll-target="#raw-model-internals-both-folders---direct-pyomo-exports">13. Raw Model Internals (Both Folders) - Direct Pyomo Exports</a>
+  <ul class="collapse">
+  <li><a href="#variables-csv-files" id="toc-variables-csv-files" class="nav-link" data-scroll-target="#variables-csv-files">Variables (CSV files)</a></li>
+  <li><a href="#parameters-csv-files" id="toc-parameters-csv-files" class="nav-link" data-scroll-target="#parameters-csv-files">Parameters (CSV files)</a></li>
+  <li><a href="#constraint-duals-csv-files-with-_dual-suffix" id="toc-constraint-duals-csv-files-with-_dual-suffix" class="nav-link" data-scroll-target="#constraint-duals-csv-files-with-_dual-suffix">Constraint Duals (CSV files with <code>_dual</code> suffix)</a></li>
+  <li><a href="#model-statistics" id="toc-model-statistics" class="nav-link" data-scroll-target="#model-statistics">Model Statistics</a></li>
+  <li><a href="#purpose" id="toc-purpose" class="nav-link" data-scroll-target="#purpose">Purpose</a></li>
+  </ul></li>
+  <li><a href="#input-files-read-by-script" id="toc-input-files-read-by-script" class="nav-link" data-scroll-target="#input-files-read-by-script">14. Input Files (Read by Script)</a></li>
+  <li><a href="#file-naming-conventions" id="toc-file-naming-conventions" class="nav-link" data-scroll-target="#file-naming-conventions">File Naming Conventions</a>
+  <ul class="collapse">
+  <li><a href="#temporal-resolution-suffixes" id="toc-temporal-resolution-suffixes" class="nav-link" data-scroll-target="#temporal-resolution-suffixes">Temporal Resolution Suffixes</a></li>
+  <li><a href="#geographic-suffixes" id="toc-geographic-suffixes" class="nav-link" data-scroll-target="#geographic-suffixes">Geographic Suffixes</a></li>
+  <li><a href="#technology-suffixes" id="toc-technology-suffixes" class="nav-link" data-scroll-target="#technology-suffixes">Technology Suffixes</a></li>
+  </ul></li>
+  <li><a href="#categories-summary" id="toc-categories-summary" class="nav-link" data-scroll-target="#categories-summary">Categories Summary</a></li>
+  <li><a href="#usage-notes" id="toc-usage-notes" class="nav-link" data-scroll-target="#usage-notes">Usage Notes</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../wiki/discussions/input-data-analysis.html">Discussions</a></li><li class="breadcrumb-item"><a href="../../wiki/discussions/output-files.html">Output files</a></li></ol></nav></header>
+
+
+
+
+
+<section id="output-files-generated-by-create_scenario_fast.py" class="level1">
+<h1>Output Files Generated by create_scenario_fast.py</h1>
+<p><em>First version created by Ali Darudi in collaboration with AI (Claude Sonnet 4.5) - January 2026</em></p>
+<p>This document catalogs all CSV and Excel files generated by the <code>create_scenario_fast.py</code> script in the CentIv/cgep folder.</p>
+<section id="output-location" class="level2">
+<h2 class="anchored" data-anchor-id="output-location">Output Location</h2>
+<p>All files are saved to: <strong><code>Results/&lt;scenario_name&gt;/</code></strong></p>
+<p>Where <code>&lt;scenario_name&gt;</code> is the name of your scenario.</p>
+<p>Within this folder, two subfolders contain results from different optimization stages:</p>
+<section id="investmentrun_runyear---first-stage-investment-optimization" class="level3">
+<h3 class="anchored" data-anchor-id="investmentrun_runyear---first-stage-investment-optimization">1. <strong><code>InvestmentRun_&lt;RUNYEAR&gt;/</code></strong> - First Stage (Investment Optimization)</h3>
+<ul>
+<li>Contains results from the first optimization run that determines <strong>investment decisions</strong></li>
+<li>Includes all <a href="#13-raw-model-internals-both-folders---direct-pyomo-exports">model variables, parameters, and constraint duals</a> as CSV files</li>
+<li>Electricity prices in this stage include both investment and operating costs</li>
+</ul>
+</section>
+<section id="centiv_runyear---second-stage-operational-optimization-with-fixed-investments-plus-files-used-for-the-webviewer" class="level3">
+<h3 class="anchored" data-anchor-id="centiv_runyear---second-stage-operational-optimization-with-fixed-investments-plus-files-used-for-the-webviewer">2. <strong><code>CentIv_&lt;RUNYEAR&gt;/</code></strong> - Second Stage (Operational Optimization with Fixed Investments plus files used for the Webviewer)</h3>
+<ul>
+<li>Contains final output files after <strong>fixing the investment decisions</strong> from the first stage</li>
+<li>Includes all <a href="#13-raw-model-internals-both-folders---direct-pyomo-exports">model variables, parameters, and constraint duals</a> as CSV files</li>
+<li>Contains <a href="#0-mapping-files">mapping files</a> that link integer model IDs to meaningful names and attributes</li>
+<li>Additionally, extra files are created (Excel/CSV) documenting system operation and investment (partially used in the Webviewer)</li>
+<li><strong>Electricity prices in this folder reflect only operating costs</strong>, as in actual electricity markets</li>
+</ul>
+<p>Where <code>&lt;RUNYEAR&gt;</code> is the year being simulated (e.g., 2030, 2040, 2050).</p>
+<p><strong>Why Two Stages?</strong> The model first optimizes investments (stage 1), then re-runs with those investments fixed (stage 2) to calculate electricity prices that reflect pure operating costs, matching real electricity market price formation.</p>
+</section>
+</section>
+<section id="overview" class="level2">
+<h2 class="anchored" data-anchor-id="overview">Overview</h2>
+<p>The script generates approximately 550+ output files in three main categories:</p>
+<section id="category-a-mapping-files-section-0" class="level3">
+<h3 class="anchored" data-anchor-id="category-a-mapping-files-section-0">Category A: Mapping Files (Section 0)</h3>
+<p><strong>Location:</strong> <code>CentIv_&lt;RUNYEAR&gt;/mappings/</code></p>
+<p>These files link integer model IDs to meaningful names and attributes:</p>
+<ul>
+<li>Complete data files for all model elements (generators, buses, lines, transformers, loads)</li>
+<li>Forward and reverse mapping files (ID ↔︎ attributes)</li>
+<li>Essential for interpreting results and performing post-processing</li>
+</ul>
+<p><strong>~50+ files</strong> created at the start of the results saving process.</p>
+</section>
+<section id="category-b-post-processed-result-files-sections-1-12" class="level3">
+<h3 class="anchored" data-anchor-id="category-b-post-processed-result-files-sections-1-12">Category B: Post-Processed Result Files (Sections 1-12)</h3>
+<p><strong>Location:</strong> <code>CentIv_&lt;RUNYEAR&gt;/</code></p>
+<p>These are <strong>human-readable, aggregated output files</strong> created through custom post-processing code:</p>
+<ul>
+<li>Investment decisions - New units, new lines, P2G2P systems</li>
+<li>Demand data - Electricity, heat pumps, e-mobility, hydrogen</li>
+<li>Generation profiles - Per generator, per technology, per country</li>
+<li>Prices - Electricity, reserves</li>
+<li>Storage levels - Dams, pumped hydro, batteries, hydrogen</li>
+<li>Cross-border flows - Imports/exports</li>
+<li>Reserve contributions - FRR, RR</li>
+<li>Power-to-Gas-to-Power (P2G2P) operations</li>
+<li>Curtailment and load shedding</li>
+<li>Aggregate scalars and summaries - Total values, external model inputs</li>
+</ul>
+<p>These files involve <strong>manual remapping, aggregation, and formatting</strong> for analysis and visualization (including the Webviewer). <strong>~100-120 files</strong> total.</p>
+</section>
+<section id="category-c-raw-model-internals-section-13" class="level3">
+<h3 class="anchored" data-anchor-id="category-c-raw-model-internals-section-13">Category C: Raw Model Internals (Section 13)</h3>
+<p><strong>Location:</strong> <code>InvestmentRun_&lt;RUNYEAR&gt;/</code> and <code>CentIv_&lt;RUNYEAR&gt;/</code></p>
+<p>These are <strong>direct Pyomo model exports</strong> with no post-processing:</p>
+<ul>
+<li>All decision variables with optimal values</li>
+<li>All input parameters</li>
+<li>Constraint dual values (shadow prices)</li>
+</ul>
+<p>These are the <strong>raw materials from the solver</strong> - no manual remapping or aggregation applied. <strong>~200+ files in each folder</strong> (~400+ total).</p>
+<hr>
+</section>
+</section>
+<section id="category-a-mapping-files" class="level2">
+<h2 class="anchored" data-anchor-id="category-a-mapping-files">Category A: Mapping Files</h2>
+</section>
+<section id="mapping-files" class="level2">
+<h2 class="anchored" data-anchor-id="mapping-files">0. Mapping Files</h2>
+<p><strong>Location:</strong> <code>Results/&lt;scenario_name&gt;/CentIv_&lt;RUNYEAR&gt;/mappings/</code></p>
+<p><strong>Created by:</strong> <code>save_results_fcns.saveMappingFiles(mapping_data, results_folder)</code></p>
+<p>This function creates mapping files in both forward and reverse directions for all model elements (generators, buses, lines, transformers, loads).</p>
+<section id="why-mapping-files-are-needed" class="level3">
+<h3 class="anchored" data-anchor-id="why-mapping-files-are-needed">Why Mapping Files Are Needed</h3>
+<p><strong>Important:</strong> For legacy reasons, the optimization model internally uses only <strong>integers as identifiers</strong> for all elements:</p>
+<ul>
+<li>Power plants are named: <code>0</code>, <code>1</code>, <code>2</code>, <code>3</code>, …</li>
+<li>Buses/nodes are named: <code>0</code>, <code>1</code>, <code>2</code>, <code>3</code>, …</li>
+</ul>
+<p>This integer naming convention makes some of the result files difficult to interpret without context. <strong>The mapping files solve this problem by:</strong></p>
+<ol type="1">
+<li><strong>Remapping integers to meaningful names</strong>: Convert model IDs (0, 1, 2, …) to descriptive names (e.g., <code>Hydro_Basel</code>, <code>Gas_Germany</code>, <code>Solar_Zurich</code>)</li>
+<li><strong>Linking elements to attributes</strong>: Map each element to its properties (e.g., plant 42 → Country: CH, Technology: Wind, Canton: Bern)</li>
+<li><strong>Enabling aggregation</strong>: Find all generators of a specific type, all buses in a region, etc.</li>
+</ol>
+<p>These files are created at the start of the results saving process and are essential for post-processing and analysis.</p>
+</section>
+<section id="complete-data-files" class="level3">
+<h3 class="anchored" data-anchor-id="complete-data-files">Complete Data Files</h3>
+<ul>
+<li><strong>Data_generators.csv</strong> - Complete list of all generators with all attributes</li>
+<li><strong>Data_buses.csv</strong> - Complete list of all buses/nodes with all attributes</li>
+<li><strong>Data_lines.csv</strong> - Complete list of all transmission lines with all attributes</li>
+<li><strong>Data_transformers.csv</strong> - Complete list of all transformers with all attributes</li>
+<li><strong>Data_loads_busnodes.csv</strong> - Complete list of load connections to buses</li>
+<li><strong>Data_emobilityloads_busnodes.csv</strong> - E-mobility load to bus mappings</li>
+<li><strong>Data_heatpumploads_busnodes.csv</strong> - Heat pump load to bus mappings</li>
+<li><strong>Data_H2loads_busnodes.csv</strong> - Hydrogen load to bus mappings</li>
+<li><strong>Data_gens_busnodes.csv</strong> - Generator to bus connections</li>
+<li><strong>Data_distivinj_busnodes.csv</strong> - Distributed generation injection points</li>
+</ul>
+</section>
+<section id="mapping-files-forward-and-reverse" class="level3">
+<h3 class="anchored" data-anchor-id="mapping-files-forward-and-reverse">Mapping Files (Forward and Reverse)</h3>
+<p>For each element type and attribute, mapping files are created in both directions:</p>
+<p><strong>Generators:</strong></p>
+<ul>
+<li><code>Map_generators_country.csv</code> / <code>Map_country_generators.csv</code></li>
+<li><code>Map_generators_technology.csv</code> / <code>Map_technology_generators.csv</code></li>
+<li><code>Map_generators_busname.csv</code> / <code>Map_busname_generators.csv</code></li>
+<li><code>Map_generators_gentype.csv</code> / <code>Map_gentype_generators.csv</code></li>
+<li><code>Map_generators_unittype.csv</code> / <code>Map_unittype_generators.csv</code></li>
+<li><code>Map_generators_genname.csv</code> / <code>Map_genname_generators.csv</code></li>
+<li><code>Map_generators_fueltype.csv</code> / <code>Map_fueltype_generators.csv</code></li>
+<li><code>Map_generators_subregion.csv</code> / <code>Map_subregion_generators.csv</code></li>
+</ul>
+<p><strong>Buses:</strong></p>
+<ul>
+<li><code>Map_buses_country.csv</code> / <code>Map_country_buses.csv</code></li>
+<li><code>Map_buses_busname.csv</code> / <code>Map_busname_buses.csv</code></li>
+<li><code>Map_buses_subregion.csv</code> / <code>Map_subregion_buses.csv</code></li>
+</ul>
+<p><strong>Lines:</strong></p>
+<ul>
+<li><code>Map_lines_fromcountry.csv</code> / <code>Map_fromcountry_lines.csv</code></li>
+<li><code>Map_lines_tocountry.csv</code> / <code>Map_tocountry_lines.csv</code></li>
+<li><code>Map_lines_linename.csv</code> / <code>Map_linename_lines.csv</code></li>
+<li><code>Map_lines_frombusname.csv</code> / <code>Map_frombusname_lines.csv</code></li>
+<li><code>Map_lines_tobusname.csv</code> / <code>Map_tobusname_lines.csv</code></li>
+</ul>
+<p><strong>Transformers:</strong></p>
+<ul>
+<li>Similar structure to lines with FromCountry, ToCountry, TrafoName, FromBusName, ToBusName</li>
+</ul>
+<p><strong>Load Connections:</strong></p>
+<ul>
+<li>Similar mappings for loads, emobility loads, heat pump loads, H2 loads connecting to buses</li>
+</ul>
+<p><strong>Purpose:</strong> These mappings allow easy filtering and aggregation of results by country, technology, bus, canton, etc. The forward mapping (e.g., <code>Map_generators_country.csv</code>) maps from model ID to attribute value. The reverse mapping (e.g., <code>Map_country_generators.csv</code>) maps from attribute value to all relevant model IDs.</p>
+<hr>
+</section>
+</section>
+<section id="category-b-post-processed-result-files" class="level2">
+<h2 class="anchored" data-anchor-id="category-b-post-processed-result-files">Category B: Post-Processed Result Files</h2>
+<p><strong>Created by:</strong> The main code in <code>create_scenario_fast.py</code></p>
+<p>The following sections (1-12) contain post-processed result files created through custom code that extracts data from the optimization model, performs manual remapping and aggregation, and saves formatted outputs. Helper methods from the <code>SaveResults</code> class in <code>save_results.py</code> are used for file writing.</p>
+<hr>
+</section>
+<section id="investment-stage-decision-files" class="level2">
+<h2 class="anchored" data-anchor-id="investment-stage-decision-files">1. Investment Stage Decision Files</h2>
+<p>These files capture which new assets are built in the optimization scenario. If invetment in an asset group (e.g., transmission lines) is not activated in the run, the corresponding file will be empty.</p>
+<section id="transmission-lines" class="level3">
+<h3 class="anchored" data-anchor-id="transmission-lines">Transmission Lines</h3>
+<ul>
+<li><p><strong>NewLines.xlsx</strong> - Investment status of all candidate transmission lines</p>
+<ul>
+<li>Contains: Line connections, ranks, investment decisions</li>
+<li>Note: May be empty if no lines are built</li>
+</ul></li>
+<li><p><strong>NewLinesOnlyOneStatus.xlsx</strong> - Newly built transmission lines only (filtered to status = 1)</p>
+<ul>
+<li>Contains: Only lines with NewInvestment == 1</li>
+</ul></li>
+</ul>
+</section>
+<section id="generation-units" class="level3">
+<h3 class="anchored" data-anchor-id="generation-units">Generation Units</h3>
+<ul>
+<li><p><strong>NewUnits.xlsx</strong> - Newly built generation units</p>
+<ul>
+<li>Contains: Generator names and investment status (NewInvestment == 1)</li>
+<li>Excludes: Existing generators</li>
+</ul></li>
+<li><p><strong>NewUnitsWithNodeInfo.xlsx</strong> - Newly built generation units with node location information</p>
+<ul>
+<li>Contains: Same as NewUnits.xlsx but with node/location details</li>
+</ul></li>
+</ul>
+</section>
+<section id="power-to-gas-to-power-p2g2p-systems" class="level3">
+<h3 class="anchored" data-anchor-id="power-to-gas-to-power-p2g2p-systems">Power-to-Gas-to-Power (P2G2P) Systems</h3>
+<ul>
+<li><strong>NewUnits_P2G2P.xlsx</strong> - Newly built P2G2P units
+<ul>
+<li>Contains: GenName, Pmax, Pmin, Emax_h2stor, Pmax_methdac, Technology, NewInvestment</li>
+<li>Filter: NewInvestment == 2 (P2G2P units)</li>
+<li>Note: May be empty if no P2G2P units are built</li>
+</ul></li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="demand-files" class="level2">
+<h2 class="anchored" data-anchor-id="demand-files">2. Demand Files</h2>
+<section id="switzerland-ch" class="level3">
+<h3 class="anchored" data-anchor-id="switzerland-ch">Switzerland (CH)</h3>
+<ul>
+<li><strong>Demand_tpRes_CH.xlsx</strong> / <strong>Demand_tpRes_CH.csv</strong> - Swiss hourly demand using representative days (test cases only) (Format: Timeseries by canton/bus)</li>
+<li><strong>Demand_hourly_CH.xlsx</strong> / <strong>Demand_hourly_CH.csv</strong> - Swiss hourly demand (full resolution) - Purpose: For energy market analysis</li>
+<li><strong>eMobilityDemand_tpRes_CH.csv</strong> - E-mobility demand using representative days (test cases only) - Contains: EV charging demand by bus/canton</li>
+<li><strong>eMobilityDemand_hourly_CH.xlsx</strong> - E-mobility demand (full hourly resolution)</li>
+<li><strong>baseDemand_hourly_CH.xlsx</strong> - Base electricity demand (without heat pumps, EVs, H2)</li>
+<li><strong>unflex_heatpumpDemand_hourly_CH.xlsx</strong> - Optimized heat pump demand</li>
+<li><strong>uncontrolled_heatpumpDemand_hourly_CH.xlsx</strong> - Reference uncontrolled heat pump demand</li>
+<li><strong>heatpumpDemand_hourly_CH.xlsx</strong> - Controlled heat pump demand (after optimization)</li>
+<li><strong>H2electrDemand_hourly_CH.xlsx</strong> - Hydrogen electrolyzer demand</li>
+</ul>
+</section>
+<section id="neighboring-countries" class="level3">
+<h3 class="anchored" data-anchor-id="neighboring-countries">Neighboring Countries</h3>
+<ul>
+<li><strong>Demand_hourly_FR.xlsx</strong> - France hourly demand</li>
+<li><strong>Demand_hourly_IT.xlsx</strong> - Italy hourly demand</li>
+<li><strong>Demand_hourly_AT.xlsx</strong> - Austria hourly demand</li>
+<li><strong>Demand_hourly_DE.xlsx</strong> - Germany hourly demand</li>
+</ul>
+</section>
+<section id="all-regions" class="level3">
+<h3 class="anchored" data-anchor-id="all-regions">All Regions</h3>
+<ul>
+<li><strong>DemandOriginal_hourly_ALL.csv</strong> - Original demand before any adjustments (all nodes)</li>
+</ul>
+</section>
+<section id="demand-shifting-flexibility" class="level3">
+<h3 class="anchored" data-anchor-id="demand-shifting-flexibility">Demand Shifting &amp; Flexibility</h3>
+<ul>
+<li><strong>LoadEmob_BeforeShift_hourly_ALL_LP.csv</strong> - E-mobility load before demand shifting</li>
+<li><strong>LoadEmob_AfterShift_hourly_ALL_LP.csv</strong> - E-mobility load after demand shifting</li>
+<li><strong>LoadHeatPump_BeforeShift_hourly_ALL_LP.csv</strong> - Heat pump load before shifting</li>
+<li><strong>LoadHeatPump_BeforeShift_NonFlexiblePortion_hourly_ALL_LP.csv</strong> - Non-flexible portion of HP load</li>
+<li><strong>LoadHeatPump_BeforeShift_FlexiblePortion_hourly_ALL_LP.csv</strong> - Flexible portion of HP load (before shift)</li>
+<li><strong>LoadHeatPump_AfterShift_hourly_ALL_LP.csv</strong> - Heat pump load after shifting</li>
+<li><strong>LoadHeatPump_AfterShift_FlexiblePortion_hourly_ALL_LP.csv</strong> - Flexible portion after shifting</li>
+</ul>
+</section>
+<section id="demand-shift-components" class="level3">
+<h3 class="anchored" data-anchor-id="demand-shift-components">Demand Shift Components</h3>
+<ul>
+<li><strong>LoadShiftDSMUp_hourly_ALL_LP.xlsx</strong> - Demand-side management upward shifts</li>
+<li><strong>LoadShiftDSMDown_hourly_ALL_LP.xlsx</strong> - Demand-side management downward shifts</li>
+<li><strong>LoadShiftEmobUp_hourly_ALL_LP.xlsx</strong> - E-mobility upward shifts</li>
+<li><strong>LoadShiftEmobDown_hourly_ALL_LP.xlsx</strong> - E-mobility downward shifts</li>
+<li><strong>LoadShiftHpUp_hourly_ALL_LP.xlsx</strong> - Heat pump upward shifts</li>
+<li><strong>LoadShiftHpDown_hourly_ALL_LP.xlsx</strong> - Heat pump downward shifts</li>
+</ul>
+</section>
+<section id="flexibility-constraints" class="level3">
+<h3 class="anchored" data-anchor-id="flexibility-constraints">Flexibility Constraints</h3>
+<ul>
+<li><strong>LoadEmob_PmaxLimit_hourly_ALL_LP.csv</strong> - Upper limit on EV charging power per node</li>
+<li><strong>LoadEmob_PminLimit_hourly_ALL_LP.csv</strong> - Lower limit on EV charging power per node</li>
+<li><strong>LoadHeatPump_EmaxCumulativeLimit_hourly_ALL_LP.csv</strong> - Upper limit on cumulative HP energy per day</li>
+<li><strong>LoadHeatPump_EminCumulativeLimit_hourly_ALL_LP.csv</strong> - Lower limit on cumulative HP energy per day</li>
+</ul>
+</section>
+<section id="additional-demand-files" class="level3">
+<h3 class="anchored" data-anchor-id="additional-demand-files">Additional Demand Files</h3>
+<ul>
+<li><strong>FlexLoadHeatPump_hourly_ALL_LP.xlsx</strong> - Flexible heat pump load</li>
+<li><strong>heatpumpDemand_hourly_ALL_LP.xlsx</strong> - Controlled heat pump demand (all nodes)</li>
+<li><strong>FinalLoadCascades_hourly_ALL_LP.xlsx</strong> - Final load including all cascading effects</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="generation-output-files" class="level2">
+<h2 class="anchored" data-anchor-id="generation-output-files">4. Generation Output Files</h2>
+<section id="all-generators-countries" class="level3">
+<h3 class="anchored" data-anchor-id="all-generators-countries">All Generators &amp; Countries</h3>
+<ul>
+<li><strong>GenerationPerGen_hourly_ALL_LP.xlsx</strong> - Generation by each generator (all countries, hourly)- Dimensions: Generators × Hours - Contains: Country, Technology info</li>
+<li><strong>GenerationPerGenGasNet_hourly_ALL_LP.xlsx</strong> - Generation with gas network information - Additional info: Generator names for gas network analysis</li>
+<li><strong>GenerationPerGenCANTONS_hourly_ALL_LP.xlsx</strong> - Generation by generator with cantonal breakdown - For Switzerland: Includes canton information</li>
+<li><strong>ConsumptionPerGen_full_ALL_LP.xlsx</strong> - Consumption by each unit (e.g., pumped hydro, P2G2P) - Contains: Country, Technology</li>
+<li><strong>ConsumptionPerGenCANTONS_hourly_ALL_LP.xlsx</strong> - Consumption with cantonal breakdown</li>
+<li><strong>GenerationConsumptionPerGen_hourly_ALL_LP.xlsx</strong> - Net generation minus consumption per generator - Purpose: Net energy balance per unit</li>
+<li><strong>GenerationConsumptionPerGenGenNames_hourly_ALL_LP.xlsx</strong> - Same as above with generator names</li>
+<li><strong>CurtailmentPerGen_hourly_ALL_LP.xlsx</strong> - Curtailment by generator - Contains: Renewable curtailment by generator name</li>
+</ul>
+</section>
+<section id="country-specific-generation-aggregation" class="level3">
+<h3 class="anchored" data-anchor-id="country-specific-generation-aggregation">Country-Specific Generation Aggregation</h3>
+<ul>
+<li><strong>GenerationPerGenType_hourly_CH_LP.csv</strong> - Switzerland generation aggregated by technology type</li>
+<li><strong>GenerationPerGenType_hourly_DE_LP.csv</strong> - Germany generation by technology type</li>
+<li><strong>GenerationPerGenType_hourly_IT_LP.csv</strong> - Italy generation by technology type</li>
+<li><strong>GenerationPerGenType_hourly_AT_LP.csv</strong> - Austria generation by technology type</li>
+<li><strong>GenerationPerGenType_hourly_FR_LP.csv</strong> - France generation by technology type</li>
+</ul>
+</section>
+<section id="switzerland-monthlytotal-generation" class="level3">
+<h3 class="anchored" data-anchor-id="switzerland-monthlytotal-generation">Switzerland Monthly/Total Generation</h3>
+<ul>
+<li><strong>GenerationConsumption_monthly_CH_LP.xlsx</strong> - CH generation/consumption by technology (monthly) - Contains: Multiple sheets with detailed technology breakdowns (Dams, Pumped, RoR, Nuclear, Biomass, Gas, Solar, Wind, Oil, Batteries, P2G2P, DAC)</li>
+<li><strong>GenerationConsumption_total_CH_LP.xlsx</strong> - CH generation/consumption aggregated for CGE model - Contains: Total generation, pumping, investment costs, operational costs by technology</li>
+</ul>
+</section>
+<section id="neighboring-countries-monthly-generation" class="level3">
+<h3 class="anchored" data-anchor-id="neighboring-countries-monthly-generation">Neighboring Countries Monthly Generation</h3>
+<ul>
+<li><strong>GenerationConsumption_monthly_DE_LP.xlsx</strong> - Germany monthly generation/pumping by technology</li>
+<li><strong>GenerationConsumption_monthly_AT_LP.xlsx</strong> - Austria monthly generation/pumping by technology</li>
+<li><strong>GenerationConsumption_monthly_FR_LP.xlsx</strong> - France monthly generation/pumping by technology</li>
+<li><strong>GenerationConsumption_monthly_IT_LP.xlsx</strong> - Italy monthly generation/pumping by technology</li>
+</ul>
+</section>
+<section id="generation-costs" class="level3">
+<h3 class="anchored" data-anchor-id="generation-costs">Generation Costs</h3>
+<ul>
+<li><strong>GenerationCostPerGen_hourly_ALL_LP.xlsx</strong> - Generation cost per generator per hour
+<ul>
+<li>Contains: Country, Technology, Generator name</li>
+</ul></li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="price-files" class="level2">
+<h2 class="anchored" data-anchor-id="price-files">5. Price Files</h2>
+<section id="electricity-prices" class="level3">
+<h3 class="anchored" data-anchor-id="electricity-prices">Electricity Prices</h3>
+<ul>
+<li><p><strong>ElPrice_tpRes_CH.xlsx</strong> - Electricity prices for Switzerland (representative days - test cases only) - Contains: Nodal dual variables (shadow prices) in CHF/MWh</p></li>
+<li><p><strong>ElPrice_tpRes_Neighbours.xlsx</strong> - Electricity prices for neighboring countries (representative days - test cases only)</p></li>
+<li><p><strong>ElPrice_hourly_CH.xlsx</strong> - Hourly electricity prices for Switzerland</p></li>
+<li><p><strong>ElPrice_hourly_Neighbours.xlsx</strong> - Hourly electricity prices for neighboring countries</p></li>
+<li><p><strong>ElPrice_hourly_adjustedDistIvABM_CH.xlsx</strong> - CH electricity prices adjusted for distributed generation from ABM</p></li>
+<li><p><strong>ElPrice_tpRes_adjustedDistIvABM_CH.xlsx</strong> - CH prices (representative days - test cases only) adjusted for distributed generation</p></li>
+<li><p><strong>ElPrice_hourly_adjustedDistIvABM_Neighbours.xlsx</strong> - Neighbor prices adjusted for distributed generation</p></li>
+<li><p><strong>ElPrice_tpRes_adjustedDistIvABM_Neighbours.xlsx</strong> - Neighbor prices (representative days - test cases only) adjusted for distributed generation</p></li>
+</ul>
+</section>
+<section id="reserve-prices" class="level3">
+<h3 class="anchored" data-anchor-id="reserve-prices">Reserve Prices</h3>
+<ul>
+<li><strong>FRRupPrice_tpRes_CH.xlsx</strong> - Frequency Restoration Reserve (upward) price</li>
+<li><strong>FRRdownPrice_tpRes_CH.xlsx</strong> - Frequency Restoration Reserve (downward) price</li>
+<li><strong>RRupPrice_tpRes_CH.xlsx</strong> - Replacement Reserve (upward) price</li>
+<li><strong>RRdownPrice_tpRes_CH.xlsx</strong> - Replacement Reserve (downward) price</li>
+</ul>
+</section>
+<section id="res-premium-price" class="level3">
+<h3 class="anchored" data-anchor-id="res-premium-price">RES Premium Price</h3>
+<ul>
+<li><strong>RESpremiumPrice_CH.xlsx</strong> - Renewable Energy Source premium price
+<ul>
+<li>Contains: Dual variable from RES target constraint</li>
+</ul></li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="reserve-requirement-files" class="level2">
+<h2 class="anchored" data-anchor-id="reserve-requirement-files">6. Reserve Requirement Files</h2>
+<ul>
+<li><p><strong>AddReserve_Args.xlsx</strong> - Additional reserve arguments</p>
+<ul>
+<li>Contains: Technical characteristics for reserve provision (TCR), distributed investment (DistIv), centralized investment (CentIv) for Wind and Solar</li>
+<li>Columns: TCR_windUP, TCR_windDOWN, TCR_solarUP, TCR_solarDOWN, DistIv_Solar_MW, CentIv_Solar_MW, CentIv_Wind_MW</li>
+</ul></li>
+<li><p><strong>FRRSystemReserves_tpRes_CH.xlsx</strong> - System-wide secondary reserve requirements</p>
+<ul>
+<li>Contains: FRRdnReq, FRRupReq (MW)</li>
+</ul></li>
+<li><p><strong>ReserveContributionFRR_hourly_CH_LP.xlsx</strong> - FRR contributions by technology</p>
+<ul>
+<li>Sheets: FRRup/down from Dams, Pumps, Daily Pumps, Nuclear (existing &amp; new), Conventional</li>
+</ul></li>
+<li><p><strong>ReserveContributionRR_hourly_CH_LP.xlsx</strong> - RR contributions by technology</p>
+<ul>
+<li>Sheets: RRup/down from Dams, Pumps, Daily Pumps, Nuclear (existing &amp; new), Conventional</li>
+</ul></li>
+</ul>
+<hr>
+</section>
+<section id="storage-level-files" class="level2">
+<h2 class="anchored" data-anchor-id="storage-level-files">7. Storage Level Files</h2>
+<section id="dam-pumped-hydro-storage" class="level3">
+<h3 class="anchored" data-anchor-id="dam-pumped-hydro-storage">Dam &amp; Pumped Hydro Storage</h3>
+<ul>
+<li><p><strong>Reservoirs_hourly_CH_LP.xlsx</strong> - Reservoir storage levels (hourly) - Sheets: DamLevel_hourly_CH, PumpLevel_hourly_CH, DailyPumpLevel_hourly_CH</p></li>
+<li><p><strong>CumulativeStorageLevels_monthly_CH_LP.xlsx</strong> - Monthly cumulative storage levels (all storage)</p></li>
+<li><p><strong>DamStorageLevels_monthly_CH_LP.xlsx</strong> / <strong>DamStorageLevels_monthly_CH_LP.csv</strong> Monthly dam storage levels - Contains: Month names and storage levels in MWh</p></li>
+<li><p><strong>DamGeneration_hourly_CH_LP.xlsx</strong> - Dam generation (Switzerland)</p></li>
+<li><p><strong>DamGeneration_hourly_Neighbours_LP.xlsx</strong> - Dam generation (Neighbors)</p></li>
+<li><p><strong>PumpGeneration_hourly_CH_LP.xlsx</strong> - Pumped hydro generation (Switzerland)</p></li>
+<li><p><strong>PumpConsumption_hourly_CH_LP.xlsx</strong> - Pumped hydro consumption (Switzerland)</p></li>
+<li><p><strong>PumpGeneration_hourly_Neighbours_LP.xlsx</strong> - Pumped hydro generation (Neighbors)</p></li>
+<li><p><strong>PumpConsumption_hourly_Neighbours_LP.xlsx</strong> - Pumped hydro consumption (Neighbors)</p></li>
+</ul>
+</section>
+<section id="battery-storage" class="level3">
+<h3 class="anchored" data-anchor-id="battery-storage">Battery Storage</h3>
+<ul>
+<li><strong>BattSoC_hourly_ALL_LP.xlsx</strong> - Battery state of charge (all batteries) - Sheets: BattSoC_hourly_existing, BattSoC_hourly_candidate</li>
+</ul>
+</section>
+<section id="hydrogen-storage-p2g2p" class="level3">
+<h3 class="anchored" data-anchor-id="hydrogen-storage-p2g2p">Hydrogen Storage (P2G2P)</h3>
+<ul>
+<li><strong>P2G2P_H2SoC_hourly_ALL_LP.xlsx</strong> - Hydrogen storage state of charge - Sheets: H2SoC_hourly_all, H2SoC_hourly_built</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="cross-border-flow-files" class="level2">
+<h2 class="anchored" data-anchor-id="cross-border-flow-files">8. Cross-Border Flow Files</h2>
+<section id="switzerland-importsexports" class="level3">
+<h3 class="anchored" data-anchor-id="switzerland-importsexports">Switzerland Imports/Exports</h3>
+<ul>
+<li><p><strong>ExportImport_total_CH_LP.xlsx</strong> - Total exports and imports for Switzerland (MWh) - Contains: Tot_Export_CH_MWh, Tot_Import_CH_MWh</p></li>
+<li><p><strong>ExportImport_total_ALL.xlsx</strong> - Bilateral flows between all countries - Sheets: CH_AT, CH_DE, CH_FR, CH_IT, DE_FR, DE_AT, FR_IT, IT_AT</p></li>
+<li><p><strong>CrossBorderBranchFlows_hourly_CH_LP.xlsx</strong> - Cross-border branch flows involving Switzerland</p></li>
+<li><p><strong>CH_exports.csv</strong> - Swiss exports by hour and line (negative values)</p></li>
+<li><p><strong>CH_imports.csv</strong> - Swiss imports by hour and line (positive values, adjusted sign)</p></li>
+</ul>
+</section>
+<section id="all-branch-flows" class="level3">
+<h3 class="anchored" data-anchor-id="all-branch-flows">All Branch Flows</h3>
+<ul>
+<li><strong>BranchFlows_hourly_ALL_LP.xlsx</strong> - All transmission line flows (hourly) - Contains: Line ratings, line names</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="power-to-gas-to-power-p2g2p-files" class="level2">
+<h2 class="anchored" data-anchor-id="power-to-gas-to-power-p2g2p-files">9. Power-to-Gas-to-Power (P2G2P) Files</h2>
+<section id="market-interactions" class="level3">
+<h3 class="anchored" data-anchor-id="market-interactions">Market Interactions</h3>
+<ul>
+<li><strong>P2G2P_CH4Market_hourly_CH_LP.xlsx</strong> - CH4 (methane) to/from market - Units: MWh_th</li>
+<li><strong>P2G2P_H2Market_hourly_CH_LP.xlsx</strong> - H2 (hydrogen) to/from market - Units: tonne_H2</li>
+<li><strong>P2G2P_CO2captured_hourly_CH_LP.xlsx</strong> - CO2 captured - Units: tonne_CO2</li>
+</ul>
+</section>
+<section id="p2g2p-components" class="level3">
+<h3 class="anchored" data-anchor-id="p2g2p-components">P2G2P Components</h3>
+<ul>
+<li><strong>P2G2P_ELconsumption_hourly_CH_LP.xlsx</strong> - Electrolyzer electricity consumption - Units: MWh</li>
+<li><strong>P2G2P_CH4DACconsumption_hourly_CH_LP.xlsx</strong> - CH4 consumption for DAC (Direct Air Capture) - Units: MWh</li>
+<li><strong>P2G2P_REgeneration_hourly_CH_LP.xlsx</strong> - Re-conversion generation (fuel cell / turbine output) - Units: MWh</li>
+</ul>
+</section>
+<section id="p2g2p-economics" class="level3">
+<h3 class="anchored" data-anchor-id="p2g2p-economics">P2G2P Economics</h3>
+<ul>
+<li><p><strong>P2G2P_ImportsCosts_hourly_ALL_LP.xlsx</strong> - Imports and costs - Sheets: H2import, H2importcost, CH4import, CH4importcost</p></li>
+<li><p><strong>P2G2P_RevenuesCarriers_hourly_ALL_LP.xlsx</strong> - Revenues from selling carriers - Sheets: H2revenue, CH4revenue, CO2revenue</p></li>
+</ul>
+</section>
+<section id="p2g2p-variables" class="level3">
+<h3 class="anchored" data-anchor-id="p2g2p-variables">P2G2P Variables</h3>
+<ul>
+<li><strong>P2G2P_H2vars_hourly_LP.xlsx</strong> - Hydrogen balance variables - Sheets: H2byEL_hourly_all, H2meth_hourly_all, H2market_hourly_all, H2recon_hourly_all</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="curtailment-load-shedding-files" class="level2">
+<h2 class="anchored" data-anchor-id="curtailment-load-shedding-files">10. Curtailment &amp; Load Shedding Files</h2>
+<ul>
+<li><p><strong>REScurtailmentDistIv_hourly_ALL_LP.xlsx</strong> / <strong>REScurtailmentDistIv_hourly_ALL_LP.csv</strong></p>
+<ul>
+<li>Contains: Curtailment of distributed renewable generation by bus/node</li>
+<li>Units: MW</li>
+<li>Note: A warning message is printed if curtailment occurs</li>
+</ul></li>
+<li><p><strong>LoadShedding_hourly_ALL_LP.xlsx</strong> / <strong>LoadShedding_hourly_ALL_LP.csv</strong></p>
+<ul>
+<li>Contains: Emergency load shedding by bus/node</li>
+<li>Units: MW</li>
+</ul></li>
+</ul>
+<hr>
+</section>
+<section id="aggregate-scalar-files" class="level2">
+<h2 class="anchored" data-anchor-id="aggregate-scalar-files">11. Aggregate &amp; Scalar Files</h2>
+<section id="res-production" class="level3">
+<h3 class="anchored" data-anchor-id="res-production">RES Production</h3>
+<ul>
+<li><strong>RESGeneration_total_CH.xlsx</strong> - Total RES generation in Switzerland - Contains: Tot_RES_Production_MWh</li>
+<li><strong>OriginalRESTarget_total_CH.xlsx</strong> - Original RES target for Switzerland - Contains: Original_RES_Target_TWh</li>
+</ul>
+</section>
+<section id="demand-scalar" class="level3">
+<h3 class="anchored" data-anchor-id="demand-scalar">Demand Scalar</h3>
+<ul>
+<li><strong>Demand_Scalar.xlsx</strong> - Demand scaling factor - Contains: DemandScalar used to adjust load</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="generator-summary-files-for-external-models" class="level2">
+<h2 class="anchored" data-anchor-id="generator-summary-files-for-external-models">12. Generator Summary Files (for External Models)</h2>
+<ul>
+<li><p><strong>Generators_EM.xlsx</strong> - Generator parameters for external energy model (EM) - Contains: Generator names, technologies, Pmax, Pmin</p></li>
+<li><p><strong>Generators_EM_agg.csv</strong> - Aggregated generator data by technology - Contains: Technology-level aggregation of Pmax, Pmin</p></li>
+<li><p><strong>Investments_total_CH_LP.xlsx</strong> - Total investment summary- Contains: Fixed operational costs, investment costs, total generation by technology</p></li>
+</ul>
+<hr>
+</section>
+<section id="category-c-raw-model-internals" class="level2">
+<h2 class="anchored" data-anchor-id="category-c-raw-model-internals">Category C: Raw Model Internals</h2>
+</section>
+<section id="raw-model-internals-both-folders---direct-pyomo-exports" class="level2">
+<h2 class="anchored" data-anchor-id="raw-model-internals-both-folders---direct-pyomo-exports">13. Raw Model Internals (Both Folders) - Direct Pyomo Exports</h2>
+<p><strong>Locations:</strong></p>
+<ul>
+<li><code>Results/&lt;scenario_name&gt;/InvestmentRun_&lt;RUNYEAR&gt;/</code> - First stage optimization with investment decisions</li>
+<li><code>Results/&lt;scenario_name&gt;/CentIv_&lt;RUNYEAR&gt;/</code> - Second stage optimization with fixed investments</li>
+</ul>
+<p><strong>Created by:</strong> <code>save_results_fcns.saveVarParDualsCsv(opt.model, results_folder)</code></p>
+<p>This function directly exports all Pyomo model components (variables, parameters, constraint duals) to CSV files without any post-processing.</p>
+<p><strong>Important Distinction:</strong> Unlike sections 0-12 which contain post-processed, human-readable files created through custom aggregation and remapping code, <strong>these are direct, unprocessed exports from the Pyomo optimization model</strong>. No manual remapping or aggregation is applied - these are the raw materials from the solver.</p>
+<p>All Pyomo model variables, parameters, and constraint duals are exported to CSV files in <strong>both folders</strong>. These files provide complete access to the optimization model’s internal state for advanced analysis and debugging.</p>
+<p><strong>Key Difference Between Folders:</strong></p>
+<ul>
+<li><strong>InvestmentRun:</strong> Contains results where investment variables are free to optimize (investment costs included in objective)</li>
+<li><strong>CentIv:</strong> Contains results where investment decisions are fixed from stage 1 (only operational optimization, electricity prices reflect operating costs only)</li>
+</ul>
+<section id="variables-csv-files" class="level3">
+<h3 class="anchored" data-anchor-id="variables-csv-files">Variables (CSV files)</h3>
+<p>All decision variables from the optimization model are exported with their optimal values. Examples include:</p>
+<ul>
+<li><strong>Generation variables:</strong> Power output by generator and time period</li>
+<li><strong>Storage variables:</strong> State of charge for batteries, hydro, hydrogen storage</li>
+<li><strong>Investment variables:</strong> Binary/continuous decisions for new capacity</li>
+<li><strong>Load shifting variables:</strong> Flexible demand adjustments</li>
+<li><strong>Flow variables:</strong> Power flows on transmission lines</li>
+<li><strong>Reserve variables:</strong> Reserve provision by generators</li>
+</ul>
+<p>Each variable file is named <code>&lt;variable_name&gt;.csv</code> and contains:</p>
+<ul>
+<li>Index columns identifying the variable indices (e.g., generator ID, time period, bus)</li>
+<li>Value column with the optimal solution value</li>
+</ul>
+<p><strong>Tip:</strong> To find where a variable is defined in the code, use the project-wide search (Ctrl+Shift+F in VS Code) and search for <code>&lt;variable_name&gt; =</code> (e.g., <code>MaxPowerInvNonDisp =</code>).</p>
+</section>
+<section id="parameters-csv-files" class="level3">
+<h3 class="anchored" data-anchor-id="parameters-csv-files">Parameters (CSV files)</h3>
+<p>All model parameters (input data) are exported. Examples include:</p>
+<ul>
+<li><strong>Generator characteristics:</strong> Pmax, Pmin, efficiency, costs</li>
+<li><strong>Time series data:</strong> Demand profiles, renewable availability factors</li>
+<li><strong>Network parameters:</strong> Line capacities, reactances</li>
+<li><strong>Cost parameters:</strong> Fuel prices, investment costs, operational costs</li>
+</ul>
+<p>Each parameter file is named <code>&lt;parameter_name&gt;.csv</code> with the same structure as variables.</p>
+<p><strong>Tip:</strong> To find where a parameter is defined in the code, use the project-wide search (Ctrl+Shift+F in VS Code) and search for <code>&lt;parameter_name&gt; =</code>.</p>
+</section>
+<section id="constraint-duals-csv-files-with-_dual-suffix" class="level3">
+<h3 class="anchored" data-anchor-id="constraint-duals-csv-files-with-_dual-suffix">Constraint Duals (CSV files with <code>_dual</code> suffix)</h3>
+<p>Dual values (shadow prices) for key constraints are exported. These duals represent the marginal value of relaxing each constraint. Currently exported duals include:</p>
+<ul>
+<li><strong>NodalConstraint_dual.csv</strong> / <strong>NodalConstraint_one_CH_dual.csv</strong> - Nodal energy balance duals (electricity prices)</li>
+<li><strong>SoCHydroCon1_dual.csv</strong> - Hydro storage constraint duals</li>
+<li><strong>SoCHydroDamCon_dual.csv</strong> - Dam storage constraint duals</li>
+<li><strong>SoCBattCandCon_dual.csv</strong> / <strong>SoCBattCon_dual.csv</strong> / <strong>SoCCon_dual.csv</strong> - Battery storage constraint duals</li>
+<li><strong>SoCDSMCon_dual.csv</strong> - Demand-side management storage constraint duals</li>
+<li><strong>SoCHydrogenCandCon_dual.csv</strong> / <strong>SoCH2CandCon_dual.csv</strong> - Hydrogen storage constraint duals</li>
+<li><strong>SoCHydroDayCon1_dual.csv</strong> - Daily hydro storage constraint duals</li>
+</ul>
+<p>Each dual file contains:</p>
+<ul>
+<li>Index columns identifying the constraint instance</li>
+<li>Value column with the dual (shadow price) value</li>
+</ul>
+</section>
+<section id="model-statistics" class="level3">
+<h3 class="anchored" data-anchor-id="model-statistics">Model Statistics</h3>
+<ul>
+<li><strong>selected_stats.csv</strong> - Summary statistics including:
+<ul>
+<li>Solver termination condition and status</li>
+<li>Objective function value (total system cost)</li>
+<li>Solve time</li>
+<li>Number of variables and constraints</li>
+<li>Duration log of different model building and solving phases</li>
+</ul></li>
+</ul>
+</section>
+<section id="purpose" class="level3">
+<h3 class="anchored" data-anchor-id="purpose">Purpose</h3>
+<p>These InvestmentRun files are primarily for:</p>
+<ul>
+<li><strong>Advanced debugging:</strong> Inspecting all model variables and parameters</li>
+<li><strong>Custom post-processing:</strong> Building analyses not covered by standard output files</li>
+<li><strong>Model validation:</strong> Verifying constraint satisfaction and solution quality</li>
+<li><strong>Research:</strong> Accessing detailed optimization results for academic studies</li>
+</ul>
+<p><strong>Note:</strong> These files can be very large (hundreds of MB) depending on model size. Production runs use full 8760 hourly resolution.</p>
+<hr>
+</section>
+</section>
+<section id="input-files-read-by-script" class="level2">
+<h2 class="anchored" data-anchor-id="input-files-read-by-script">14. Input Files (Read by Script)</h2>
+<p>These files are <strong>read</strong> by the script (not written):</p>
+<ul>
+<li><strong>Hourly_Nodal_Residual_Demand.xlsx</strong> - Residual demand input</li>
+<li><strong>Residual_FRR_System_Reserves.xlsx</strong> - Reserve requirements input</li>
+<li><strong>GenerationDistIv_hourly_CH.xlsx</strong> - Distributed generation input (if ABM is not used)</li>
+<li><strong>priorityList.csv</strong> - Priority list for generators</li>
+<li><strong>expPlanTable.csv</strong> - Expansion plan table</li>
+</ul>
+<hr>
+</section>
+<section id="file-naming-conventions" class="level2">
+<h2 class="anchored" data-anchor-id="file-naming-conventions">File Naming Conventions</h2>
+<section id="temporal-resolution-suffixes" class="level3">
+<h3 class="anchored" data-anchor-id="temporal-resolution-suffixes">Temporal Resolution Suffixes</h3>
+<ul>
+<li><strong><code>_tpRes_</code></strong> - Temporally aggregated resolution using representative days (test cases only). The model runs on selected days which are then copied to fill 8760 hours. <strong>Normal production runs do not use this - they run full 8760 hours.</strong></li>
+<li><strong><code>_hourly_</code></strong> - Full hourly resolution (8760 hours) - standard for production runs</li>
+<li><strong><code>_monthly_</code></strong> - Monthly aggregation</li>
+</ul>
+</section>
+<section id="geographic-suffixes" class="level3">
+<h3 class="anchored" data-anchor-id="geographic-suffixes">Geographic Suffixes</h3>
+<ul>
+<li><strong><code>_CH</code></strong> - Switzerland only</li>
+<li><strong><code>_Neighbours</code></strong> - AT, DE, FR, IT (neighboring countries)</li>
+<li><strong><code>_ALL</code></strong> - All regions/nodes</li>
+<li><strong><code>_LP</code></strong> - Linear Programming optimization results (2nd stage runs)</li>
+</ul>
+</section>
+<section id="technology-suffixes" class="level3">
+<h3 class="anchored" data-anchor-id="technology-suffixes">Technology Suffixes</h3>
+<ul>
+<li><strong>DistIv</strong> - Distributed Investment (e.g., rooftop solar)</li>
+<li><strong>CentIv</strong> - Centralized Investment (e.g., utility-scale solar/wind)</li>
+<li><strong>P2G2P</strong> - Power-to-Gas-to-Power systems</li>
+<li><strong>EM</strong> - Energy Model (external CGE or equilibrium model)</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="categories-summary" class="level2">
+<h2 class="anchored" data-anchor-id="categories-summary">Categories Summary</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 31%">
+<col style="width: 17%">
+<col style="width: 12%">
+<col style="width: 39%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Category</th>
+<th>Number of Files</th>
+<th>File Type</th>
+<th>Location</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Mapping Files</td>
+<td>50+</td>
+<td>.csv</td>
+<td>CentIv_YEAR/mappings/</td>
+</tr>
+<tr class="even">
+<td>Investment Decisions</td>
+<td>5</td>
+<td>.xlsx</td>
+<td>CentIv_YEAR/</td>
+</tr>
+<tr class="odd">
+<td>Demand</td>
+<td>25+</td>
+<td>.xlsx, .csv</td>
+<td>CentIv_YEAR/</td>
+</tr>
+<tr class="even">
+<td>Distributed Generation</td>
+<td>3</td>
+<td>.xlsx, .csv</td>
+<td>CentIv_YEAR/</td>
+</tr>
+<tr class="odd">
+<td>Generation Output</td>
+<td>20+</td>
+<td>.xlsx, .csv</td>
+<td>CentIv_YEAR/</td>
+</tr>
+<tr class="even">
+<td>Prices</td>
+<td>10+</td>
+<td>.xlsx</td>
+<td>CentIv_YEAR/</td>
+</tr>
+<tr class="odd">
+<td>Reserve Requirements</td>
+<td>4</td>
+<td>.xlsx</td>
+<td>CentIv_YEAR/</td>
+</tr>
+<tr class="even">
+<td>Storage Levels</td>
+<td>12+</td>
+<td>.xlsx, .csv</td>
+<td>CentIv_YEAR/</td>
+</tr>
+<tr class="odd">
+<td>Cross-Border Flows</td>
+<td>6</td>
+<td>.xlsx, .csv</td>
+<td>CentIv_YEAR/</td>
+</tr>
+<tr class="even">
+<td>P2G2P Operations</td>
+<td>15+</td>
+<td>.xlsx</td>
+<td>CentIv_YEAR/</td>
+</tr>
+<tr class="odd">
+<td>Curtailment &amp; Load Shedding</td>
+<td>4</td>
+<td>.xlsx, .csv</td>
+<td>CentIv_YEAR/</td>
+</tr>
+<tr class="even">
+<td>Aggregates &amp; Scalars</td>
+<td>3</td>
+<td>.xlsx</td>
+<td>CentIv_YEAR/</td>
+</tr>
+<tr class="odd">
+<td>Generator Summaries</td>
+<td>3</td>
+<td>.xlsx, .csv</td>
+<td>CentIv_YEAR/</td>
+</tr>
+<tr class="even">
+<td>Model Internals</td>
+<td>200+ each</td>
+<td>.csv</td>
+<td>InvestmentRun_YEAR/ &amp; CentIv_YEAR/</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Total: Approximately 550+ output files</strong> (100-120 result files in CentIv, 50+ mapping files in CentIv, 200+ model internals in InvestmentRun, 200+ model internals in CentIv)</p>
+<hr>
+</section>
+<section id="usage-notes" class="level2">
+<h2 class="anchored" data-anchor-id="usage-notes">Usage Notes</h2>
+<ol type="1">
+<li><p><strong>Conditional Generation</strong>: Many files are only created if certain model features are enabled:</p>
+<ul>
+<li>P2G2P files require P2G2P units to be active</li>
+<li>Reserve files require reserve modeling to be enabled</li>
+<li>Distributed generation files depend on ABM integration</li>
+</ul></li>
+<li><p><strong>File Formats</strong>:</p>
+<ul>
+<li><code>.xlsx</code> files typically have multiple sheets and formatted data</li>
+<li><code>.csv</code> files are simpler, single-table format for easier programmatic access</li>
+</ul></li>
+<li><p><strong>Coordinate Systems</strong>:</p>
+<ul>
+<li>Most files use node/bus identifiers</li>
+<li>Swiss files often include canton information</li>
+<li>Generator files include technology and country info</li>
+</ul></li>
+<li><p><strong>Sign Conventions</strong>:</p>
+<ul>
+<li>Exports: Negative values indicate power leaving a region</li>
+<li>Imports: Positive values indicate power entering a region</li>
+<li>Some files are adjusted for post-processing (e.g., <code>CH_exports.csv</code> has signs flipped)</li>
+</ul></li>
+</ol>
+<hr>
+
+
+</section>
+</section>
+
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/Energy-Science-Center\.github\.io\/nexus-e\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../wiki/discussions/performance-analysis.html" class="pagination-link" aria-label="Performance analysis">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Performance analysis</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../wiki/discussions/scenario-lifecycle.html" class="pagination-link" aria-label="Scenario lifecycle">
+        <span class="nav-page-text">Scenario lifecycle</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

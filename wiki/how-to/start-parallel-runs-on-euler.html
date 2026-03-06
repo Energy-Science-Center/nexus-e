@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>start-parallel-runs-on-euler – Nexus-e</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../wiki/discussions/input-data-analysis.html" rel="next">
+<link href="../../wiki/how-to/work-on-euler.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-4d9afe2b8d18ee9fa5d0d57b5ed4214d.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-007a8609411f977ffbfe52380a417f90.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-6b74d00bf9800a17f7fea13582486bf4.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-007a8609411f977ffbfe52380a417f90.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar docked nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Nexus-e</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="../../wiki/home.html" aria-current="page"> 
+<span class="menu-text">Wiki</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../wiki/how-to/work-on-euler.html">How-to</a></li><li class="breadcrumb-item"><a href="../../wiki/how-to/start-parallel-runs-on-euler.html">Start parallel runs on Euler</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../wiki/home.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wiki</span></a>
+  </div>
+</li>
+        <li class="px-0"><hr class="sidebar-divider hi "></li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Get started</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../wiki/get-started/install.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Install</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../wiki/get-started/run.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Run</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../wiki/get-started/configure.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Configure</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../wiki/get-started/modules.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Modules</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Scenarios</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../wiki/scenarios/upload.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Upload a scenario</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../wiki/scenarios/tyndp24.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">TYNDP24</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../wiki/scenarios/nodal-hourly-load.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Nodal hourly load</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../wiki/scenarios/ntc.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">NTC</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../wiki/scenarios/europe.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Europe</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">How-to</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../wiki/how-to/work-on-euler.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Work on Euler</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../wiki/how-to/start-parallel-runs-on-euler.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Start parallel runs on Euler</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Discussions</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../wiki/discussions/input-data-analysis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Input data analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../wiki/discussions/performance-analysis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Performance analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../wiki/discussions/output-files.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Output files</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../wiki/discussions/scenario-lifecycle.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Scenario lifecycle</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">Developer guide</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../wiki/developer-guide/how-to-contribute.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">How to contribute</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../wiki/developer-guide/tests.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Write tests</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../wiki/developer-guide/style-guide.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Style guide</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../wiki/developer-guide/solid-principles.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">SOLID principles</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a></li>
+  <li><a href="#table-of-contents" id="toc-table-of-contents" class="nav-link" data-scroll-target="#table-of-contents">Table of Contents</a></li>
+  <li><a href="#prerequisites" id="toc-prerequisites" class="nav-link" data-scroll-target="#prerequisites">Prerequisites</a>
+  <ul class="collapse">
+  <li><a href="#access-environment" id="toc-access-environment" class="nav-link" data-scroll-target="#access-environment">1. Access &amp; Environment</a></li>
+  <li><a href="#repository-setup" id="toc-repository-setup" class="nav-link" data-scroll-target="#repository-setup">2. Repository Setup</a></li>
+  <li><a href="#directory-structure" id="toc-directory-structure" class="nav-link" data-scroll-target="#directory-structure">3. Directory Structure</a></li>
+  </ul></li>
+  <li><a href="#first-time-setup" id="toc-first-time-setup" class="nav-link" data-scroll-target="#first-time-setup">First Time Setup</a>
+  <ul class="collapse">
+  <li><a href="#step-1-create-your-personal-configuration" id="toc-step-1-create-your-personal-configuration" class="nav-link" data-scroll-target="#step-1-create-your-personal-configuration">Step 1: Create Your Personal Configuration</a></li>
+  <li><a href="#step-2-edit-your-configuration" id="toc-step-2-edit-your-configuration" class="nav-link" data-scroll-target="#step-2-edit-your-configuration">Step 2: Edit Your Configuration</a></li>
+  <li><a href="#step-3-verify-config.toml" id="toc-step-3-verify-config.toml" class="nav-link" data-scroll-target="#step-3-verify-config.toml">Step 3: Verify config.toml</a></li>
+  </ul></li>
+  <li><a href="#common-workflows" id="toc-common-workflows" class="nav-link" data-scroll-target="#common-workflows">Common Workflows</a>
+  <ul class="collapse">
+  <li><a href="#full-calibration-run-multiple-scenarios-in-parallel" id="toc-full-calibration-run-multiple-scenarios-in-parallel" class="nav-link" data-scroll-target="#full-calibration-run-multiple-scenarios-in-parallel">Full Calibration Run (Multiple Scenarios in Parallel)</a></li>
+  </ul></li>
+  <li><a href="#how-it-works" id="toc-how-it-works" class="nav-link" data-scroll-target="#how-it-works">How It Works</a>
+  <ul class="collapse">
+  <li><a href="#workflow-diagram" id="toc-workflow-diagram" class="nav-link" data-scroll-target="#workflow-diagram">Workflow Diagram</a></li>
+  <li><a href="#what-happens-in-each-job" id="toc-what-happens-in-each-job" class="nav-link" data-scroll-target="#what-happens-in-each-job">What Happens in Each Job</a></li>
+  </ul></li>
+  <li><a href="#monitoring-jobs" id="toc-monitoring-jobs" class="nav-link" data-scroll-target="#monitoring-jobs">Monitoring Jobs</a>
+  <ul class="collapse">
+  <li><a href="#email-notifications" id="toc-email-notifications" class="nav-link" data-scroll-target="#email-notifications">Email Notifications</a></li>
+  <li><a href="#check-job-status" id="toc-check-job-status" class="nav-link" data-scroll-target="#check-job-status">Check Job Status</a></li>
+  <li><a href="#monitor-progress-in-real-time" id="toc-monitor-progress-in-real-time" class="nav-link" data-scroll-target="#monitor-progress-in-real-time">Monitor Progress in Real-Time</a></li>
+  <li><a href="#check-individual-job-logs" id="toc-check-individual-job-logs" class="nav-link" data-scroll-target="#check-individual-job-logs">Check Individual Job Logs</a></li>
+  </ul></li>
+  <li><a href="#understanding-the-manifest-file" id="toc-understanding-the-manifest-file" class="nav-link" data-scroll-target="#understanding-the-manifest-file">Understanding the Manifest File</a>
+  <ul class="collapse">
+  <li><a href="#example-manifest" id="toc-example-manifest" class="nav-link" data-scroll-target="#example-manifest">Example Manifest</a></li>
+  <li><a href="#entry-types" id="toc-entry-types" class="nav-link" data-scroll-target="#entry-types">Entry Types</a></li>
+  </ul></li>
+  <li><a href="#troubleshooting" id="toc-troubleshooting" class="nav-link" data-scroll-target="#troubleshooting">Troubleshooting</a>
+  <ul class="collapse">
+  <li><a href="#problem-euler_run.config.local-not-found" id="toc-problem-euler_run.config.local-not-found" class="nav-link" data-scroll-target="#problem-euler_run.config.local-not-found">Problem: “euler_run.config.local not found”</a></li>
+  <li><a href="#problem-job-fails-immediately" id="toc-problem-job-fails-immediately" class="nav-link" data-scroll-target="#problem-job-fails-immediately">Problem: Job Fails Immediately</a></li>
+  <li><a href="#problem-repo-not-found-at-repo_path" id="toc-problem-repo-not-found-at-repo_path" class="nav-link" data-scroll-target="#problem-repo-not-found-at-repo_path">Problem: “Repo not found at $REPO_PATH”</a></li>
+  </ul></li>
+  <li><a href="#additional-resources" id="toc-additional-resources" class="nav-link" data-scroll-target="#additional-resources">Additional Resources</a></li>
+  <li><a href="#appendix-understanding-create_a_copy-behavior" id="toc-appendix-understanding-create_a_copy-behavior" class="nav-link" data-scroll-target="#appendix-understanding-create_a_copy-behavior">Appendix: Understanding create_a_copy Behavior</a>
+  <ul class="collapse">
+  <li><a href="#when-create_a_copy-true" id="toc-when-create_a_copy-true" class="nav-link" data-scroll-target="#when-create_a_copy-true">When create_a_copy = true</a></li>
+  <li><a href="#when-create_a_copy-false" id="toc-when-create_a_copy-false" class="nav-link" data-scroll-target="#when-create_a_copy-false">When create_a_copy = false</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../wiki/how-to/work-on-euler.html">How-to</a></li><li class="breadcrumb-item"><a href="../../wiki/how-to/start-parallel-runs-on-euler.html">Start parallel runs on Euler</a></li></ol></nav></header>
+
+
+
+
+
+<section id="overview" class="level2">
+<h2 class="anchored" data-anchor-id="overview">Overview</h2>
+<p>This guide explains how to run multiple Nexus-E simulations in parallel on the Euler cluster using <code>euler_run.sbatch</code>.</p>
+<p><strong>Why use this?</strong> Instead of manually copying files and running simulations one by one, this script automates running multiple database/playlist combinations in parallel, saving significant time and effort.</p>
+<p><strong>Key features:</strong></p>
+<ul>
+<li><strong>Runs on scratch storage</strong>: Each job automatically copies only the necessary files to scratch - fast and doesn’t consume Home quota</li>
+<li><strong>Centralized tracking</strong>: All job statuses are collected in a single manifest file, including paths to nexus-e logs, SLURM output/error files, and results</li>
+<li><strong>Email notifications</strong>: Receive an email when each job completes or fails (optional)</li>
+<li><strong>Parallel execution</strong>: All database/playlist combinations run independently in parallel</li>
+</ul>
+<p><strong>Files involved:</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 42%">
+<col style="width: 57%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>euler_run.sbatch</code></td>
+<td>Main batch script (submit this with <code>sbatch</code>)</td>
+</tr>
+<tr class="even">
+<td><code>modules_playlists/euler_run.config.local</code></td>
+<td>Your personal settings: JOBS, REPO_PATH, EMAIL (git-ignored)</td>
+</tr>
+<tr class="odd">
+<td><code>modules_playlists/euler_run.config.example</code></td>
+<td>Template to copy for creating your <code>.local</code> file</td>
+</tr>
+<tr class="even">
+<td><code>config.toml</code></td>
+<td>Main Nexus-E config (database credentials, settings)</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="table-of-contents" class="level2">
+<h2 class="anchored" data-anchor-id="table-of-contents">Table of Contents</h2>
+<ul>
+<li><a href="#prerequisites">Prerequisites (may skip)</a></li>
+<li><a href="#first-time-setup">First Time Setup</a></li>
+<li><a href="#common-workflows">Common Workflows</a></li>
+<li><a href="#how-it-works">How It Works</a></li>
+<li><a href="#monitoring-jobs">Monitoring Jobs</a></li>
+<li><a href="#understanding-the-manifest-file">Understanding the Manifest File</a></li>
+<li><a href="#troubleshooting">Troubleshooting</a></li>
+<li><a href="#appendix-understanding-create_a_copy-behavior">Appendix: Understanding create_a_copy Behavior</a></li>
+</ul>
+</section>
+<section id="prerequisites" class="level2">
+<h2 class="anchored" data-anchor-id="prerequisites">Prerequisites</h2>
+<p>💡 <strong>Already running Nexus-E on Euler?</strong> If you’ve successfully run Nexus-E on Euler before, you can skip this section and go directly to <a href="#first-time-setup">First Time Setup</a>. Before using <code>euler_run.sbatch</code>, ensure you have:</p>
+<section id="access-environment" class="level3">
+<h3 class="anchored" data-anchor-id="access-environment">1. Access &amp; Environment</h3>
+<ul>
+<li>SSH access to Euler cluster</li>
+<li>Member of the <code>es_sansa</code> account (or update <code>#SBATCH --account</code> in the script)</li>
+<li><code>uv</code> package manager installed and accessible</li>
+</ul>
+</section>
+<section id="repository-setup" class="level3">
+<h3 class="anchored" data-anchor-id="repository-setup">2. Repository Setup</h3>
+<ul>
+<li>Nexus-E framework cloned to Euler (default location: <code>~/repos/nexus-e-framework</code>)
+<ul>
+<li>If you use a different path, you’ll need to update <code>REPO_PATH</code> in your config file (see Step 2)</li>
+<li><strong>Recommendation:</strong> Keep only one repository version on Home to avoid confusion</li>
+</ul></li>
+<li>Your <code>config.toml</code> configured with correct database credentials, user initials, etc.</li>
+<li>Required databases accessible on the database server</li>
+</ul>
+</section>
+<section id="directory-structure" class="level3">
+<h3 class="anchored" data-anchor-id="directory-structure">3. Directory Structure</h3>
+<p>The script expects this structure:</p>
+<pre><code>~/repos/nexus-e-framework/    # Your repo (can be different path)
+├── euler_run.sbatch           # The batch script
+├── config.toml                # Main config (database credentials, user settings)
+├── modules_playlists/
+│   ├── euler_run.config.local # Your personal config (JOBS, REPO_PATH) - You make this in the Step 1.
+│   ├── centiv_2050.toml              # Playlist definitions
+│   └── ...
+└── ...
+
+~/Euler_logs/                  # Created automatically for logs and manifests</code></pre>
+</section>
+</section>
+<section id="first-time-setup" class="level2">
+<h2 class="anchored" data-anchor-id="first-time-setup">First Time Setup</h2>
+<section id="step-1-create-your-personal-configuration" class="level3">
+<h3 class="anchored" data-anchor-id="step-1-create-your-personal-configuration">Step 1: Create Your Personal Configuration</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~/repos/nexus-e-framework  <span class="co"># Or wherever your repo is</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> modules_playlists/euler_run.config.example modules_playlists/euler_run.config.local</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="step-2-edit-your-configuration" class="level3">
+<h3 class="anchored" data-anchor-id="step-2-edit-your-configuration">Step 2: Edit Your Configuration</h3>
+<p>Open <code>modules_playlists/euler_run.config.local</code> and configure:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define which database/playlist combinations to run</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="va">JOBS</span><span class="op">=</span><span class="va">(</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"test_nuclear_all_eu|centiv_2050"</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"test_nuclear_all_eu|suportRES"</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"my_scenario_db|centiv_2050"</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="va">)</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Path to your nexus-e-framework repository</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="va">REPO_PATH</span><span class="op">=</span><span class="st">"</span><span class="va">$HOME</span><span class="st">/repos/nexus-e-framework"</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Email notifications (optional)</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Set your email to receive notifications when jobs </span><span class="re">END</span><span class="co"> or FAIL</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Leave empty to disable: EMAIL_ADDRESS=""</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="va">EMAIL_ADDRESS</span><span class="op">=</span><span class="st">"your.email@ethz.ch"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Understanding JOBS:</strong></p>
+<ul>
+<li>Format: <code>"database_name|playlist_name"</code></li>
+<li><code>database_name</code>: Name of the database in MySQL</li>
+<li><code>playlist_name</code>: Name of the playlist file in <code>modules_playlists/</code> (without <code>.toml</code> extension)</li>
+<li>Each job runs independently in parallel</li>
+<li><strong>Note:</strong> The script automatically patches <code>config.toml</code> with these values for each job - you don’t need to manually edit database or playlist settings in <code>config.toml</code></li>
+</ul>
+<p><strong>Understanding EMAIL_ADDRESS:</strong></p>
+<ul>
+<li>Optional: Set your email to receive notifications when jobs complete or fail</li>
+<li>Leave empty (<code>EMAIL_ADDRESS=""</code>) to disable email notifications</li>
+<li>Each user can set their own email in their personal <code>euler_run.config.local</code> file</li>
+<li>You’ll receive an email for each job when it ends (success) or fails</li>
+</ul>
+</section>
+<section id="step-3-verify-config.toml" class="level3">
+<h3 class="anchored" data-anchor-id="step-3-verify-config.toml">Step 3: Verify config.toml</h3>
+<p>Check your <code>config.toml</code> has correct settings:</p>
+<ul>
+<li>Database server credentials (<code>[input_database_server]</code>, <code>[output_database_server]</code>)</li>
+<li>User initials (<code>user_initials</code>)</li>
+<li><code>create_a_copy</code> setting (determines which database field(s) get patched):
+<ul>
+<li><code>true</code>: Creates a copy of the database; <code>original_name</code> will be set from JOBS</li>
+<li><code>false</code>: Uses database directly; <strong>both</strong> <code>original_name</code> and <code>copy_name</code> will be set from JOBS</li>
+</ul></li>
+<li>Any other settings <strong>except</strong> <code>original_name</code>/<code>copy_name</code> and <code>playlist_name</code> (these are set automatically per job)</li>
+</ul>
+</section>
+</section>
+<section id="common-workflows" class="level2">
+<h2 class="anchored" data-anchor-id="common-workflows">Common Workflows</h2>
+<section id="full-calibration-run-multiple-scenarios-in-parallel" class="level3">
+<h3 class="anchored" data-anchor-id="full-calibration-run-multiple-scenarios-in-parallel">Full Calibration Run (Multiple Scenarios in Parallel)</h3>
+<p>Run multiple scenarios simultaneously:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~/repos/nexus-e-framework</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">sbatch</span> euler_run.sbatch</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</section>
+<section id="how-it-works" class="level2">
+<h2 class="anchored" data-anchor-id="how-it-works">How It Works</h2>
+<section id="workflow-diagram" class="level3">
+<h3 class="anchored" data-anchor-id="workflow-diagram">Workflow Diagram</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────┐
+│ 1. You run: sbatch euler_run.sbatch                         │
+└────────────────────┬────────────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────────────────────┐
+│ 2. Script reads modules_playlists/euler_run.config.local    │
+│    - Loads JOBS array                                       │
+│    - Loads REPO_PATH                                        │
+└────────────────────┬────────────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────────────────────┐
+│ 3. Creates experiment tag (timestamp)                       │
+│    - Manifest file: ~/Euler_logs/multiRun_YYYYMMDD_HHMMSS   │
+└────────────────────┬────────────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────────────────────┐
+│ 4. Submits one SLURM job per database|playlist pair         │
+│    Each job runs independently in parallel                  │
+└────────────────────┬────────────────────────────────────────┘
+                     │
+        ┌────────────┴────────────┬───────────────┐
+        ▼                         ▼               ▼
+   ┌─────────┐             ┌─────────┐       ┌─────────┐
+   │ Job 1   │             │ Job 2   │  ...  │ Job N   │
+   └────┬────┘             └────┬────┘       └────┬────┘
+        │                       │                 │
+        └───────────────────────┴─────────────────┘
+                            │
+                            ▼
+        ┌────────────────────────────────────────┐
+        │ Each job independently:                │
+        │ a. Creates scratch directory           │
+        │    /cluster/scratch/$USER/run_$JOBID   │
+        │ b. Copies repo to scratch              │
+        │ c. Patches config.toml with DB/playlist│
+        │ d. Runs: uv run nexus_e/app.py         │
+        │ e. Writes results to scratch           │
+        │ f. Updates manifest file               │
+        └────────────────────────────────────────┘</code></pre>
+</section>
+<section id="what-happens-in-each-job" class="level3">
+<h3 class="anchored" data-anchor-id="what-happens-in-each-job">What Happens in Each Job</h3>
+<ol type="1">
+<li><strong>Scratch Directory</strong>: Creates <code>/cluster/scratch/$USER/run_${SLURM_JOB_ID}/</code></li>
+<li><strong>Copy Files</strong>: Copies from <code>REPO_PATH</code>:
+<ul>
+<li>Folders: <code>CentIv/</code>, <code>nexus_e/</code>, <code>Shared/</code>, <code>modules_playlists/</code></li>
+<li>All top-level files including <code>config.toml</code></li>
+</ul></li>
+<li><strong>Patch config.toml</strong>: Automatically sets:
+<ul>
+<li>If <code>create_a_copy = true</code>: <code>[scenario].original_name</code> = “database_name”</li>
+<li>If <code>create_a_copy = false</code>: <strong>both</strong> <code>[scenario].original_name</code> AND <code>[scenario].copy_name</code> = “database_name”</li>
+<li><code>[modules].playlist_name = "playlist_name"</code></li>
+<li><code>output_name</code> and <code>simulation_folder</code></li>
+</ul></li>
+<li><strong>Run Simulation</strong>: Executes <code>uv run nexus_e/app.py</code></li>
+<li><strong>Store Results</strong>: Saves to <code>scratch/nexus-e-framework/Results/run_${DATABASE}_${PLAYLIST_NAME}/</code></li>
+<li><strong>Update Manifest</strong>: Records completion status, results path, and webviewer link</li>
+</ol>
+</section>
+</section>
+<section id="monitoring-jobs" class="level2">
+<h2 class="anchored" data-anchor-id="monitoring-jobs">Monitoring Jobs</h2>
+<section id="email-notifications" class="level3">
+<h3 class="anchored" data-anchor-id="email-notifications">Email Notifications</h3>
+<p>If you configured <code>EMAIL_ADDRESS</code> in your <code>euler_run.config.local</code>, you’ll receive automatic email notifications:</p>
+<ul>
+<li><strong>When jobs complete successfully</strong>: Email includes job ID, runtime, and basic stats</li>
+<li><strong>When jobs fail</strong>: Email includes job ID and failure information</li>
+</ul>
+<p>The emails are sent by SLURM automatically. Check your manifest file (path shown in the email) for detailed results locations and webviewer links.</p>
+</section>
+<section id="check-job-status" class="level3">
+<h3 class="anchored" data-anchor-id="check-job-status">Check Job Status</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># View your running/pending jobs</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">squeue</span> <span class="at">-u</span> <span class="va">$USER</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Cancel all your jobs</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="ex">scancel</span> <span class="at">-u</span> <span class="va">$USER</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="monitor-progress-in-real-time" class="level3">
+<h3 class="anchored" data-anchor-id="monitor-progress-in-real-time">Monitor Progress in Real-Time</h3>
+<p>The manifest file is your central dashboard:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Find your manifest (created when you submit jobs)</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="at">-lt</span> ~/Euler_logs/multiRun_<span class="pp">*</span>.manifest <span class="kw">|</span> <span class="fu">head</span> <span class="at">-1</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Watch it update in real-time</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="ex">watch</span> <span class="at">-n</span> 5 cat ~/Euler_logs/multiRun_20250124_143022.manifest</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="check-individual-job-logs" class="level3">
+<h3 class="anchored" data-anchor-id="check-individual-job-logs">Check Individual Job Logs</h3>
+<p>Each job creates three log files, output, error, and nexus-e log. The location of all files can be found in the manifest file.</p>
+</section>
+</section>
+<section id="understanding-the-manifest-file" class="level2">
+<h2 class="anchored" data-anchor-id="understanding-the-manifest-file">Understanding the Manifest File</h2>
+<p>The manifest file (<code>~/Euler_logs/multiRun_TIMESTAMP.manifest</code>) tracks all jobs in your batch.</p>
+<section id="example-manifest" class="level3">
+<h3 class="anchored" data-anchor-id="example-manifest">Example Manifest</h3>
+<pre><code># Multi-run manifest for 20250124_143022
+
+[START] Job 12345678 | DB: test_nuclear_all_eu | Playlist: base
+  App:   /cluster/scratch/username/run_12345678/nexus-e-framework/nexus-e.log
+  Out:   /cluster/home/username/Euler_logs/output_12345678.log
+  Err:   /cluster/home/username/Euler_logs/error_12345678.log
+  Monitor: tail -f &lt;path&gt; or cat &lt;path&gt;
+
+[COMPLETE] Job 12345678 | DB: test_nuclear_all_eu | Playlist: base
+  Results: /cluster/scratch/username/run_12345678/nexus-e-framework/Results/run_test_nuclear_all_eu_base
+  Folder:  run_test_nuclear_all_eu_base
+  Webviewer: http://example.com/webviewer/...
+
+[START] Job 12345679 | DB: test_nuclear_all_eu | Playlist: suportRES
+  App:   /cluster/scratch/username/run_12345679/nexus-e-framework/nexus-e.log
+  Out:   /cluster/home/username/Euler_logs/output_12345679.log
+  Err:   /cluster/home/username/Euler_logs/error_12345679.log
+
+[FAILED] Job 12345679 | DB: test_nuclear_all_eu | Playlist: suportRES
+  Reason: Application error detected in log (exit code was 1)
+  Check app log: /cluster/scratch/username/run_12345679/nexus-e-framework/nexus-e.log
+  Check error log: /cluster/home/username/Euler_logs/error_12345679.log</code></pre>
+</section>
+<section id="entry-types" class="level3">
+<h3 class="anchored" data-anchor-id="entry-types">Entry Types</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 14%">
+<col style="width: 85%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Entry Type</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>[START]</code></td>
+<td>Job started running, includes all log paths for monitoring</td>
+</tr>
+<tr class="even">
+<td><code>[COMPLETE]</code></td>
+<td>Job finished successfully, includes results location and webviewer link</td>
+</tr>
+<tr class="odd">
+<td><code>[FAILED]</code></td>
+<td>Job failed, includes exit code and error log path</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="troubleshooting" class="level2">
+<h2 class="anchored" data-anchor-id="troubleshooting">Troubleshooting</h2>
+<section id="problem-euler_run.config.local-not-found" class="level3">
+<h3 class="anchored" data-anchor-id="problem-euler_run.config.local-not-found">Problem: “euler_run.config.local not found”</h3>
+<p><strong>Symptom:</strong></p>
+<pre><code>WARNING: modules_playlists/euler_run.config.local not found
+ERROR: JOBS list is empty.</code></pre>
+<p><strong>Solution:</strong></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create your config file</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~/repos/nexus-e-framework</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> modules_playlists/euler_run.config.example modules_playlists/euler_run.config.local</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Edit it with your settings</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="fu">nano</span> modules_playlists/euler_run.config.local</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<hr>
+</section>
+<section id="problem-job-fails-immediately" class="level3">
+<h3 class="anchored" data-anchor-id="problem-job-fails-immediately">Problem: Job Fails Immediately</h3>
+<p><strong>Symptom:</strong> Job shows in manifest as <code>[FAILED]</code> shortly after submission</p>
+<p><strong>Debug Steps:</strong></p>
+<ol type="1">
+<li><p>Check the error log first:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> ~/Euler_logs/error_<span class="op">&lt;</span>JOB_ID<span class="op">&gt;</span>.log</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
+<li><p>Check the application log:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> /cluster/scratch/<span class="va">$USER</span>/run_<span class="op">&lt;</span>JOB_ID<span class="op">&gt;</span>/nexus-e-framework/nexus-e.log</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
+</ol>
+<p><strong>Common Causes:</strong></p>
+<ul>
+<li><strong>Database connection error</strong>: Check credentials in <code>config.toml</code></li>
+<li><strong>Database doesn’t exist</strong>: Verify database name in <code>JOBS</code> array</li>
+<li><strong>Playlist file missing</strong>: Check <code>modules_playlists/playlist_name.toml</code> exists</li>
+</ul>
+<hr>
+</section>
+<section id="problem-repo-not-found-at-repo_path" class="level3">
+<h3 class="anchored" data-anchor-id="problem-repo-not-found-at-repo_path">Problem: “Repo not found at $REPO_PATH”</h3>
+<p><strong>Symptom:</strong></p>
+<pre><code>Repo not found at /cluster/home/username/repos/nexus-e-framework</code></pre>
+<p><strong>Solution:</strong> Edit <code>modules_playlists/euler_run.config.local</code> with the correct path:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="va">REPO_PATH</span><span class="op">=</span><span class="st">"/cluster/home/username/actual/path/to/nexus-e-framework"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</section>
+<section id="additional-resources" class="level2">
+<h2 class="anchored" data-anchor-id="additional-resources">Additional Resources</h2>
+<ul>
+<li><a href="https://scicomp.ethz.ch/wiki/Euler">Euler Cluster Documentation</a></li>
+<li><a href="https://slurm.schedmd.com/pdfs/summary.pdf">SLURM Commands Cheatsheet</a></li>
+</ul>
+</section>
+<section id="appendix-understanding-create_a_copy-behavior" class="level2">
+<h2 class="anchored" data-anchor-id="appendix-understanding-create_a_copy-behavior">Appendix: Understanding create_a_copy Behavior</h2>
+<p>The <code>create_a_copy</code> setting in <code>config.toml</code> controls how the script patches database names and how the application uses them:</p>
+<section id="when-create_a_copy-true" class="level3">
+<h3 class="anchored" data-anchor-id="when-create_a_copy-true">When create_a_copy = true</h3>
+<ul>
+<li><strong>Script behavior</strong>: Patches <code>[scenario].original_name</code> with the database from JOBS</li>
+<li><strong>Application behavior</strong>:
+<ul>
+<li>Reads from <code>original_name</code> database</li>
+<li>Creates a temporary copy with auto-generated name (timestamp + initials + random string)</li>
+<li>Runs simulation on the copy</li>
+<li>Postprocessing reads input data from <code>original_name</code></li>
+<li>Optionally deletes the copy after simulation (if <code>delete_copy_after_simulation = true</code>)</li>
+</ul></li>
+<li><strong>Use case</strong>: Safe experimentation - leaves the original database untouched</li>
+</ul>
+</section>
+<section id="when-create_a_copy-false" class="level3">
+<h3 class="anchored" data-anchor-id="when-create_a_copy-false">When create_a_copy = false</h3>
+<ul>
+<li><strong>Script behavior</strong>: Patches <strong>both</strong> <code>[scenario].original_name</code> AND <code>[scenario].copy_name</code> with the database from JOBS</li>
+<li><strong>Application behavior</strong>:
+<ul>
+<li>Uses <code>copy_name</code> database directly (no copying)</li>
+<li>Runs simulation on that database</li>
+<li>Postprocessing reads input data from <code>original_name</code> (same database)</li>
+</ul></li>
+<li><strong>Use case</strong>: Working directly with a specific database, faster startup (no copy time)</li>
+</ul>
+<hr>
+<p><em>Originally created by Ali Darudi in discussion with Claude.</em></p>
+
+
+</section>
+</section>
+
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/Energy-Science-Center\.github\.io\/nexus-e\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../wiki/how-to/work-on-euler.html" class="pagination-link" aria-label="Work on Euler">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Work on Euler</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../wiki/discussions/input-data-analysis.html" class="pagination-link" aria-label="Input data analysis">
+        <span class="nav-page-text">Input data analysis</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

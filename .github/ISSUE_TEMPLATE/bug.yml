@@ -1,0 +1,50 @@
+name: Bug
+title: "[Bug]: "
+type: bug
+body:
+
+  - type: textarea
+    id: summary
+    attribute:
+      label: Summary
+      placeholder: Summarize the bug encountered concisely
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-to-reproduce
+    attribute:
+      label: Steps to reproduce
+      placeholder: How one can reproduce the issue - this is very important
+    validations:
+      required: true
+
+  - type: textarea
+    id: bug-behavior
+    attribute:
+      label: What is the current bug behavior?
+      placeholder: What actually happens
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attribute:
+      label: What is the expected correct behavior?
+      placeholder: What you should see instead
+    validations:
+      required: true
+
+  - type: upload
+    id: logs-and-screenshots
+    attribute:
+      label: Relevant logs and/or screenshots
+      placeholder: Paste any relevant logs - use code blocks (```) to format
+        console output, logs, and code, as it's very hard to read otherwise.
+
+  - type: textarea
+    id: possible-fixes
+    attribute:
+      label: Possible fixes
+      placeholder: If you can, link to the line of code that might be 
+        responsible for the problem

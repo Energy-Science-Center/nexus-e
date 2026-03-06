@@ -1,0 +1,33 @@
+## Setup
+
+If you work on a freshly cloned repository, you first need setup a virtual environment by running:
+
+```bash
+uv sync
+```
+
+If you plan to use the parts of Nexus-e that require MATLAB you need to run:
+
+```bash
+uv sync --extra matlab 
+```
+
+Then, you will need to create the default config file by running the following command:
+
+```bash
+nexus-e --setup
+```
+
+You will be prompted to configure a connection to a MySQL server.
+
+## How to use
+
+This python workflow relies on the correct use of the [config file](configure.qmd) and the [modules playlist](configure.qmd#the-modules-playlists) which let you describe the main aspects of your simulations.
+
+## Run locally
+
+Open a terminal in nexus-e-framework folder and run the following command:
+
+```bash
+nexus-e --run
+```

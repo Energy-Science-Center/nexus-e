@@ -4,7 +4,6 @@ theme:
   light: default
   dark: darkly
 toc: true
-logo: <img src="/logo.png" width="180"> 
 
 website:
   title: Nexus-e

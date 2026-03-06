@@ -1,5 +1,5 @@
 
-<img src="doc/logo.png" width="180"> 
+<img src="docs/logo.png" width="180"> 
 
 **An integrated energy systems modelling platform** | [nexus-e.org](https://nexus-e.org/)
 
@@ -26,14 +26,11 @@ More information on the Nexus-e platform can be found on our website <https://ne
 - [Contributors](#contributors)
 - [License](#license)
 
-## Installation
-Read our [Quickstart](https://gitlab.com/energy_science_center/nexus-e/nexus-e/-/wikis/quickstart) article.
-
-## Usage
-Check the [wiki](https://gitlab.com/energy_science_center/nexus-e/nexus-e/-/wikis/home).
+## How to use
+Check our [documentation](https://energy-science-center.github.io/nexus-e/wiki/home.html)
 
 ## Contributing
-Read our [How to contribute](https://gitlab.com/energy_science_center/nexus-e/nexus-e/-/wikis/how_to_contribute) article.
+Read our [How to contribute](https://energy-science-center.github.io/nexus-e/wiki/developer-guide/how-to-contribute.html) article.
 
 ## Contributors
 This repository came with a clean commit history so as to remove elements we were not willing to share. Nevertheless, Nexus-e has been built commit after commit by the following contributors:

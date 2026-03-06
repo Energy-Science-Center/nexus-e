@@ -1,0 +1,64 @@
+name: Exploration
+title: "[Exploration]: "
+type: exploration
+body:
+
+  - type: textarea
+    id: summary
+    attribute:
+      label: Summary
+      placeholder: Describe the topic or area you want to explore.
+    validations:
+      required: true
+
+  - type: textarea
+    id: background
+    attribute:
+      label: Background
+      placeholder: Provide any relevant context, links, or prior work.
+    validations:
+      required: true
+
+  - type: textarea
+    id: goals
+    attribute:
+      label: Goals
+      placeholder: What do you want to achieve or learn? List specific questions
+        or hypotheses.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-approach
+    attribute:
+      label: Proposed Approach
+      placeholder: How will you explore this topic? What resources or methods
+        will you use?
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-benefits
+    attribute:
+      label: Expected Benefits
+      placeholder: What positive outcomes or value do you anticipate from this
+        exploration?
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-risks
+    attribute:
+      label: Expected Risks
+      placeholder: What potential challenges, limitations, or negative impacts
+        could arise? How might you mitigate them?
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-notes
+    attribute:
+      label: Additional Notes
+      placeholder: Anything else to consider?
+    validations:
+      required: false

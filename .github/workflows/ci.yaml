@@ -30,6 +30,11 @@ jobs:
           paths: "junit/test-results/*.xml"
         if: always()
 
+      - name: Test build documentation
+        run: |
+          uv run quartodoc build --config docs/_quarto.yml
+          uv run quarto build docs
+
       
     
     

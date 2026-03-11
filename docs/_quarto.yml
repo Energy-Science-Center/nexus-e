@@ -4,6 +4,8 @@ theme:
   light: flatly
   dark: darkly
 toc: true
+metadata-files:
+  - reference/_sidebar.yml
 
 website:
   title: Nexus-e
@@ -14,8 +16,10 @@ website:
 
   navbar:
     left:
-      - text: "Wiki"
+      - text: Wiki
         href: wiki/home.qmd
+      - text: Reference
+        file: reference/
 
   sidebar:
     - title: "Wiki"
@@ -73,3 +77,40 @@ website:
               href: wiki/developer-guide/style-guide.qmd
             - text: SOLID principles
               href: wiki/developer-guide/solid-principles.qmd
+
+quartodoc:
+  package: null
+  source_dir: src
+  title: Reference
+  dir: reference
+  sidebar: 
+    file: reference/_sidebar.yml
+    collapse-level: 2
+  sections:
+    - title: API
+      package: nexus_e_interface
+      contents:
+        - name: plugin
+          # members: ["Plugin", "Plugin.run", "Plugin.get_default_parameters"]
+        - name: scenario
+          # members: [DataContext, Scenario, Scenario.create_new_database, Scenario.execute]
+        - name: tables
+    - title: Plugins
+      package: plugins
+      contents:
+        - name: centiv.nexus_e_plugin
+          members: ["NexusePlugin"]
+        - name: copy_database.nexus_e_plugin
+          members: ["NexusePlugin", "Parameters"]
+        - name: delete_database_copies
+          members: ["NexusePlugin", "Parameters"]
+        - name: postprocess.nexus_e_plugin
+          members: ["NexusePlugin", "Parameters"]
+        - name: update_inv_costs.nexus_e_plugin
+          members: ["NexusePlugin", "Parameters"]
+        - name: update_investments.nexus_e_plugin
+          members: ["NexusePlugin", "Config"]
+        - name: upload_res_data.nexus_e_plugin
+          members: ["NexusePlugin", "Parameters"]
+        - name: upload_scenario.nexus_e_plugin
+          members: ["NexusePlugin", "Config"]

@@ -22,6 +22,11 @@ jobs:
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
 
+      - name: Set up quartodoc
+        run: |
+          uv sync --group dev
+          quartodoc build --config docs/_quarto.yml
+
       - name: Render and Publish
         uses: quarto-dev/quarto-actions/publish@v2
         with:

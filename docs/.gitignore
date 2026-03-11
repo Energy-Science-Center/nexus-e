@@ -2,3 +2,4 @@
 **/*.quarto_ipynb
 _site/
 objects.json
+reference/

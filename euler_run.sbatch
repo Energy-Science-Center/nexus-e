@@ -77,12 +77,11 @@
 #   3. Each job:
 #      - Creates scratch directory: /cluster/scratch/$USER/run_${SLURM_JOB_ID}/
 #      - Copies from repository path (default: ~/repos/nexus-e-framework/):
-#          * Folders: CentIv, nexus_e, Shared, modules_playlists
-#          * All top-level files (including config.toml)
+#          * The whole folder except any .git folder 
 #      - Patches config.toml to set:
-#          * database name in [scenario].original_name
+#          * database name in [data_context].name
 #          * playlist name in [modules].playlist_name
-#      - Runs: uv run nexus_e
+#      - Runs: nexus-e --run
 #      - Results stored in: scratch/nexus-e-framework/Results/run_${DATABASE}_${PLAYLIST_NAME}/
 #      - Records absolute path to results in manifest file
 #
@@ -271,7 +270,7 @@ cd "$REPO_PATH" || { echo "Repo not found at $REPO_PATH"; exit 1; }
 
 
 
-cp -r CentIv nexus_e Shared modules_playlists "$SCRATCH_DIR/nexus-e-framework"
+rsync -a ./ $SCRATCH_DIR/nexus-e-framework --exclude .git
 find . -maxdepth 1 -type f -exec cp {} "$SCRATCH_DIR/nexus-e-framework" \;
 
 
@@ -291,11 +290,10 @@ fi
 
 
 
-sed -i -E "0,/^[[:space:]]*output_name[[:space:]]*=.*/s//output_name = \"${OUTPUT_NAME}\"/" "$CONFIG"
-sed -i -E "0,/^[[:space:]]*simulation_folder[[:space:]]*=.*/s//simulation_folder = \"${SIM_FOLDER}\"/" "$CONFIG"
-
 # Patch playlist_name in [modules] section
 sed -i -E "/^\[modules\]/,/^\[/ s/^[[:space:]]*playlist_name[[:space:]]*=.*/playlist_name = \"${PLAYLIST_NAME}\"/" "$CONFIG"
+# Patch name in [data_context] section
+sed -i -E "/^\[data_context\]/,/^\[/ s/^[[:space:]]*name[[:space:]]*=.*/name = \"${DATABASE}\"/" "$CONFIG"
 
 
 
@@ -385,7 +383,7 @@ echo "  [modules].playlist_name  = ${PLAYLIST_NAME}"
 # -------------------
 export PYTHONUNBUFFERED=1
 echo "Running model..."
-uv run nexus_e
+nexus-e --run
 APP_EXIT_CODE=$?
 
 echo "App finished with exit code: $APP_EXIT_CODE"

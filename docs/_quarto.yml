@@ -1,7 +1,7 @@
 project:
   type: website
 theme:
-  light: default
+  light: flatly
   dark: darkly
 toc: true
 

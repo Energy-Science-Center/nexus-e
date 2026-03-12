@@ -12,7 +12,7 @@ Create a new branch out of the latest `main` branch. Name the branch such that i
 
 ## Implement your solution
 
-If you need to write code to implement your solution please do so with [writing tests](tests.qmd) in a [TDD](https://www.youtube.com/watch?v=B1j6k2j2eJg) fashion, keeping in mind the [SOLID principles](solid-principles.qmd), and by applying our [style guide](style-guide.qmd).
+If you need to write code to implement your solution please do so with [writing tests](tests.md) in a [TDD](https://www.youtube.com/watch?v=B1j6k2j2eJg) fashion, keeping in mind the [SOLID principles](solid-principles.md), and by applying our [style guide](style-guide.md).
 
 ## Open a Pull Request
 

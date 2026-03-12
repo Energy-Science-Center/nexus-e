@@ -22,7 +22,7 @@ You will be prompted to configure a connection to a MySQL server.
 
 ## How to use
 
-This python workflow relies on the correct use of the [config file](configure.qmd) and the [modules playlist](configure.qmd#the-modules-playlists) which let you describe the main aspects of your simulations.
+This python workflow relies on the correct use of the [config file](configure.md#config-file) and the [modules playlist](configure.md#the-modules-playlists) which let you describe the main aspects of your simulations.
 
 ## Run locally
 

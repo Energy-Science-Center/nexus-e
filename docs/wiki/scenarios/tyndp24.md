@@ -1,5 +1,9 @@
 # Using TYNDP2024 data
 
+!!! warning
+
+    This page is deprecated
+
 The data for the new TYNDP2024 Distributed Energy scenario using the reference 2009 weather year are now ready and tested. The Matlab-based process for creating MySQL databases is ready and Jared has completed many test simulations. To create a new database, you simply need to follow these steps:
 
 ## Edit ‘upload_parameters.json’ (saved in "Shared\\DBcreation\\upload_parameters.json") to define the following:
@@ -16,14 +20,14 @@ The data for the new TYNDP2024 Distributed Energy scenario using the reference 2
 UploadDatabases(@addNexusExcel2dataBase_multiyear_v14)
 ```
 
-Note that this process uses the new nodal-hourly loads and flexibility parameters defined in the folder of CSVs (see [Nodal-hourly load](/wiki/scenarios/nodal-hourly-load.qmd) for more details) along with the main excel input file.
+Note that this process uses the new nodal-hourly loads and flexibility parameters defined in the folder of CSVs (see [Nodal-hourly load](../scenarios/nodal-hourly-load.md) for more details) along with the main excel input file.
 
 Jared has already setup the following versions of these input files
 
 ## Main Excel input file
 
 - `Nexuse_DB-Input_v48_TYNDP24-DE09_CentIvPV_xbAC.xlsx` : models cross border lines as AC connectors (like we have always done it)
-- `Nexuse_DB-Input_v48_TYNDP24-DE09_CentIvPV_xbNTC.xlsx` : models cross border lines as NTC connectors. This new feature is recommended, and it also represents the NTC limits going in each direction. See [Cross border connectors as NTCs](/wiki/scenarios/ntc.qmd) for more information.
+- `Nexuse_DB-Input_v48_TYNDP24-DE09_CentIvPV_xbNTC.xlsx` : models cross border lines as NTC connectors. This new feature is recommended, and it also represents the NTC limits going in each direction. See [Cross border connectors as NTCs](../scenarios/ntc.md) for more information.
 
 ## CSVs of nodal-hourly loads and flexibility parameters
 
@@ -34,7 +38,7 @@ Jared has already setup the following versions of these input files
 - At the moment, specifying the CSVs with ‘NoEVflex’ is the only way to turn off EV demand flexibility. This is done in these files by setting the parameter values for daily flexible energy (`XXXX_eMobility_Flex_FE_NodalDaily_MWh.csv`) to zeros. No other modification is necessary to accomplish this.
 - A future update could allow the user to turn EV flexibility off as a control switch in the main run script.
 
-No other TYNDP scenario will be setup for use with the Matlab-based DB creation process. Now, with the Python-based DB creation process the user can simply indicate which combination of TYNDP scenario / weather year / grid version they desire. However, **the Calliope data are not yet available with this process**. See more info in [Modelling all EU](/wiki/scenarios/europe.qmd).
+No other TYNDP scenario will be setup for use with the Matlab-based DB creation process. Now, with the Python-based DB creation process the user can simply indicate which combination of TYNDP scenario / weather year / grid version they desire. However, **the Calliope data are not yet available with this process**. See more info in [Modelling all EU](../scenarios/europe.md).
 
 Jared has already created the four MySQL databases, anyone can feel free to use these for their own testing
 

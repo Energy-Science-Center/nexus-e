@@ -32,11 +32,13 @@ matlab = [
 
 [dependency-groups]
 dev = [
+    "mkdocs>=1.6.1",
+    "mkdocs-jupyterlite>=0.4.1",
+    "mkdocs-material>=9.7.5",
+    "mkdocstrings[python]>=1.0.3",
+    "pymdown-extensions>=10.16.1",
     "pytest>=8.3.5",
-]
-doc = [
-    "quarto>=0.1.0",
-    "quartodoc>=0.11.1",
+    "ruff>=0.15.6",
 ]
 
 [tool.uv.sources]

@@ -2,31 +2,31 @@
 
 This module's purpose is to provide an easy access to the variables stored in a
 config file. The ConfigFile interface declare methods to load and write a
-dictionnary from a given file. The TomlFile class implements this interface for
+dictionary from a given file. The TomlFile class implements this interface for
 .toml files.
 
-To avoid having to use this dictionnary directly, the module provides
-a Config class that can conveniently parse and be exported to a dictionnary.
+To avoid having to use this dictionary directly, the module provides
+a Config class that can conveniently parse and be exported to a dictionary.
 The config variables can then be accessed via the Config class attributes.
 
 The load(), write() and write_default_config_file() functions of this module
 can be used to handle a Config object with a pre-defined ConfigFile object.
 
 Example:
-    Write a default config file and update a config variable value::
+    Write a default config file and update a config variable value:
 
-        import config
-        config.write_default_config_file()
-        settings = config.load()
-        settings.logging.filename = "alternative.log"
-        config.write(settings)
-
-Running this script asks the user if a default config file should be written.
+    ```python
+    import config
+    config.write_default_config_file()
+    settings = config.load()
+    settings.logging.filename = "alternative.log"
+    config.write(settings)
+    ```
 """
 
 import os
 from pathlib import Path
-from typing import Any, List
+from typing import Any, List, Literal
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, asdict, field
 import tomli
@@ -43,25 +43,17 @@ class ConfigFile(ABC):
 
     @abstractmethod
     def __init__(self, file_path: str):
-        """Store the file path in an object's attribute.
-
-        Args:
-            file_path: Full path to the config file.
-        """
+        """Store the file path in an object's attribute."""
         pass
 
     @abstractmethod
     def load(self) -> dict:
-        """Load the full content of the config file as a dictionnary."""
+        """Load the full content of the config file as a dictionary."""
         pass
 
     @abstractmethod
     def write(self, config: dict):
-        """Fill the config file with the content of a dictionnary.
-
-        Args:
-            config: structured config variables
-        """
+        """Fill the config file with the content of a dictionary."""
         pass
 
 
@@ -82,44 +74,59 @@ class TomlFile(ConfigFile):
 
 @dataclass
 class Logging:
-    """Config section about the logger's parameters.
-    https://docs.python.org/3/library/logging.html#logging.basicConfig"""
+    """
+    Config section about the [logger's parameters](https://docs.python.org/3/library/logging.html#logging.basicConfig).
+    """
 
     filename: str = "nexus-e.log"
     filemode: str = "w"
     format: str = "%(asctime)s %(levelname)s %(message)s"
-    """See how to build a log record format string here:
-    https://docs.python.org/3/library/logging.html#logrecord-attributes"""
+    """See how to build a log record format string
+    [here](https://docs.python.org/3/library/logging.html#logrecord-attributes)."""
     date_format: str = "%Y-%m-%d %H:%M:%S"
-    """See how to build a date format string here:
-    https://docs.python.org/3/library/time.html#time.strftime"""
-    level: str = "INFO"
-    """The logging level can be given as a string, to be chosen among:
-    ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
-    https://docs.python.org/3/library/logging.html#levels"""
+    """See how to build a date format string
+    [here](https://docs.python.org/3/library/time.html#time.strftime)."""
+    level: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = "INFO"
+    """The logging level can be given as a string. More
+    [here](https://docs.python.org/3/library/logging.html#levels)."""
 
 
 @dataclass
 class Module:
+    """
+    Represents a module configuration with its name and its associated parameters.
+    """
     name: str = ""
+    """The name of the module to import."""
     parameters: dict = field(default_factory=dict)
+    """A dictionary containing the module's specific parameters."""
 
 
 @dataclass
 class Results:
+    """
+    Represents configuration settings for simulation results management.
+    """
     base_folder: str = "Results"
+    """The base directory where simulation results are stored."""
     create_new_simulation_results_folder: bool = True
+    """Determines whether a new folder should be created for each simulation's results."""
 
 
 @dataclass
 class Modules:
+    """
+    Represents configuration settings for all modules.
+    """
     commons: dict[str, Any] = field(default_factory=lambda: 
         {
             "resolution_in_days": 8,
             "single_electric_node": True,
         }
     )
+    """The extra parameters passed to every Module."""
     playlist_name: str = "end_to_end_test"
+    """The file defining the modules to load and their execution order."""
 
 
 @dataclass
@@ -130,15 +137,17 @@ class Config:
     or a new dataclass that is itself an attribute of this Config class.
 
     Example:
-        Add a new config variable and a new dataclass::
+        Add a new config variable and a new dataclass:
 
-            @dataclass
-            class NewConfigSection:
-                new_config_variable: str = "default_variable_value"
+        ```python
+        @dataclass
+        class NewConfigSection:
+            new_config_variable: str = "default_variable_value"
 
-            @dataclass
-            class Config:
-                new_config_section: NewConfigSection = field(default_factory=NewConfigSection)
+        @dataclass
+        class Config:
+            new_config_section: NewConfigSection = field(default_factory=NewConfigSection)
+        ```
 
     The default value of the config variable is given by the default value of
     its corresponding dataclass attribute.
@@ -150,7 +159,7 @@ class Config:
     modules: Modules = field(default_factory=Modules)
 
     def parse(self, **config: dict):
-        """Populate the Config class with an input dictionnary."""
+        """Populate the Config class with an input dictionary."""
         for key in config.keys():
             if isinstance(config[key], dict):
                 config_class_name = "".join(

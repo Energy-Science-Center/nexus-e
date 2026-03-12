@@ -8,7 +8,7 @@ import logging
 import os
 import re
 import subprocess
-from typing import Any
+from typing import Any, Literal
 
 import mysql
 import mysql.connector
@@ -53,7 +53,7 @@ class Config:
 
     include_tyndp24: bool = False
     tyndp24_data_path: str = "src/data/TYNDP24_datasets/TYNDP24_nbc"
-    tyndp24_scope: str = "nbc"
+    tyndp24_scope: Literal["nbc", "EU"] = "nbc"
     tyndp24_policy: str = "DE"
     tyndp24_climate_year: int = 2009
 

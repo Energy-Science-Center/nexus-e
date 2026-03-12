@@ -1,6 +1,0 @@
-Users should use the [Upload scenario module](/wiki/get-started/modules.qmd#upload-scenario) to define the needed parameters and create new databases using the available TYNDP2024 data and the nodal-hourly loads as well as the EV and HP flexibilities. Two Excel input data files and two folders of input CSV files (use v48 in their names) are available as a starting point to create new databases for simulations. All cross-border connectors should be represented as NTCs.
-
-- [TYNDP24](/wiki/scenarios/tyndp24.qmd)
-- [Nodal-hourly load](/wiki/scenarios/nodal-hourly-load.qmd)
-- [Cross border connectors as NTCs](/wiki/scenarios/ntc.qmd)
-- [Modelling all EU](/wiki/scenarios/europe.qmd)

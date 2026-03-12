@@ -1,4 +1,6 @@
-> **WARNING**: This page is deprecated and will be replaced by an automatically produced reference guide.
+!!! warning
+
+    This page is deprecated and will be replaced by an automatically produced reference guide.
 
 The available modules that can be added to a Nexus-e modules playlist file.
 
@@ -15,7 +17,7 @@ This module's main purpose is to create a MySQL database containing the data nee
 * Can inject nodal hourly demands
 * Can re-export scenario as Excel file
 
-See [Upload a scenario](/wiki/scenarios/upload.qmd)
+See [Upload a scenario](../scenarios/upload.md)
 
 ### Configuration
 

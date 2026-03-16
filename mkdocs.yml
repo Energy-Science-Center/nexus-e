@@ -1,0 +1,126 @@
+site_name: Nexus-e
+site_description: 
+site_author: Nexus-e Team
+repo_url: https://github.com/Energy-Science-Center/nexus-e
+repo_name: nexus-e
+
+theme:
+  name: material
+  palette:
+    # Light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.instant.prefetch
+    - navigation.instant.preview
+    - navigation.instant.progress
+    - navigation.path
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.top
+    - navigation.tracking
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+  - admonition
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          inventories:
+          - https://docs.python.org/3/objects.inv
+          options:
+            docstring_options:
+              ignore_init_summary: true
+            docstring_section_style: spacy
+            filters:
+            # Filters out elements starting with _
+            - "!^_"
+            heading_level: 3
+            line_length: 80
+            merge_init_into_class: true
+            parameter_headings: true
+            separate_signature: true
+            signature_crossrefs: true
+            show_if_no_docstring: true
+            show_root_heading: false
+            show_root_toc_entry: false
+            show_signature_annotations: true
+            show_source: true
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+  # Just here so it's ready to be used
+  # - jupyterlite:
+  #     enabled: false
+
+nav:
+  - Home: index.md
+
+  - Wiki:
+    - Get started:
+      - Install: wiki/get-started/install.md
+      - Run: wiki/get-started/run.md
+      - Configure: wiki/get-started/configure.md
+      - Modules: wiki/get-started/modules.md
+    - Scenarios:
+      - Upload a scenario: wiki/scenarios/upload.md
+      - TYNDP24: wiki/scenarios/tyndp24.md
+      - Nodal hourly load: wiki/scenarios/nodal-hourly-load.md
+      - NTC: wiki/scenarios/ntc.md
+      - Europe: wiki/scenarios/europe.md
+    - How-to:
+      - Work on Euler: wiki/how-to/work-on-euler.md
+      - Start parallel runs on Euler: wiki/how-to/start-parallel-runs-on-euler.md
+    - Discussions:
+      - Input data analysis: wiki/discussions/input-data-analysis.md
+      - Performance analysis: wiki/discussions/performance-analysis.md
+      - Output files: wiki/discussions/output-files.md
+      - Scenario lifecycle: wiki/discussions/scenario-lifecycle.md
+    - Developer guide:
+      - How to contribute: wiki/developer-guide/how-to-contribute.md
+      - Write tests: wiki/developer-guide/tests.md
+      - Style guide: wiki/developer-guide/style-guide.md
+      - SOLID principles: wiki/developer-guide/solid-principles.md
+
+  - Reference:
+    - Config: reference/nexus_e/config.md
+    - Interface:
+      - ORM: reference/interface/tables.md
+      - Scenario: reference/interface/scenario.md
+      - Plugin: reference/interface/plugin.md
+    - Plugins:
+      - upload_scenario: reference/plugins/upload_scenario.md
+      - copy_database: reference/plugins/copy_database.md
+      - upload_res_data: reference/plugins/upload_res_data.md
+      - update_inv_costs: reference/plugins/update_inv_costs.md
+      - centiv: reference/plugins/centiv.md
+      - update_investments: reference/plugins/update_investments.md
+      - postprocess: reference/plugins/postprocess.md
+      - delete_database_copies: reference/plugins/delete_database_copies.md
+

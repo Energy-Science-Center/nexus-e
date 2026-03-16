@@ -1,5 +1,6 @@
 ## Prerequisite
 You will need the following software to work with Nexus-e:
+
 - [MATLAB 2023b](https://mathworks.com/products/new_products/release2023b.html) (needed only for multi-year runs, skip otherwise - license needed) with the following toolboxes:
     - Database Toolbox
     - Financial Toolbox
@@ -10,6 +11,7 @@ You will need the following software to work with Nexus-e:
 - [Gurobi](https://www.gurobi.com/) (license needed on the device running the optimization - free Academic license can be ordered if running on personal device is needed)
 
 We advise to also use:
+
 - [UV](https://docs.astral.sh/uv/getting-started/installation/) (python projects manager)
 - [git](https://git-scm.com/download) (version control system)
 - an IDE like [VS Code](https://code.visualstudio.com/)
@@ -26,6 +28,7 @@ In the `javaclasspath.txt` file, write the path to the connector .jar file that 
 Reload Matlab
 
 Test whether a database connector is set up successfully. Write the following commands in Matlab with the following substitutions:
+
 - YOUR_SERVER: the MySQL server you want to use
 - YOUR_USERNAME: valid username of the chosen MySQL server
 - YOUR_PASSWORD: corresponding password
@@ -41,9 +44,9 @@ If the second command returns 1, it means success.
 Clone the nexus-e repository by running the command:
 
 ```bash
-git clone git@gitlab.com:energy_science_center/nexus-e/nexus-e.git
+git clone git@github.com:Energy-Science-Center/nexus-e.git
 ```
 
 ## Running Nexus-e
-You can proceed with running Nexus-e with our [python workflow](run.qmd).
-Note: if you would like to connect to Euler, please consider [connecting via ssh using VS Code](/wiki/how-to/work-on-euler.qmd).
+You can proceed with running Nexus-e with our [python workflow](run.md).
+Note: if you would like to connect to Euler, please consider [connecting via ssh using VS Code](../how-to/work-on-euler.md).

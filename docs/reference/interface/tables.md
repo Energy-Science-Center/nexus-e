@@ -1,0 +1,43 @@
+::: nexus_e_interface.tables
+    options:
+        merge_init_into_class: false
+        members:
+        - BusConfiguration
+        - BusData
+        - CentFlexPotential
+        - DBInfo
+        - DistABGenCosts
+        - DistFlexPotential
+        - DistGenConfigInfo
+        - DistGenConfiguration
+        - DistGenData
+        - DistProfiles
+        - DistRegionByGenTypeData
+        - DistRegionByIrradLevelData
+        - DistRegionData
+        - FlexParamsHP
+        - FlexProfilesEV
+        - FlexProfilesHP
+        - FuelPrices
+        - GenConfigInfo
+        - GenConfiguration
+        - GenConfigurationExtra
+        - GenData
+        - GenTypeData
+        - LineConfiguration
+        - LineData
+        - LoadProfiles
+        - LoadConfigInfo
+        - LoadConfiguration
+        - LoadData
+        - MarketsConfiguration
+        - NetworkConfigInfo
+        - ProfileData
+        - Projections
+        - ScenarioConfiguration
+        - SecurityRef
+        - SwissAnnualTargetsConfigInfo
+        - SwissAnnualTargetsConfiguration
+        - TransformerConfiguration
+        - TransformerData
+        - Workforce            

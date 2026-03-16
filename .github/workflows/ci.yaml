@@ -30,6 +30,9 @@ jobs:
           paths: "junit/test-results/*.xml"
         if: always()
 
+      - name: Test build documentation
+        run: uv run mkdocs build
+
       
     
     

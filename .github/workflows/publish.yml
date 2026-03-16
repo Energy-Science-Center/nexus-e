@@ -8,7 +8,7 @@ on:
 jobs:
 
   publish:
-    name: Quarto publish
+    name: Publish documentation to Github Page
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -24,4 +24,4 @@ jobs:
         run: uv sync --group dev
 
       - name: Build and publish documentation
-        run: uv run mkdocs gh-deploy
+        run: uv run mkdocs gh-deploy --force

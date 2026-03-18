@@ -27,10 +27,10 @@ More information on the Nexus-e platform can be found on our website <https://ne
 - [License](#license)
 
 ## How to use
-Check our [documentation](https://energy-science-center.github.io/nexus-e/wiki/home.html)
+Check our [documentation](https://energy-science-center.github.io/nexus-e/wiki/get-started/install/)
 
 ## Contributing
-Read our [How to contribute](https://energy-science-center.github.io/nexus-e/wiki/developer-guide/how-to-contribute.html) article.
+Read our [How to contribute](https://energy-science-center.github.io/nexus-e/wiki/developer-guide/how-to-contribute) article.
 
 ## Contributors
 This repository came with a clean commit history so as to remove elements we were not willing to share. Nevertheless, Nexus-e has been built commit after commit by the following contributors:

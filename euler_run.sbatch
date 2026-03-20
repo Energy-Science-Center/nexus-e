@@ -221,7 +221,6 @@ trap record_failure ERR
 
 
 
-OUTPUT_NAME="run_${DATABASE}_${PLAYLIST_NAME}"
 SIM_FOLDER="run_${DATABASE}_${PLAYLIST_NAME}"
 
 
@@ -270,7 +269,13 @@ cd "$REPO_PATH" || { echo "Repo not found at $REPO_PATH"; exit 1; }
 
 
 
-rsync -a ./ $SCRATCH_DIR/nexus-e-framework --exclude .git
+mkdir -p "$SCRATCH_DIR/nexus-e-framework/src/plugins"
+cp -r src/nexus_e "$SCRATCH_DIR/nexus-e-framework/src/"
+cp -r src/plugins/centiv \
+      src/plugins/postprocess \
+      src/plugins/update_investments \
+      "$SCRATCH_DIR/nexus-e-framework/src/plugins/"
+cp -r modules_playlists "$SCRATCH_DIR/nexus-e-framework/"
 find . -maxdepth 1 -type f -exec cp {} "$SCRATCH_DIR/nexus-e-framework" \;
 
 
@@ -285,6 +290,7 @@ cd "$SCRATCH_DIR/nexus-e-framework" || exit 1
 CONFIG="config.toml"
 if [[ ! -f "$CONFIG" ]]; then
   echo "ERROR: config.toml not found" >&2
+  echo "Create one by running: uv run config.toml --setup" >&2
   exit 3
 fi
 
@@ -297,83 +303,8 @@ sed -i -E "/^\[data_context\]/,/^\[/ s/^[[:space:]]*name[[:space:]]*=.*/name = \
 
 
 
-# Check if create_a_copy is true or false to determine which field(s) to patch
-CREATE_A_COPY=$(grep -E "^[[:space:]]*create_a_copy[[:space:]]*=" "$CONFIG" | sed -E 's/.*=[[:space:]]*(true|false).*/\1/')
-
-if [[ "$CREATE_A_COPY" == "true" ]]; then
-  # If create_a_copy = true, patch only original_name
-  awk -v db="$DATABASE" '
-    BEGIN { in_scen=0; found=0 }
-    /^\[[^]]+\]/ {
-      if (in_scen && !found) {
-        print "original_name = \"" db "\""
-      }
-      in_scen = ($0 ~ /^\[scenario\]/) ? 1 : 0
-      found = 0
-      print
-      next
-    }
-    {
-      if (in_scen && $0 ~ "^[[:space:]]*original_name[[:space:]]*=") {
-        print "original_name = \"" db "\""
-        found = 1
-        next
-      }
-      print
-    }
-    END {
-      if (in_scen && !found) {
-        print "original_name = \"" db "\""
-      }
-    }
-  ' "$CONFIG" > "$CONFIG.tmp" && mv "$CONFIG.tmp" "$CONFIG"
-
-  FIELDS_PATCHED="original_name"
-else
-  # If create_a_copy = false, patch both original_name AND copy_name
-  awk -v db="$DATABASE" '
-    BEGIN { in_scen=0; found_orig=0; found_copy=0 }
-    /^\[[^]]+\]/ {
-      if (in_scen) {
-        if (!found_orig) print "original_name = \"" db "\""
-        if (!found_copy) print "copy_name = \"" db "\""
-      }
-      in_scen = ($0 ~ /^\[scenario\]/) ? 1 : 0
-      found_orig = 0
-      found_copy = 0
-      print
-      next
-    }
-    {
-      if (in_scen && $0 ~ "^[[:space:]]*original_name[[:space:]]*=") {
-        print "original_name = \"" db "\""
-        found_orig = 1
-        next
-      }
-      if (in_scen && $0 ~ "^[[:space:]]*copy_name[[:space:]]*=") {
-        print "copy_name = \"" db "\""
-        found_copy = 1
-        next
-      }
-      print
-    }
-    END {
-      if (in_scen) {
-        if (!found_orig) print "original_name = \"" db "\""
-        if (!found_copy) print "copy_name = \"" db "\""
-      }
-    }
-  ' "$CONFIG" > "$CONFIG.tmp" && mv "$CONFIG.tmp" "$CONFIG"
-
-  FIELDS_PATCHED="original_name and copy_name"
-fi
-
-
-
 echo "Patched ${CONFIG}:"
-echo "  output_name       = ${OUTPUT_NAME}"
-echo "  simulation_folder = ${SIM_FOLDER}"
-echo "  [scenario].${FIELDS_PATCHED} = ${DATABASE}"
+echo "  [data_context].name      = ${DATABASE}"
 echo "  [modules].playlist_name  = ${PLAYLIST_NAME}"
 
 
@@ -383,7 +314,7 @@ echo "  [modules].playlist_name  = ${PLAYLIST_NAME}"
 # -------------------
 export PYTHONUNBUFFERED=1
 echo "Running model..."
-nexus-e --run
+"$REPO_PATH/.venv/bin/nexus-e" --run
 APP_EXIT_CODE=$?
 
 echo "App finished with exit code: $APP_EXIT_CODE"

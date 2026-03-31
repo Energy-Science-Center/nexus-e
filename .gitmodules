@@ -1,0 +1,3 @@
+[submodule "src/data"]
+	path = src/data
+	url = https://gitlab.ethz.ch/nexus-e/data.git

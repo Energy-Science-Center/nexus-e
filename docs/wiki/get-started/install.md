@@ -47,6 +47,12 @@ Clone the nexus-e repository by running the command:
 git clone git@github.com:Energy-Science-Center/nexus-e.git
 ```
 
+If you want to also download the data we use to produce our open-source scenarios you need to run instead:
+
+```bash
+git clone --recursive git@github.com:Energy-Science-Center/nexus-e.git
+```
+
 ## Running Nexus-e
 You can proceed with running Nexus-e with our [python workflow](run.md).
 Note: if you would like to connect to Euler, please consider [connecting via ssh using VS Code](../how-to/work-on-euler.md).

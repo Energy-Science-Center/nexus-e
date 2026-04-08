@@ -1,14 +1,12 @@
 """Serve as the python entry point of Nexus-e.
-
-Currently Nexus-e is executed by calling the MATLAB script
-Run_nexuse/run_Nexuse_platform.m. This process will be replaced by the present
-module and executing Nexus-e will be possible by running App.main().
 """
 
-import argparse
+from argparse import ArgumentParser
 import logging
 import os
 import sys
+
+from nexus_e.execution_mode import ExecutionMode
 
 from . import config
 from .simulation import Simulation, CorePluginFactory
@@ -61,32 +59,43 @@ class App:
         # I ensure that cleanup runs first, but the error is not silently swallowed.
         if error:
             raise error
-        
+
+class SetupMode(ExecutionMode):
+    command: str = "setup"
+    help: str = (
+        "Use to create your first config file, or overwrite the "
+        "existing config.toml file."
+    )
+
+    @classmethod
+    def start(cls, args: dict):
+        config.write_default_config_file()
+
+
+class RunMode(ExecutionMode):
+    command: str = "run"
+    help: str = "Run a Nexus-e simulation as defined in the config.toml file."
+
+    @classmethod
+    def start(cls, args: dict):
+        App.main()
+    
+
 def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--setup",
-        action="store_true",
-        help=(
-            "Use to create your first config file, or overwrite the "
-            "existing config.toml file."
-        )
-    )
-    parser.add_argument(
-        "--run",
-        action="store_true",
-        help="Run a Nexus-e simulation as defined in the config.toml file."
-    )
+    parser = ArgumentParser()
+
+    execution_modes = parser.add_subparsers()
+    SetupMode.add_to_parser(execution_modes)
+    config.Cli.add_to_parser(execution_modes)
+    RunMode.add_to_parser(execution_modes)
+
     no_cli_argument = len(sys.argv) == 1
     if no_cli_argument:
         parser.print_help()
         return
-
+    
     args = parser.parse_args()
-    if args.setup:
-        config.write_default_config_file()
-    if args.run:
-        App.main()
+    args.start_execution_mode(args.__dict__)
 
 if __name__ == "__main__":
     main()

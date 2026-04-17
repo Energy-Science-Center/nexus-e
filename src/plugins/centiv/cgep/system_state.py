@@ -232,9 +232,9 @@ class SystemState:
         opt.options["NumericFocus"] = 1 # Slightly increased numerical robustness vs. default
         opt.options['ResultFile'] = "test_2018.ilp" #diagnoses infeasibilities
 
-        # Add scaling parameters
-        opt.options["ScaleFlag"] = 2      # Geometric scaling for constraint matrix
-        opt.options["ObjScale"] = -1      # Scale objective by 10^-1
+        # # Add scaling parameters
+        # opt.options["ScaleFlag"] = 2      # Geometric scaling for constraint matrix
+        # opt.options["ObjScale"] = -1      # Scale objective by 10^-1
 
         results = opt.solve(self.model, symbolic_solver_labels=True, tee = True)
         self.model.solutions.load_from(results)
@@ -321,8 +321,7 @@ class SystemState:
                 cobject = getattr(self.model, str(c))
                 if str(c) == "NodalConstraint_one_CH":
                     for index in cobject:
-                        if baseMVA: # now I have hardcoded it to 1.0 if single_electric_node is True, so this line is not needed
-                            baseMVA = 1.0  # now I have hardcoded it to 1.0 if single_electric_node is True, so this line is not needed
+                        if baseMVA: 
                             result["CH00"].append(self.model.dual[cobject[index]]/baseMVA)
                         else:
                             result["CH00"].append(self.model.dual[cobject[index]])

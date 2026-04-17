@@ -162,6 +162,9 @@ def saveVarParDualsCsv(model: pyo.ConcreteModel, results_folder: str):
         "SoCHydrogenCandCon",  # hydrogen x
         "SoCH2CandCon",        # hydrogen x
         "SoCHydroDayCon1",  # hydro *
+        "EqualAnnualExportImportCon",  # cross-border lines *
+        "EqualWinterExportImportCon",  # cross-border lines *
+        "CO2Limit",  # CO2 emissions *
 
         # "storage_soc_limit",
         # "lineATClimit",
@@ -225,14 +228,14 @@ def saveVarParDualsCsv(model: pyo.ConcreteModel, results_folder: str):
             result_values.index.names = header_list
 
             result_values.to_csv(
-                os.path.join(results_folder, f"{variable.name}.csv")
+                os.path.join(results_folder, variable.name + ".csv")
             )
 
         # export empty file
         else:
             result_values = pd.DataFrame()
             result_values.to_csv(
-                os.path.join(results_folder, f"{variable.name}.csv")
+                os.path.join(results_folder, variable.name + ".csv")
             )
 
     # Export duals of selected constraints to CSV files -----------
@@ -282,14 +285,13 @@ def saveVarParDualsCsv(model: pyo.ConcreteModel, results_folder: str):
             # Convert DataFrame to include the set names as the first row
             result_duals.columns = header_list + ["value"]
             result_duals.to_csv(
-                os.path.join(results_folder, f"{constraint.name}_dual.csv"),
+                os.path.join(results_folder, constraint.name + "_dual.csv"),
                 index=False,
             )
 
             result_duals_dict[constraint.name] = result_duals
         except:
             logging.debug(f"Error in exporting duals for {constraint.name}")
-
 def saveMappingFiles(data_dict, results_folder: str):
     """
     Create mapping files for all model elements to help with post-processing analysis.
@@ -298,9 +300,8 @@ def saveMappingFiles(data_dict, results_folder: str):
         data_dict: Dictionary containing all data structures to create mappings for
         results_folder: Base folder where mappings subfolder will be created
     """
-    
+    mappings_folder = os.path.join(results_folder, "mappings")            
     # Create mappings subfolder
-    mappings_folder = os.path.join(results_folder, "mappings")
     os.makedirs(mappings_folder, exist_ok=True)
     
     # Define key attributes for each element type
@@ -324,7 +325,7 @@ def saveMappingFiles(data_dict, results_folder: str):
             logging.debug(f"  Processing {element_name}...")
             _createElementMappings(element_data, element_name, key_attributes[element_name], mappings_folder)
     
-    logging.debug(f"Mapping files created in: {mappings_folder}")
+    logging.info(f"Mapping files created in: {mappings_folder}")
 
 
 def _createElementMappings(element_data, element_name, key_attributes, mappings_folder):
@@ -350,9 +351,8 @@ def _createElementMappings(element_data, element_name, key_attributes, mappings_
     # Save complete data
     complete_file = os.path.join(mappings_folder, f"Data_{element_name}.csv")
     df.to_csv(complete_file, index=True)
-    logging.debug(f"    Saved complete data: Data_{element_name}.csv ({len(df)} rows)")
     
-    # Determine the ID column (usually the index or first meaningful ID column)
+    # Determine the ID column 
     id_col = 'ID'
     df_with_id = df.reset_index().rename(columns={'index': id_col})
     
@@ -372,7 +372,6 @@ def _createElementMappings(element_data, element_name, key_attributes, mappings_
                 reverse_file = os.path.join(mappings_folder, f"Map_{attr.lower()}_{element_name}.csv")
                 reverse_mapping.to_csv(reverse_file, index=False)
                 
-                logging.debug(f"    Created mappings for {attr}: Map_{element_name}_{attr.lower()}.csv and Map_{attr.lower()}_{element_name}.csv")
             else:
                 logging.debug(f"    Warning: No valid data for attribute {attr} in {element_name}")
         else:
@@ -396,8 +395,7 @@ def _createReverseMapping(mapping_df, id_col, value_col):
     
     Returns:
         DataFrame with one row per attribute value and separate columns for each ID
-    """
-    
+    """  
     # Group by value and get list of IDs for each
     grouped = mapping_df.groupby(value_col)[id_col].apply(list).reset_index()
     

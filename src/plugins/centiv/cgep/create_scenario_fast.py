@@ -65,8 +65,42 @@ class Config():
     """Multiplier for the fixed operational costs - Input from Gemel"""
     
     demandCH : float = 0
-    """Total (yearly) Swiss demand in MWh - Input from Gemel"""
-    
+    """Total (yearly) Swiss demand in MWh - Input from Gemel. Scales all CH loads together.
+    If 0, no scaling is applied (database values used unchanged).
+    Mutually exclusive with individual demand parameters (demandCH_base, etc.)."""
+
+    demandCH_base: float = 0
+    """Total yearly Swiss BASE load demand in MWh (excludes e-mobility, heat pumps, H2).
+    If 0, no scaling is applied (database values used unchanged)."""
+
+    demandCH_emobility: float = 0
+    """Total yearly Swiss e-mobility demand in MWh.
+    If 0, no scaling is applied (database values used unchanged)."""
+
+    demandCH_heatpump: float = 0
+    """Total yearly Swiss heat pump demand in MWh.
+    If 0, no scaling is applied (database values used unchanged)."""
+
+    demandCH_H2: float = 0
+    """Total yearly Swiss H2 electrolyzer demand in MWh.
+    If 0, no scaling is applied (database values used unchanged)."""
+
+    # --- Demand Flexibility Parameters ---
+    flex_ev_enabled: bool = True
+    """Enable EV (e-mobility) demand flexibility/shifting.
+    If True, EV demand can be shifted within daily energy and power bounds from database.
+    If False, all EV demand is treated as fixed (no shifting allowed)."""
+
+    flex_heatpump_enabled: bool = True
+    """Enable heat pump demand flexibility.
+    If True, a portion of HP demand (defined by flex_heatpump_percentage) can be shifted.
+    If False, all HP demand is treated as fixed (no shifting allowed)."""
+
+    flex_heatpump_percentage: float = 0.33
+    """Portion of heat pump demand that is flexible (0.0 to 1.0).
+    0.0 = 0% flexible (all fixed), 1.0 = 100% flexible.
+    Only used when flex_heatpump_enabled=True. Default: 0.33 (33%)."""
+
     targetRES: float | None = None
     """Total Swiss RES target in TWh"""
     
@@ -217,7 +251,6 @@ class DataImport(object):
         self.heatpumploadsPMax_busnodes = [] #contains heatpump maximum power load (i.e., installed capacity)
         self.heatpumploadsECumulMax_busnodes = [] #contains heatpump hourly cummulative energy upper limit time series data per bus
         self.heatpumploadsECumulMin_busnodes = [] #contains heatpump hourly cummulative energy lower limit time series data per bus
-        self.HPFlexiblePercentage = 0.33 # 1 = 100% flexibility, 0 = 0% flexibility (all load is fixed) - hard coded but should be an input
         self.H2loads_busnodes = [] #contains H2 load time series data per bus
 
         self.original_load = {}
@@ -459,15 +492,15 @@ class DataImport(object):
                 self.H2profileId = target['idProfile']
             elif target["TargetName"] == "Renew_Gen_Target":
                 if config.timeperiods != 8760: #if not annual time resolution
+                    config.targetRES = 0
+                    logging.warning("In DataImport, targetRES is set to 0 because timeperiods != 8760 (timeperiods is e.g. 168 for debugging)")
+                else:
+                    # if config.targetRES does not have a value yet, read config.targetRES = target['Value'] into it, else, keep the value of config.targetRES
                     if config.targetRES is None:
                         config.targetRES = target['Value']
                         print(f"Info: Using RES target from database: {config.targetRES}")
                     else:
-                        print(f"Info: Using RES target from config: {config.targetRES} (ignoring database value)") 
-                    logging.warning("In DataImport, targetRES is set to 0 because timeperiods != 8760 (timeperiods is e.g. 168 for debugging)")
-                else:
-                    #if annual time resolution, then set targetRES to the value from the database
-                    config.targetRES = target['Value']    
+                        print(f"Info: Using RES target from config: {config.targetRES} (ignoring database value)")    
             elif target["TargetName"] == "PV-Roof_Gen_Target":
                 if config.timeperiods != 8760: #if not annual time resolution
                     config.targetRESPV = 0
@@ -582,38 +615,6 @@ class DataImport(object):
         #9.1.Store the generators in list self.generators
         Generators_DataFrame = pd.DataFrame(data=GeneratorInfo, columns=self.col_names_Gens)
 
-        # if a single electric is to be considered, for CandidateUnit (=1), per Dispatchable generation UnitType, keep only one generator (remove the rest)
-        # On the RES side (PV and Wind), we keep all generators because their capacity factor may differ
-        if config.single_electric_node:
-            # Step 1: Create a boolean mask for candidate, dispatchable units
-            dispatchable_mask = (
-                (Generators_DataFrame["CandidateUnit"] == 1) &
-                (Generators_DataFrame["UnitType"] == "Dispatchable")
-            )
-
-            # Step 2: Group the filtered generators by Technology
-            grouped = Generators_DataFrame[dispatchable_mask].groupby("Technology")
-
-            # Step 3: Prepare to collect indices of duplicate rows (to drop)
-            indices_to_drop = []
-
-            # Step 4: Columns whose values should be summed and assigned to the kept row (this way we e.g., make sure total potential of investments is correct)
-            cols_to_sum = ["Pmax", "Pmin", "Emax", "Emin"]
-
-            # Step 5: Iterate through each technology group
-            for tech, group in grouped:
-                first_idx = group.index[0]  # Keep the first generator for each technology
-
-                # Step 5.1: Sum selected columns and assign to the first row
-                for col in cols_to_sum:
-                    total = group[col].sum()
-                    Generators_DataFrame.loc[first_idx, col] = total
-
-                # Step 5.2: Mark the remaining generators in this group for removal
-                indices_to_drop.extend(group.index[1:])
-
-            # Step 6: Drop all the extra generator rows
-            Generators_DataFrame = Generators_DataFrame.drop(index=indices_to_drop)
 
         # --- Optional: boost installed capacities in selected countries to avoid lost load (calibration) ---
         # Controlled by a switch value on the Config, e.g. config.max_LL_switch in {0, 0.5, 1}.
@@ -666,15 +667,11 @@ class DataImport(object):
             # remove certain technologies from the candidate list, in the calibration stage
 
             # Further calibrations
-            # For all power generators that are of Technology "Battery-TSO", multiply the current value of Emax by 6
-            Generators_DataFrame.loc[
-                Generators_DataFrame["Technology"] == "Battery-TSO",
-                "Emax",
-            ] = Generators_DataFrame.loc[
-                Generators_DataFrame["Technology"] == "Battery-TSO",
-                "Emax",
-            ].astype(float) * 6.0
-            print("here")
+            # For all power generators that are outside Switzerland and of Technology "Battery-TSO", multiply the current value of Emax by 6
+            non_swiss_battery_tso = (Generators_DataFrame["Technology"] == "Battery-TSO") & \
+                                (Generators_DataFrame["Country"] != "CH")
+            Generators_DataFrame.loc[non_swiss_battery_tso, "Emax"] = \
+                Generators_DataFrame.loc[non_swiss_battery_tso, "Emax"].astype(float) * 6.0
 
             # Further calibrations
             # Mannually adjusting severla batteries, for the plants with names like keys in bat_new, apply the new Emax and Pmax values
@@ -1240,7 +1237,7 @@ class DataImport(object):
                 results_folder = str(
                     Path(config.results_path) 
                     / f"CentIv_{idScenario_to_year[config.idScenario]}"
-                )
+            )
             # Create mappings subfolder
             saveMappingFiles(mapping_data, results_folder)
 
@@ -1330,6 +1327,17 @@ class DataImport(object):
 
         logging.debug('Startng separate timing for ----- GetOptimization ---------------------')
         time_restarted = time.time()
+
+        # Set flexibility parameters from config
+        # If flexibility is disabled, set percentage to 0 (all load is fixed)
+        if config.flex_heatpump_enabled:
+            self.HPFlexiblePercentage = config.flex_heatpump_percentage
+        else:
+            self.HPFlexiblePercentage = 0.0
+        logging.info(f"Heat pump flexibility: enabled={config.flex_heatpump_enabled}, "
+                    f"percentage={self.HPFlexiblePercentage:.0%}")
+        logging.info(f"EV flexibility: enabled={config.flex_ev_enabled}")
+
         #0.Get unit status - candidate or existing
         unitsTechnology = {k:self.generators[k]['Technology'] for k in self.generator_id}
 
@@ -1566,6 +1574,38 @@ class DataImport(object):
         #6.Fill in a dictionary with load timeseries for each bus in the system AND collect power/energy shifting limits for each bus
         #...If a given bus does not have load time series data associated with it, an array with zeroes is automatically created
         #...All time series have length the number of simulated time periods
+        # First make a list of swiss busses
+        buses_CH = []
+        #other buses
+        buses_AT = []
+        buses_DE = []
+        buses_FR = []
+        buses_IT = []
+        bus_neighbor_NTC_rep = [] #buses that are neighbors are considered in neighbouring countries used for the rep. NTC connection 
+        bus_neighbor_no_NTC_rep = [] # buses that are neighbors but not used for the rep. NTC connection. They will always require nodal balance equation.
+        #all buses
+        buses_all = []
+        for Id, row in enumerate(self.buses):
+            buses_all.append(Id)
+            if row['Country'] == 'CH':
+                row.update({u'PayInjection': 0}) #should be a parameter coming from DistIv
+                buses_CH.append(Id)
+            else:
+                row.update({u'PayInjection': 0})
+                if row['Country'] == 'AT':
+                    buses_AT.append(Id)
+                if row['Country'] == 'DE':
+                    buses_DE.append(Id)
+                if row['Country'] == 'FR':
+                    buses_FR.append(Id)
+                if row['Country'] == 'IT':
+                    buses_IT.append(Id)
+                # if row['canton'] ends in _X, save it as bus_neighbor_NTC_rep
+                if '_X_' in row['BusName']: # NOTE this is not ideal! there should be a better of indicating such busses in getBusData_v2 procedure in sql!
+                    bus_neighbor_NTC_rep.append(Id)
+                else:
+                    bus_neighbor_no_NTC_rep.append(Id)
+
         eload_timeseries = {}
         dsm_pshift_hourly = {}
         dsm_eshift_daily = {}
@@ -1584,31 +1624,7 @@ class DataImport(object):
                 emobilityload_timeseries.update({(row['idIntBus']):{k:ts[k] for k in range(self.timeperiods)}}) # the multiplier "* row['DemandShare']" was removed. timeSeries already contains the final value of the demand.
             else:
                 emobilityload_timeseries.update({(row['idIntBus']):{k:0 for k in range(self.timeperiods)}})  #list with zeroes with the same length .... 
-        # for the new eMobility dictionaries
-        emob_eshift_daily = {}
-        emob_pupshift_hourly = {}
-        emob_pdownshift_hourly = {}
-        for Id, row in enumerate(self.emobilityloadsEFlex_busnodes):
-            if row['timeSeries'] :
-                ts = json.loads(row['timeSeries'])
-                emob_eshift_daily.update({(row['idIntBus']):{k:ts[k] for k in range(int(self.timeperiods/24))}})
-                
-            else: 
-                emob_eshift_daily.update({(row['idIntBus']):{k:0 for k in range(int(self.timeperiods/24))}})
-        for Id, row in enumerate(self.emobilityloadsPUp_busnodes):
-            if row['timeSeries'] :
-                ts = json.loads(row['timeSeries'])
-                emob_pupshift_hourly.update({(row['idIntBus']):{k:ts[k] for k in range(self.timeperiods)}})
-            else:
-                emob_pupshift_hourly.update({(row['idIntBus']):{k:0 for k in range(self.timeperiods)}})
-        for Id, row in enumerate(self.emobilityloadsPDown_busnodes):
-            if row['timeSeries'] :
-                ts = json.loads(row['timeSeries'])
-                emob_pdownshift_hourly.update({(row['idIntBus']):{k:ts[k] for k in range(self.timeperiods)}})
-            else: 
-                emob_pdownshift_hourly.update({(row['idIntBus']):{k:0 for k in range(self.timeperiods)}})
-
-        # define the remaining inflexible HP load 
+        # define the HP load (unscaled - scaling applied later)
         heatpumpload_timeseries = {}
         uncontrolled_heatpumpload_timeseries = {}
         heatpumpload_timeseries_flexibleportion = {}
@@ -1620,25 +1636,7 @@ class DataImport(object):
                 heatpumpload_timeseries_flexibleportion.update({(row['idIntBus']):{k:ts[k]*(self.HPFlexiblePercentage) for k in range(self.timeperiods)}}) # JG: here the multiplier "*(self.HPFlexiblePercentage)" indicates how much flexible load should be kept in the HP load timeseries
             else:
                 heatpumpload_timeseries.update({(row['idIntBus']):{k:0 for k in range(self.timeperiods)}})  #list with zeroes with the same length .... 
-        # added for the new Heatpump flexibility dictionaries
-        heatpump_pmax_hourly = {}
-        heatpump_ecumulmax_hourly = {}
-        heatpump_ecumulmin_hourly = {}
-        for Id, row in enumerate(self.heatpumploadsPMax_busnodes):
-            heatpump_pmax_hourly.update({row['idIntBus']:row['value']}) # the value in the DB is in MW
-        for Id, row in enumerate(self.heatpumploadsECumulMax_busnodes):
-            if row['timeSeries'] :
-                ts = json.loads(row['timeSeries'])
-                heatpump_ecumulmax_hourly.update({(row['idIntBus']):{k:ts[k]*(self.HPFlexiblePercentage) for k in range(self.timeperiods)}})
-            else:
-                heatpump_ecumulmax_hourly.update({(row['idIntBus']):{k:0 for k in range(self.timeperiods)}})
-        for Id, row in enumerate(self.heatpumploadsECumulMin_busnodes):
-            if row['timeSeries'] :
-                ts = json.loads(row['timeSeries'])
-                heatpump_ecumulmin_hourly.update({(row['idIntBus']):{k:ts[k]*(self.HPFlexiblePercentage) for k in range(self.timeperiods)}})
-            else: 
-                heatpump_ecumulmin_hourly.update({(row['idIntBus']):{k:0 for k in range(self.timeperiods)}})
-        
+        # define the H2 load (unscaled - scaling applied later)
         H2load_timeseries = {}
         for Id, row in enumerate(self.H2loads_busnodes):
             if row['timeSeries'] :
@@ -1646,6 +1644,166 @@ class DataImport(object):
                 H2load_timeseries.update({(row['idIntBus']):{k:ts[k] for k in range(self.timeperiods)}}) # the multiplier "* row['DemandShare']" was removed. timeSeries already contains the final value of the demand.
             else:
                 H2load_timeseries.update({(row['idIntBus']):{k:0 for k in range(self.timeperiods)}})  #list with zeroes with the same length .... 
+        # Determine scale factors if annual targets given ---------------------------
+        # Validate: demandCH and individual demand parameters are mutually exclusive
+        any_specific_demand_is_scaled = any([
+            config.demandCH_base != 0,
+            config.demandCH_emobility != 0,
+            config.demandCH_heatpump != 0,
+            config.demandCH_H2 != 0
+        ])
+        if any_specific_demand_is_scaled and config.demandCH != 0:
+            raise ValueError("Cannot use demandCH together with individual demand parameters. "
+                             "Use either demandCH (scales all) OR demandCH_base/emobility/heatpump/H2.")
+
+        # Calculate total demand from database for each category (CH only)
+        swiss_emob_total_db = sum(
+            sum(demands.values()) 
+            for bus, demands in emobilityload_timeseries.items() 
+            if bus in buses_CH
+        )
+        swiss_hp_total_db = sum(
+            sum(demands.values()) for bus, demands in uncontrolled_heatpumpload_timeseries.items() 
+            if bus in buses_CH
+        )
+        swiss_h2_total_db = sum(
+            sum(demands.values()) for bus, demands in H2load_timeseries.items() 
+            if bus in buses_CH
+        )
+        swiss_base_total_db = sum(
+            sum(demands.values()) for bus, demands in eload_timeseries.items() 
+            if bus in buses_CH
+        )
+        swiss_loadAll_total_db = swiss_base_total_db + swiss_emob_total_db + swiss_hp_total_db + swiss_h2_total_db
+
+        logging.debug('-----Load Information----------------------------')
+        logging.debug('    3) Total initial CH base load (including trains) from db is %f MWh' % swiss_base_total_db)
+        logging.debug('       Total initial CH e-mobility load from db is %f MWh' % swiss_emob_total_db)
+        logging.debug('       Total initial CH heat pump load from db is %f MWh' % swiss_hp_total_db)
+        logging.debug('       Total initial CH H2 electrolyzer load from db is %f MWh' % swiss_h2_total_db)
+        logging.debug('       Total initial CH load (all categories) from db is %f MWh' % swiss_loadAll_total_db)
+
+        # Determine scale factors
+        time_fraction = config.timeperiods / 8760
+
+        if config.demandCH != 0:
+            # Legacy mode: scale all loads by same factor based on total base load
+            prorated_demandCH = config.demandCH * time_fraction
+            adjusted_load_CH = prorated_demandCH / float(swiss_loadAll_total_db)
+            adjusted_load_CH_base = adjusted_load_CH
+            adjusted_load_CH_emob = adjusted_load_CH
+            adjusted_load_CH_hp = adjusted_load_CH
+            adjusted_load_CH_H2 = adjusted_load_CH
+            print('    4) CH load scale factor (all categories) is %f' % adjusted_load_CH)
+            if config.timeperiods != 8760:
+                print('       (annual target %.0f MWh prorated to %.0f MWh for %d hours)' % (config.demandCH, prorated_demandCH, config.timeperiods))
+        else:
+            # Individual mode: each category scaled separately
+            prorated_base = config.demandCH_base * time_fraction
+            prorated_emob = config.demandCH_emobility * time_fraction
+            prorated_hp = config.demandCH_heatpump * time_fraction
+            prorated_h2 = config.demandCH_H2 * time_fraction
+
+            adjusted_load_CH_base = prorated_base / float(swiss_base_total_db) if config.demandCH_base != 0 else 1.0
+            adjusted_load_CH_emob = prorated_emob / float(swiss_emob_total_db) if config.demandCH_emobility != 0 and swiss_emob_total_db > 0 else 1.0
+            adjusted_load_CH_hp = prorated_hp / float(swiss_hp_total_db) if config.demandCH_heatpump != 0 and swiss_hp_total_db > 0 else 1.0
+            adjusted_load_CH_H2 = prorated_h2 / float(swiss_h2_total_db) if config.demandCH_H2 != 0 and swiss_h2_total_db > 0 else 1.0
+            adjusted_load_CH = adjusted_load_CH_base  # for backwards compatibility with later code
+            logging.debug('    4) CH base load scale factor is %f' % adjusted_load_CH_base)
+            logging.debug('       CH e-mobility load scale factor is %f' % adjusted_load_CH_emob)
+            logging.debug('       CH heat pump load scale factor is %f' % adjusted_load_CH_hp)
+            logging.debug('       CH H2 electrolyzer load scale factor is %f' % adjusted_load_CH_H2)
+            if config.timeperiods != 8760:
+                logging.debug('       (annual targets prorated for %d hours simulation)' % config.timeperiods)
+
+        # Apply scale factors to demand time series (CH buses only)
+        for Id, row in eload_timeseries.items():
+            if Id in buses_CH:
+                row.update((k, v * adjusted_load_CH_base) for k, v in row.items())
+
+        for Id, row in emobilityload_timeseries.items():
+            if Id in buses_CH:
+                row.update((k, v * adjusted_load_CH_emob) for k, v in row.items())
+
+        for Id, row in heatpumpload_timeseries.items():
+            if Id in buses_CH:
+                row.update((k, v * adjusted_load_CH_hp) for k, v in row.items())
+
+        for Id, row in uncontrolled_heatpumpload_timeseries.items():
+            if Id in buses_CH:
+                row.update((k, v * adjusted_load_CH_hp) for k, v in row.items())
+
+        for Id, row in heatpumpload_timeseries_flexibleportion.items():
+            if Id in buses_CH:
+                row.update((k, v * adjusted_load_CH_hp) for k, v in row.items())
+
+        for Id, row in H2load_timeseries.items():
+            if Id in buses_CH:
+                row.update((k, v * adjusted_load_CH_H2) for k, v in row.items())
+
+        # for the new eMobility dictionaries
+        # If EV flexibility is disabled, set power bounds equal to demand (fixes load at original value)
+        # The constraints are: (Demand + ShiftUp) <= MaxUp and (Demand - ShiftDown) >= MaxDown
+        # Setting MaxUp = MaxDown = Demand forces ShiftUp = ShiftDown = 0
+        emob_eshift_daily = {}
+        emob_pupshift_hourly = {}
+        emob_pdownshift_hourly = {}
+        if config.flex_ev_enabled:
+            # EV flexibility enabled: load flexibility bounds from database
+            for Id, row in enumerate(self.emobilityloadsEFlex_busnodes):
+                if row['timeSeries'] :
+                    ts = json.loads(row['timeSeries'])
+                    scale = adjusted_load_CH_emob if row['idIntBus'] in buses_CH else 1.0
+                    emob_eshift_daily.update({(row['idIntBus']):{k:ts[k] * scale for k in range(int(self.timeperiods/24))}})
+                else:
+                    emob_eshift_daily.update({(row['idIntBus']):{k:0 for k in range(int(self.timeperiods/24))}})
+            for Id, row in enumerate(self.emobilityloadsPUp_busnodes):
+                if row['timeSeries'] :
+                    ts = json.loads(row['timeSeries'])
+                    scale = adjusted_load_CH_emob if row['idIntBus'] in buses_CH else 1.0
+                    emob_pupshift_hourly.update({(row['idIntBus']):{k:ts[k] * scale for k in range(self.timeperiods)}})
+                else:
+                    emob_pupshift_hourly.update({(row['idIntBus']):{k:0 for k in range(self.timeperiods)}})
+            for Id, row in enumerate(self.emobilityloadsPDown_busnodes):
+                if row['timeSeries'] :
+                    ts = json.loads(row['timeSeries'])
+                    scale = adjusted_load_CH_emob if row['idIntBus'] in buses_CH else 1.0
+                    emob_pdownshift_hourly.update({(row['idIntBus']):{k:ts[k] * scale for k in range(self.timeperiods)}})
+                else:
+                    emob_pdownshift_hourly.update({(row['idIntBus']):{k:0 for k in range(self.timeperiods)}})
+        else:
+            # EV flexibility disabled: set bounds equal to demand (no shifting allowed)
+            logging.info("EV flexibility disabled: setting power bounds equal to demand")
+            for bus_id, demands in emobilityload_timeseries.items():
+                # Daily energy shift = 0 (no daily shifting allowed)
+                emob_eshift_daily[bus_id] = {k: 0 for k in range(int(self.timeperiods/24))}
+                # MaxUp = Demand, MaxDown = Demand => no shifting possible
+                emob_pupshift_hourly[bus_id] = demands.copy()
+                emob_pdownshift_hourly[bus_id] = demands.copy()
+
+        # added for the new Heatpump flexibility dictionaries
+        heatpump_pmax_hourly = {}
+        heatpump_ecumulmax_hourly = {}
+        heatpump_ecumulmin_hourly = {}
+        for Id, row in enumerate(self.heatpumploadsPMax_busnodes):
+            scale = adjusted_load_CH_hp if row['idIntBus'] in buses_CH else 1.0
+            heatpump_pmax_hourly.update({row['idIntBus']:row['value'] * scale}) # the value in the DB is in MW
+        for Id, row in enumerate(self.heatpumploadsECumulMax_busnodes):
+            if row['timeSeries'] :
+                ts = json.loads(row['timeSeries'])
+                scale = adjusted_load_CH_hp if row['idIntBus'] in buses_CH else 1.0
+                heatpump_ecumulmax_hourly.update({(row['idIntBus']):{k:ts[k] * scale * self.HPFlexiblePercentage for k in range(self.timeperiods)}})
+            else:
+                heatpump_ecumulmax_hourly.update({(row['idIntBus']):{k:0 for k in range(self.timeperiods)}})
+        for Id, row in enumerate(self.heatpumploadsECumulMin_busnodes):
+            if row['timeSeries'] :
+                ts = json.loads(row['timeSeries'])
+                scale = adjusted_load_CH_hp if row['idIntBus'] in buses_CH else 1.0
+                heatpump_ecumulmin_hourly.update({(row['idIntBus']):{k:ts[k] * scale * self.HPFlexiblePercentage for k in range(self.timeperiods)}})
+            else:
+                heatpump_ecumulmin_hourly.update({(row['idIntBus']):{k:0 for k in range(self.timeperiods)}})
+
+
         #check for None values within the load and flexibility data
         for Id, row in eload_timeseries.items():
             for k, _ in row.items():
@@ -1734,81 +1892,8 @@ class DataImport(object):
             conv_emob_load = eload_plus_emobilityload_timeseries.get(k, {t: 0 for t in range(self.timeperiods)})
             dict_add = {key: h2_hp_load.get(key, 0) + conv_emob_load.get(key, 0) for key in range(self.timeperiods)}
             load_timeseries[k] = dict_add
-            
+
         self.original_load = copy.deepcopy(load_timeseries) #this is the total original load before any adjustments (i.e. Gemel load scale factor, subtraction of DistIv injections, etc.)
-        
-        #swiss busses
-        buses_CH = []
-        #other buses
-        buses_Neighbors = []
-        buses_AT = []
-        buses_DE = []
-        buses_FR = []
-        buses_IT = []
-        bus_neighbor_NTC_rep = [] #buses that are neighbors are considered in neighbouring countries used for the rep. NTC connection 
-        bus_neighbor_no_NTC_rep = [] # buses that are neighbors but not used for the rep. NTC connection. They will always require nodal balance equation.
-        #all buses
-        buses_all = []
-        
-        for Id, row in enumerate(self.buses):
-            buses_all.append(Id)
-            if row['Country'] == 'CH':
-                row.update({u'PayInjection': 0}) #should be a parameter coming from DistIv
-                buses_CH.append(Id)
-            else:
-                row.update({u'PayInjection': 0})
-                buses_Neighbors.append(Id)
-                if row['Country'] == 'AT':
-                    buses_AT.append(Id)
-                if row['Country'] == 'DE':
-                    buses_DE.append(Id) 
-                if row['Country'] == 'FR':
-                    buses_FR.append(Id)
-                if row['Country'] == 'IT':
-                    buses_IT.append(Id)  
-                # if row['canton'] ends in _X, save it as bus_neighbor_NTC_rep
-                if '_X_' in row['BusName']: # NOTE this is not ideal! there should be a better of indicating such busses in getBusData_v2 procedure in sql!
-                    bus_neighbor_NTC_rep.append(Id)
-                else:
-                    bus_neighbor_no_NTC_rep.append(Id)
-                    
-                 
-        Total_Load_Per_Bus_db = {bus:sum([demand for demand in demands.values()]) for bus, demands in load_timeseries.items()}
-
-        swiss_load_db = []
-        for key,value in Total_Load_Per_Bus_db.items():
-            if key in buses_CH: 
-                swiss_load_db.append(value)
-        swiss_load_total_db = sum(swiss_load_db)
-        print('-----Load Information----------------------------')
-        print('    3) Total initial CH load from db is %f' %(swiss_load_total_db) + ' MWh')
-        
-        if config.demandCH == 0:
-            Adjusted_Load_CH = 1.0 #if we don't get an input from Gemel keep the load pulled from the database       
-        else:
-            Adjusted_Load_CH = config.demandCH/float(swiss_load_total_db)
-        print('    4) CH load scale factor is %f' %(Adjusted_Load_CH))
-        
-        for Id, row in load_timeseries.items():
-            if Id in buses_CH:
-                row.update((k, v*Adjusted_Load_CH) for k, v in row.items()) #adjust the Swiss load using the total Swiss demand from Gemel
-        
-        for Id, row in emobilityload_timeseries.items():
-            if Id in buses_CH:
-                row.update((k, v*Adjusted_Load_CH) for k, v in row.items()) #adjust the Swiss e-mobility load using the total Swiss demand from Gemel
-        
-        for Id, row in heatpumpload_timeseries.items():
-            if Id in buses_CH:
-                row.update((k, v*Adjusted_Load_CH) for k, v in row.items()) #adjust the Swiss heatpump load using the total Swiss demand from Gemel
-
-        for Id, row in uncontrolled_heatpumpload_timeseries.items():
-            if Id in buses_CH:
-                row.update((k, v*Adjusted_Load_CH) for k, v in row.items()) #adjust the Swiss (uncontrolled) heatpump load using the total Swiss demand from Gemel
-
-        for Id, row in heatpumpload_timeseries_flexibleportion.items():
-            if Id in buses_CH:
-                row.update((k, v*Adjusted_Load_CH) for k, v in row.items()) #adjust the Swiss (flexible portion) heatpump load using the total Swiss demand from Gemel
-        
         self.adjusted_emobilityload = copy.deepcopy(emobilityload_timeseries)
         self.adjusted_heatpumpload = copy.deepcopy(heatpumpload_timeseries)
         self.adjusted_uncontrolledheatpumpload = copy.deepcopy(uncontrolled_heatpumpload_timeseries)
@@ -1975,10 +2060,7 @@ class DataImport(object):
         #...Find the id of the slack bus and the value for baseMVA
         BusTypes = {k:self.buses[k]['BusType'] for k in range(len(self.bus_id))}
         SlackBusId = [key for key, bustype in BusTypes.items() if bustype == "SL"]
-        if not config.single_electric_node:
-            baseMVA = list({k:self.network_info[k]['baseMVA'] for k in range(len(self.network_info))}.values())[0]
-        elif config.single_electric_node:
-            baseMVA = 1.0
+        baseMVA = list({k:self.network_info[k]['baseMVA'] for k in range(len(self.network_info))}.values())[0]
 
         #12.Set up the cost optimization (here we have all constraints related to operation of the different generator types)
         opt = SystemState(num_generators = len(self.generators), num_snaphots = self.timeperiods)
@@ -2493,22 +2575,21 @@ class DataImport(object):
                         line_power_limit_backward_direction={k:self.lines[k]['rateA2']/baseMVA if "rateA2" in self.lines[k] else self.lines[k]['rateA']/baseMVA for k in self.line_id},
                         type={k:self.lines[k]['line_type'] if "line_type" in self.lines[k] else "AC" for k in self.line_id})
             #set flexibility constraints
-            DCPF.set_flexibility(
-                max_shift_hourly={k: dsm_pshift_hourly.get(k, 0) / baseMVA for k in self.bus_id},
-                max_shift_daily={k: dsm_eshift_daily.get(k, 0) / baseMVA for k in self.bus_id},
-                max_up_shift_hourly_emob={k: {t: emob_pupshift_hourly.get(k, [0.0]*int(self.timeperiods))[t] / baseMVA for t in range(int(self.timeperiods))} for k in self.bus_id},
-                max_down_shift_hourly_emob={k: {t: emob_pdownshift_hourly.get(k, [0.0]*int(self.timeperiods))[t] / baseMVA for t in range(int(self.timeperiods))} for k in self.bus_id},
-                max_shift_daily_emob={k: {t: emob_eshift_daily.get(k, [0.0]*int(self.timeperiods//24))[t] / baseMVA for t in range(int(self.timeperiods//24))} for k in self.bus_id},
-                emob_demand={k: self.adjusted_emobilityload.get(k, [0.0]*int(self.timeperiods)) for k in self.bus_id},  # <-- series fallback
-                max_up_shift_hourly_heatpump={k: {t: heatpump_ecumulmax_hourly.get(k, [0.0]*int(self.timeperiods))[t] / baseMVA for t in range(int(self.timeperiods))} for k in self.bus_id},
-                max_down_shift_hourly_heatpump={k: {t: heatpump_ecumulmin_hourly.get(k, [0.0]*int(self.timeperiods))[t] / baseMVA for t in range(int(self.timeperiods))} for k in self.bus_id},
-                max_p_hourly_heatpump={k: heatpump_pmax_hourly.get(k, 0) / baseMVA for k in self.bus_id},
-                heatpump_demand={k: self.adjusted_heatpumpload.get(k, [0.0]*int(self.timeperiods)) for k in self.bus_id},  # <-- series fallback
+            DCPF.set_flexibility(max_shift_hourly={k:dsm_pshift_hourly.get(k, 0)/baseMVA for k in self.bus_id},
+                max_shift_daily={k:dsm_eshift_daily.get(k, 0)/baseMVA for k in self.bus_id},
+                max_up_shift_hourly_emob={k:{t:emob_pupshift_hourly.get(k,{t:0 for t in range(int(self.timeperiods))})[t]/baseMVA for t in range(int(self.timeperiods))} for k in self.bus_id},
+                max_down_shift_hourly_emob={k:{t:emob_pdownshift_hourly.get(k, {t: 0 for t in range(int(self.timeperiods))})[t]/baseMVA for t in range(int(self.timeperiods))} for k in self.bus_id},
+                max_shift_daily_emob={k:{t:emob_eshift_daily.get(k,{t: 0 for t in range(int(self.timeperiods//24))})[t]/baseMVA for t in range(int(self.timeperiods//24))} for k in self.bus_id},
+                emob_demand={k:self.adjusted_emobilityload.get(k,{t: 0 for t in range(int(self.timeperiods))}) for k in self.bus_id},
+                max_up_shift_hourly_heatpump={k:{t:heatpump_ecumulmax_hourly.get(k, {t: 0 for t in range(int(self.timeperiods))})[t]/baseMVA for t in range(int(self.timeperiods))} for k in self.bus_id},
+                max_down_shift_hourly_heatpump={k:{t:heatpump_ecumulmin_hourly.get(k, {t: 0 for t in range(int(self.timeperiods))})[t]/baseMVA for t in range(int(self.timeperiods))} for k in self.bus_id},
+                max_p_hourly_heatpump = {k:heatpump_pmax_hourly.get(k, 0)/baseMVA for k in self.bus_id},
+                heatpump_demand={k:self.adjusted_heatpumpload.get(k, {t: 0 for t in range(int(self.timeperiods))}) for k in self.bus_id},
                 baseMVA=baseMVA,
-                num_days=self.days,
+                num_days=self.days, 
                 tpRes=config.resolution_in_days
-            )
-            
+            ) 
+
             #nodal balance at each bus
             DCPF.connect_buses_distIv_injection(line_start=line_idFromBus, line_end=line_idToBus, type=line_type, gen_nodes=gen_idBus, loss_factor = line_loss_factor)
             
@@ -2525,7 +2606,8 @@ class DataImport(object):
                 DCPF.set_net_winter_import_limit(
                     cross_border_lines_CH, 
                     config.resolution_in_days, 
-                    config.winterNetImport)
+                    config.winterNetImport, 
+                    baseMVA)
 
             print("     Current RES Target is {}"
                 .format("disabled" if config.disableREStarget else "enabled"))            
@@ -2675,18 +2757,18 @@ class DataImport(object):
                         type={k:self.lines[k]['line_type'] if "line_type" in self.lines[k] else "AC" for k in self.line_id})
             #set flexibility constraints
             # added the differentiation between up and down flexibility
-            DCPF.set_flexibility(max_shift_hourly={k:dsm_pshift_hourly[k]/baseMVA for k in self.bus_id},
+            DCPF.set_flexibility(max_shift_hourly={k:dsm_pshift_hourly.get(k, 0)/baseMVA for k in self.bus_id},
                         max_shift_daily={k:dsm_eshift_daily.get(k, 0)/baseMVA for k in self.bus_id},
-                        max_up_shift_hourly_emob={k:{t:emob_pupshift_hourly.get(k, [0.0]*int(self.timeperiods))[t]/baseMVA for t in range(int(self.timeperiods))} for k in self.bus_id},
-                        max_down_shift_hourly_emob={k:{t:emob_pdownshift_hourly.get(k, [0.0]*int(self.timeperiods))[t]/baseMVA for t in range(int(self.timeperiods))} for k in self.bus_id},
-                        max_shift_daily_emob={k:{t:emob_eshift_daily.get(k, [0.0]*int(self.timeperiods//24))[t]/baseMVA for t in range(int(self.timeperiods//24))} for k in self.bus_id},
-                        emob_demand={k:self.adjusted_emobilityload.get(k, [0.0]*int(self.timeperiods)) for k in self.bus_id},
-                        max_up_shift_hourly_heatpump={k:{t:heatpump_ecumulmax_hourly.get(k, [0.0]*int(self.timeperiods))[t]/baseMVA for t in range(int(self.timeperiods))} for k in self.bus_id},
-                        max_down_shift_hourly_heatpump={k:{t:heatpump_ecumulmin_hourly.get(k, [0.0]*int(self.timeperiods))[t]/baseMVA for t in range(int(self.timeperiods))} for k in self.bus_id},
-                        max_p_hourly_heatpump = {k:heatpump_pmax_hourly.get(k, 0)/baseMVA for k in self.bus_id},
-                        heatpump_demand={k:self.adjusted_heatpumpload.get(k, [0.0]*int(self.timeperiods)) for k in self.bus_id},
+                        max_up_shift_hourly_emob={k:{t:emob_pupshift_hourly.get(k, {t: 0 for t in range(int(self.timeperiods))})[t]/baseMVA for t in range(int(self.timeperiods))} for k in self.bus_id},
+                        max_down_shift_hourly_emob={k:{t:emob_pdownshift_hourly.get(k, {t: 0 for t in range(int(self.timeperiods))})[t]/baseMVA for t in range(int(self.timeperiods))} for k in self.bus_id},
+                        max_shift_daily_emob={k:{t:emob_eshift_daily.get(k, {t: 0 for t in range(int(self.timeperiods//24))})[t]/baseMVA for t in range(int(self.timeperiods//24))} for k in self.bus_id},
+                        emob_demand={k:self.adjusted_emobilityload.get(k, {t: 0 for t in range(int(self.timeperiods))}) for k in self.bus_id},
+                        max_up_shift_hourly_heatpump={k:{t:heatpump_ecumulmax_hourly.get(k, {t: 0 for t in range(int(self.timeperiods))})[t]/baseMVA for t in range(int(self.timeperiods))} for k in self.bus_id},
+                        max_down_shift_hourly_heatpump={k:{t:heatpump_ecumulmin_hourly.get(k, {t: 0 for t in range(int(self.timeperiods))})[t]/baseMVA for t in range(int(self.timeperiods))} for k in self.bus_id},
+                        max_p_hourly_heatpump={k:heatpump_pmax_hourly.get(k, 0)/baseMVA for k in self.bus_id},
+                        heatpump_demand={k:self.adjusted_heatpumpload.get(k, {t: 0 for t in range(int(self.timeperiods))}) for k in self.bus_id},
                         baseMVA=baseMVA,
-                        num_days=self.days, 
+                        num_days=self.days,
                         tpRes=config.resolution_in_days)
             #nodal balance at each bus
             DCPF.connect_buses(line_start=line_idFromBus, line_end=line_idToBus, type = line_type, gen_nodes=gen_idBus, loss_factor = line_loss_factor, single_electric_node=config.single_electric_node, buses_CH = buses_CH, bus_neighbor_NTC_rep = bus_neighbor_NTC_rep, bus_neighbor_no_NTC_rep = bus_neighbor_no_NTC_rep)
@@ -2703,7 +2785,8 @@ class DataImport(object):
                 DCPF.set_net_winter_import_limit(
                     cross_border_lines_CH, 
                     config.resolution_in_days, 
-                    config.winterNetImport)
+                    config.winterNetImport,
+                    baseMVA)
 
             print("     Current RES Target is {}"
                 .format("disabled" if config.disableREStarget else "enabled"))
@@ -3350,7 +3433,7 @@ class DataImport(object):
         """
         16.11 output: demand scalar from CGE for CH
         """
-        res.saveScalars_Excel(np.column_stack([Adjusted_Load_CH]), 'Demand_Scalar.xlsx', 'DemandScalar', 'CH')
+        res.saveScalars_Excel(np.column_stack([adjusted_load_CH]), 'Demand_Scalar.xlsx', 'DemandScalar', 'CH')
 
         duration_log_dict['16'] = (time.time() - time_restarted)/60 #time in minutes
         logging.debug('Within GetOptimization, 16: Investment and Commitment Results Processing took %.2f minutes' % duration_log_dict['16'])

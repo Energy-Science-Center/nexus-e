@@ -468,14 +468,14 @@ class DC_PowerFlow_TrafoFlex(object):
         self.model.EqualAnnualExportImportCon = Constraint(
             rule=lambda m: sum(m.ActivePower[l,t] * tpRes for l in BORDERLINES for t in m.TimePeriods) == 0)
     
-    def set_net_winter_import_limit(self, BORDERLINES, tpRes, netImportLimit):
+    def set_net_winter_import_limit(self, BORDERLINES, tpRes, netImportLimit, baseMVA):
         self.model.JFMTimePeriods = RangeSet(0, (round((90/tpRes))*24)-1)  #Jan + Feb + Mar = 90 days
         self.model.ONDTimePeriods = RangeSet(self.num_snaphots-(round((92/tpRes))*24), self.num_snaphots-1)  #Oct + Nov + Dec = 92 days
         self.model.EqualWinterExportImportCon = Constraint(
             rule=lambda m:
                 sum(m.ActivePower[l,t] * tpRes for l in BORDERLINES for t in m.JFMTimePeriods)
                 + sum(m.ActivePower[l,t] * tpRes for l in BORDERLINES for t in m.ONDTimePeriods)
-                >= (-10000 * netImportLimit))
+                >= (-(1e6 / baseMVA) * netImportLimit))
 
     def set_RES_target_DistIv(self, GENS_biomass_and_geothermal, GENS_candidates, GENS_PV_existing, GENS_wind_existing, res_target, tpResolution, baseMVA):
         """

@@ -1,0 +1,4315 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+        <meta name="author" content="Nexus-e Team">
+      
+      
+      
+        <link rel="prev" href="../performance-analysis/">
+      
+      
+        <link rel="next" href="../scenario-lifecycle/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.5">
+    
+    
+      
+        <title>Output files - Nexus-e</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#output-files-generated-by-create_scenario_fastpy" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="Nexus-e" class="md-header__button md-logo" aria-label="Nexus-e" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Nexus-e
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Output files
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/Energy-Science-Center/nexus-e" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    nexus-e
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../get-started/install/" class="md-tabs__link">
+          
+  
+  
+  Wiki
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../reference/nexus_e/config/" class="md-tabs__link">
+          
+  
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="Nexus-e" class="md-nav__button md-logo" aria-label="Nexus-e" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Nexus-e
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/Energy-Science-Center/nexus-e" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    nexus-e
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wiki
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Wiki
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Get started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Get started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../get-started/install/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Install
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../get-started/run/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Run
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../get-started/configure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configure
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../get-started/modules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Modules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scenarios
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Scenarios
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../scenarios/upload/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Upload a scenario
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../scenarios/tyndp24/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TYNDP24
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../scenarios/nodal-hourly-load/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Nodal hourly load
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../scenarios/ntc/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NTC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../scenarios/europe/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Europe
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How-to
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    How-to
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../how-to/work-on-euler/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Work on Euler
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../how-to/start-parallel-runs-on-euler/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Start parallel runs on Euler
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Discussions
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Discussions
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../input-data-analysis/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Input data analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../performance-analysis/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Output files
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Output files
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#output-location" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Output Location
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Output Location">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-investmentrun_runyear-first-stage-investment-optimization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. InvestmentRun_&lt;RUNYEAR&gt;/ - First Stage (Investment Optimization)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-centiv_runyear-second-stage-operational-optimization-with-fixed-investments-plus-files-used-for-the-webviewer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. CentIv_&lt;RUNYEAR&gt;/ - Second Stage (Operational Optimization with Fixed Investments plus files used for the Webviewer)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Overview">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#category-a-mapping-files-section-0" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Category A: Mapping Files (Section 0)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#category-b-post-processed-result-files-sections-1-12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Category B: Post-Processed Result Files (Sections 1-12)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#category-c-raw-model-internals-section-13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Category C: Raw Model Internals (Section 13)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#category-a-mapping-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Category A: Mapping Files
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0-mapping-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0. Mapping Files
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0. Mapping Files">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-mapping-files-are-needed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Mapping Files Are Needed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#complete-data-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complete Data Files
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mapping-files-forward-and-reverse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mapping Files (Forward and Reverse)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#category-b-post-processed-result-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Category B: Post-Processed Result Files
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-investment-stage-decision-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Investment Stage Decision Files
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Investment Stage Decision Files">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#transmission-lines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transmission Lines
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#generation-units" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Generation Units
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#power-to-gas-to-power-p2g2p-systems" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Power-to-Gas-to-Power (P2G2P) Systems
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-demand-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Demand Files
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Demand Files">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#switzerland-ch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Switzerland (CH)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#neighboring-countries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Neighboring Countries
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#all-regions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        All Regions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#demand-shifting-flexibility" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Demand Shifting &amp; Flexibility
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#demand-shift-components" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Demand Shift Components
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#flexibility-constraints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Flexibility Constraints
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#additional-demand-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Additional Demand Files
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-generation-output-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Generation Output Files
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Generation Output Files">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#all-generators-countries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        All Generators &amp; Countries
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#country-specific-generation-aggregation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Country-Specific Generation Aggregation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#switzerland-monthlytotal-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Switzerland Monthly/Total Generation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#neighboring-countries-monthly-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Neighboring Countries Monthly Generation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#generation-costs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Generation Costs
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-price-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Price Files
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Price Files">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#electricity-prices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Electricity Prices
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reserve-prices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reserve Prices
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#res-premium-price" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RES Premium Price
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-reserve-requirement-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Reserve Requirement Files
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-storage-level-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Storage Level Files
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Storage Level Files">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dam-pumped-hydro-storage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dam &amp; Pumped Hydro Storage
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#battery-storage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Battery Storage
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hydrogen-storage-p2g2p" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hydrogen Storage (P2G2P)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-cross-border-flow-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Cross-Border Flow Files
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. Cross-Border Flow Files">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#switzerland-importsexports" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Switzerland Imports/Exports
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#all-branch-flows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        All Branch Flows
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-power-to-gas-to-power-p2g2p-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Power-to-Gas-to-Power (P2G2P) Files
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9. Power-to-Gas-to-Power (P2G2P) Files">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#market-interactions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Market Interactions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#p2g2p-components" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        P2G2P Components
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#p2g2p-economics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        P2G2P Economics
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#p2g2p-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        P2G2P Variables
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-curtailment-load-shedding-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Curtailment &amp; Load Shedding Files
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-aggregate-scalar-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Aggregate &amp; Scalar Files
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="11. Aggregate &amp; Scalar Files">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#res-production" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RES Production
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#demand-scalar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Demand Scalar
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-generator-summary-files-for-external-models" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. Generator Summary Files (for External Models)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#category-c-raw-model-internals" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Category C: Raw Model Internals
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#13-raw-model-internals-both-folders-direct-pyomo-exports" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13. Raw Model Internals (Both Folders) - Direct Pyomo Exports
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="13. Raw Model Internals (Both Folders) - Direct Pyomo Exports">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#variables-csv-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Variables (CSV files)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parameters-csv-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters (CSV files)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#constraint-duals-csv-files-with-_dual-suffix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Constraint Duals (CSV files with _dual suffix)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#model-statistics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Model Statistics
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#purpose" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Purpose
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#14-input-files-read-by-script" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14. Input Files (Read by Script)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#file-naming-conventions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        File Naming Conventions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="File Naming Conventions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#temporal-resolution-suffixes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Temporal Resolution Suffixes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#geographic-suffixes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Geographic Suffixes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#technology-suffixes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technology Suffixes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#categories-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Categories Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usage-notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage Notes
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../scenario-lifecycle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scenario lifecycle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_5" id="__nav_2_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Developer guide
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Developer guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer-guide/how-to-contribute/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How to contribute
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer-guide/tests/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Write tests
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer-guide/style-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Style guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer-guide/solid-principles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SOLID principles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/nexus_e/config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Config
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Interface
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Interface
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/interface/tables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ORM
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/interface/scenario/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scenario
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/interface/plugin/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plugin
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plugins
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Plugins
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/plugins/upload_scenario/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    upload_scenario
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/plugins/copy_database/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    copy_database
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/plugins/upload_res_data/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    upload_res_data
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/plugins/update_inv_costs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    update_inv_costs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/plugins/centiv/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    centiv
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/plugins/update_investments/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    update_investments
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/plugins/postprocess/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    postprocess
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../reference/plugins/delete_database_copies/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    delete_database_copies
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#output-location" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Output Location
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Output Location">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-investmentrun_runyear-first-stage-investment-optimization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. InvestmentRun_&lt;RUNYEAR&gt;/ - First Stage (Investment Optimization)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-centiv_runyear-second-stage-operational-optimization-with-fixed-investments-plus-files-used-for-the-webviewer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. CentIv_&lt;RUNYEAR&gt;/ - Second Stage (Operational Optimization with Fixed Investments plus files used for the Webviewer)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Overview">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#category-a-mapping-files-section-0" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Category A: Mapping Files (Section 0)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#category-b-post-processed-result-files-sections-1-12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Category B: Post-Processed Result Files (Sections 1-12)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#category-c-raw-model-internals-section-13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Category C: Raw Model Internals (Section 13)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#category-a-mapping-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Category A: Mapping Files
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0-mapping-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0. Mapping Files
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0. Mapping Files">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-mapping-files-are-needed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Mapping Files Are Needed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#complete-data-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complete Data Files
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mapping-files-forward-and-reverse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mapping Files (Forward and Reverse)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#category-b-post-processed-result-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Category B: Post-Processed Result Files
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-investment-stage-decision-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Investment Stage Decision Files
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Investment Stage Decision Files">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#transmission-lines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transmission Lines
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#generation-units" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Generation Units
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#power-to-gas-to-power-p2g2p-systems" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Power-to-Gas-to-Power (P2G2P) Systems
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-demand-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Demand Files
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Demand Files">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#switzerland-ch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Switzerland (CH)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#neighboring-countries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Neighboring Countries
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#all-regions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        All Regions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#demand-shifting-flexibility" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Demand Shifting &amp; Flexibility
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#demand-shift-components" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Demand Shift Components
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#flexibility-constraints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Flexibility Constraints
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#additional-demand-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Additional Demand Files
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-generation-output-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Generation Output Files
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Generation Output Files">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#all-generators-countries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        All Generators &amp; Countries
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#country-specific-generation-aggregation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Country-Specific Generation Aggregation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#switzerland-monthlytotal-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Switzerland Monthly/Total Generation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#neighboring-countries-monthly-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Neighboring Countries Monthly Generation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#generation-costs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Generation Costs
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-price-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Price Files
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Price Files">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#electricity-prices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Electricity Prices
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reserve-prices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reserve Prices
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#res-premium-price" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RES Premium Price
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-reserve-requirement-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Reserve Requirement Files
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-storage-level-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Storage Level Files
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Storage Level Files">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dam-pumped-hydro-storage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dam &amp; Pumped Hydro Storage
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#battery-storage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Battery Storage
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hydrogen-storage-p2g2p" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hydrogen Storage (P2G2P)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-cross-border-flow-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Cross-Border Flow Files
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. Cross-Border Flow Files">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#switzerland-importsexports" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Switzerland Imports/Exports
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#all-branch-flows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        All Branch Flows
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-power-to-gas-to-power-p2g2p-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Power-to-Gas-to-Power (P2G2P) Files
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9. Power-to-Gas-to-Power (P2G2P) Files">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#market-interactions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Market Interactions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#p2g2p-components" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        P2G2P Components
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#p2g2p-economics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        P2G2P Economics
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#p2g2p-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        P2G2P Variables
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-curtailment-load-shedding-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Curtailment &amp; Load Shedding Files
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-aggregate-scalar-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Aggregate &amp; Scalar Files
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="11. Aggregate &amp; Scalar Files">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#res-production" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RES Production
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#demand-scalar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Demand Scalar
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-generator-summary-files-for-external-models" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. Generator Summary Files (for External Models)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#category-c-raw-model-internals" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Category C: Raw Model Internals
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#13-raw-model-internals-both-folders-direct-pyomo-exports" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13. Raw Model Internals (Both Folders) - Direct Pyomo Exports
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="13. Raw Model Internals (Both Folders) - Direct Pyomo Exports">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#variables-csv-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Variables (CSV files)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parameters-csv-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters (CSV files)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#constraint-duals-csv-files-with-_dual-suffix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Constraint Duals (CSV files with _dual suffix)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#model-statistics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Model Statistics
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#purpose" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Purpose
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#14-input-files-read-by-script" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14. Input Files (Read by Script)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#file-naming-conventions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        File Naming Conventions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="File Naming Conventions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#temporal-resolution-suffixes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Temporal Resolution Suffixes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#geographic-suffixes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Geographic Suffixes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#technology-suffixes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technology Suffixes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#categories-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Categories Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usage-notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage Notes
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+                
+
+
+
+  
+
+
+  <nav class="md-path" aria-label="Navigation" >
+    <ol class="md-path__list">
+      
+        
+  
+  
+    <li class="md-path__item">
+      <a href="../../.." class="md-path__link">
+        
+  <span class="md-ellipsis">
+    Home
+  </span>
+
+      </a>
+    </li>
+  
+
+      
+      
+        
+  
+  
+    
+    
+      
+  
+  
+    
+    
+      <li class="md-path__item">
+        <a href="../../get-started/install/" class="md-path__link">
+          
+  <span class="md-ellipsis">
+    Wiki
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+        
+  
+  
+    
+    
+      <li class="md-path__item">
+        <a href="../input-data-analysis/" class="md-path__link">
+          
+  <span class="md-ellipsis">
+    Discussions
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ol>
+  </nav>
+
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="output-files-generated-by-create_scenario_fastpy">Output Files Generated by create_scenario_fast.py</h1>
+<p><em>First version created by Ali Darudi in collaboration with AI (Claude Sonnet 4.5) - January 2026</em></p>
+<p>This document catalogs all CSV and Excel files generated by the <code>create_scenario_fast.py</code> script in the CentIv/cgep folder.</p>
+<h2 id="output-location">Output Location</h2>
+<p>All files are saved to: <strong><code>Results/&lt;scenario_name&gt;/</code></strong></p>
+<p>Where <code>&lt;scenario_name&gt;</code> is the name of your scenario.</p>
+<p>Within this folder, two subfolders contain results from different optimization stages:</p>
+<h3 id="1-investmentrun_runyear-first-stage-investment-optimization">1. <strong><code>InvestmentRun_&lt;RUNYEAR&gt;/</code></strong> - First Stage (Investment Optimization)</h3>
+<ul>
+<li>Contains results from the first optimization run that determines <strong>investment decisions</strong></li>
+<li>Includes all <a href="#13-raw-model-internals-both-folders---direct-pyomo-exports">model variables, parameters, and constraint duals</a> as CSV files</li>
+<li>Electricity prices in this stage include both investment and operating costs</li>
+</ul>
+<h3 id="2-centiv_runyear-second-stage-operational-optimization-with-fixed-investments-plus-files-used-for-the-webviewer">2. <strong><code>CentIv_&lt;RUNYEAR&gt;/</code></strong> - Second Stage (Operational Optimization with Fixed Investments plus files used for the Webviewer)</h3>
+<ul>
+<li>Contains final output files after <strong>fixing the investment decisions</strong> from the first stage</li>
+<li>Includes all <a href="#13-raw-model-internals-both-folders---direct-pyomo-exports">model variables, parameters, and constraint duals</a> as CSV files</li>
+<li>Contains <a href="#0-mapping-files">mapping files</a> that link integer model IDs to meaningful names and attributes</li>
+<li>Additionally, extra files are created (Excel/CSV) documenting system operation and investment (partially used in the Webviewer)</li>
+<li><strong>Electricity prices in this folder reflect only operating costs</strong>, as in actual electricity markets</li>
+</ul>
+<p>Where <code>&lt;RUNYEAR&gt;</code> is the year being simulated (e.g., 2030, 2040, 2050).</p>
+<p><strong>Why Two Stages?</strong> The model first optimizes investments (stage 1), then re-runs with those investments fixed (stage 2) to calculate electricity prices that reflect pure operating costs, matching real electricity market price formation.</p>
+<h2 id="overview">Overview</h2>
+<p>The script generates approximately 550+ output files in three main categories:</p>
+<h3 id="category-a-mapping-files-section-0">Category A: Mapping Files (Section 0)</h3>
+<p><strong>Location:</strong> <code>CentIv_&lt;RUNYEAR&gt;/mappings/</code></p>
+<p>These files link integer model IDs to meaningful names and attributes:</p>
+<ul>
+<li>Complete data files for all model elements (generators, buses, lines, transformers, loads)</li>
+<li>Forward and reverse mapping files (ID ↔ attributes)</li>
+<li>Essential for interpreting results and performing post-processing</li>
+</ul>
+<p><strong>~50+ files</strong> created at the start of the results saving process.</p>
+<h3 id="category-b-post-processed-result-files-sections-1-12">Category B: Post-Processed Result Files (Sections 1-12)</h3>
+<p><strong>Location:</strong> <code>CentIv_&lt;RUNYEAR&gt;/</code></p>
+<p>These are <strong>human-readable, aggregated output files</strong> created through custom post-processing code:</p>
+<ul>
+<li>Investment decisions - New units, new lines, P2G2P systems</li>
+<li>Demand data - Electricity, heat pumps, e-mobility, hydrogen</li>
+<li>Generation profiles - Per generator, per technology, per country</li>
+<li>Prices - Electricity, reserves</li>
+<li>Storage levels - Dams, pumped hydro, batteries, hydrogen</li>
+<li>Cross-border flows - Imports/exports</li>
+<li>Reserve contributions - FRR, RR</li>
+<li>Power-to-Gas-to-Power (P2G2P) operations</li>
+<li>Curtailment and load shedding</li>
+<li>Aggregate scalars and summaries - Total values, external model inputs</li>
+</ul>
+<p>These files involve <strong>manual remapping, aggregation, and formatting</strong> for analysis and visualization (including the Webviewer). <strong>~100-120 files</strong> total.</p>
+<h3 id="category-c-raw-model-internals-section-13">Category C: Raw Model Internals (Section 13)</h3>
+<p><strong>Location:</strong> <code>InvestmentRun_&lt;RUNYEAR&gt;/</code> and <code>CentIv_&lt;RUNYEAR&gt;/</code></p>
+<p>These are <strong>direct Pyomo model exports</strong> with no post-processing:</p>
+<ul>
+<li>All decision variables with optimal values</li>
+<li>All input parameters</li>
+<li>Constraint dual values (shadow prices)</li>
+</ul>
+<p>These are the <strong>raw materials from the solver</strong> - no manual remapping or aggregation applied. <strong>~200+ files in each folder</strong> (~400+ total).</p>
+<hr />
+<h2 id="category-a-mapping-files">Category A: Mapping Files</h2>
+<h2 id="0-mapping-files">0. Mapping Files</h2>
+<p><strong>Location:</strong> <code>Results/&lt;scenario_name&gt;/CentIv_&lt;RUNYEAR&gt;/mappings/</code></p>
+<p><strong>Created by:</strong> <code>save_results_fcns.saveMappingFiles(mapping_data, results_folder)</code></p>
+<p>This function creates mapping files in both forward and reverse directions for all model elements (generators, buses, lines, transformers, loads).</p>
+<h3 id="why-mapping-files-are-needed">Why Mapping Files Are Needed</h3>
+<p><strong>Important:</strong> For legacy reasons, the optimization model internally uses only <strong>integers as identifiers</strong> for all elements:</p>
+<ul>
+<li>Power plants are named: <code>0</code>, <code>1</code>, <code>2</code>, <code>3</code>, ...</li>
+<li>Buses/nodes are named: <code>0</code>, <code>1</code>, <code>2</code>, <code>3</code>, ...</li>
+</ul>
+<p>This integer naming convention makes some of the result files difficult to interpret without context. <strong>The mapping files solve this problem by:</strong></p>
+<ol>
+<li><strong>Remapping integers to meaningful names</strong>: Convert model IDs (0, 1, 2, ...) to descriptive names (e.g., <code>Hydro_Basel</code>, <code>Gas_Germany</code>, <code>Solar_Zurich</code>)</li>
+<li><strong>Linking elements to attributes</strong>: Map each element to its properties (e.g., plant 42 → Country: CH, Technology: Wind, Canton: Bern)</li>
+<li><strong>Enabling aggregation</strong>: Find all generators of a specific type, all buses in a region, etc.</li>
+</ol>
+<p>These files are created at the start of the results saving process and are essential for post-processing and analysis.</p>
+<h3 id="complete-data-files">Complete Data Files</h3>
+<ul>
+<li><strong>Data_generators.csv</strong> - Complete list of all generators with all attributes</li>
+<li><strong>Data_buses.csv</strong> - Complete list of all buses/nodes with all attributes</li>
+<li><strong>Data_lines.csv</strong> - Complete list of all transmission lines with all attributes</li>
+<li><strong>Data_transformers.csv</strong> - Complete list of all transformers with all attributes</li>
+<li><strong>Data_loads_busnodes.csv</strong> - Complete list of load connections to buses</li>
+<li><strong>Data_emobilityloads_busnodes.csv</strong> - E-mobility load to bus mappings</li>
+<li><strong>Data_heatpumploads_busnodes.csv</strong> - Heat pump load to bus mappings</li>
+<li><strong>Data_H2loads_busnodes.csv</strong> - Hydrogen load to bus mappings</li>
+<li><strong>Data_gens_busnodes.csv</strong> - Generator to bus connections</li>
+<li><strong>Data_distivinj_busnodes.csv</strong> - Distributed generation injection points</li>
+</ul>
+<h3 id="mapping-files-forward-and-reverse">Mapping Files (Forward and Reverse)</h3>
+<p>For each element type and attribute, mapping files are created in both directions:</p>
+<p><strong>Generators:</strong></p>
+<ul>
+<li><code>Map_generators_country.csv</code> / <code>Map_country_generators.csv</code></li>
+<li><code>Map_generators_technology.csv</code> / <code>Map_technology_generators.csv</code></li>
+<li><code>Map_generators_busname.csv</code> / <code>Map_busname_generators.csv</code></li>
+<li><code>Map_generators_gentype.csv</code> / <code>Map_gentype_generators.csv</code></li>
+<li><code>Map_generators_unittype.csv</code> / <code>Map_unittype_generators.csv</code></li>
+<li><code>Map_generators_genname.csv</code> / <code>Map_genname_generators.csv</code></li>
+<li><code>Map_generators_fueltype.csv</code> / <code>Map_fueltype_generators.csv</code></li>
+<li><code>Map_generators_subregion.csv</code> / <code>Map_subregion_generators.csv</code></li>
+</ul>
+<p><strong>Buses:</strong></p>
+<ul>
+<li><code>Map_buses_country.csv</code> / <code>Map_country_buses.csv</code></li>
+<li><code>Map_buses_busname.csv</code> / <code>Map_busname_buses.csv</code></li>
+<li><code>Map_buses_subregion.csv</code> / <code>Map_subregion_buses.csv</code></li>
+</ul>
+<p><strong>Lines:</strong></p>
+<ul>
+<li><code>Map_lines_fromcountry.csv</code> / <code>Map_fromcountry_lines.csv</code></li>
+<li><code>Map_lines_tocountry.csv</code> / <code>Map_tocountry_lines.csv</code></li>
+<li><code>Map_lines_linename.csv</code> / <code>Map_linename_lines.csv</code></li>
+<li><code>Map_lines_frombusname.csv</code> / <code>Map_frombusname_lines.csv</code></li>
+<li><code>Map_lines_tobusname.csv</code> / <code>Map_tobusname_lines.csv</code></li>
+</ul>
+<p><strong>Transformers:</strong></p>
+<ul>
+<li>Similar structure to lines with FromCountry, ToCountry, TrafoName, FromBusName, ToBusName</li>
+</ul>
+<p><strong>Load Connections:</strong></p>
+<ul>
+<li>Similar mappings for loads, emobility loads, heat pump loads, H2 loads connecting to buses</li>
+</ul>
+<p><strong>Purpose:</strong> These mappings allow easy filtering and aggregation of results by country, technology, bus, canton, etc. The forward mapping (e.g., <code>Map_generators_country.csv</code>) maps from model ID to attribute value. The reverse mapping (e.g., <code>Map_country_generators.csv</code>) maps from attribute value to all relevant model IDs.</p>
+<hr />
+<h2 id="category-b-post-processed-result-files">Category B: Post-Processed Result Files</h2>
+<p><strong>Created by:</strong> The main code in <code>create_scenario_fast.py</code></p>
+<p>The following sections (1-12) contain post-processed result files created through custom code that extracts data from the optimization model, performs manual remapping and aggregation, and saves formatted outputs. Helper methods from the <code>SaveResults</code> class in <code>save_results.py</code> are used for file writing.</p>
+<hr />
+<h2 id="1-investment-stage-decision-files">1. Investment Stage Decision Files</h2>
+<p>These files capture which new assets are built in the optimization scenario. If invetment in an asset group (e.g., transmission lines) is not activated in the run, the corresponding file will be empty.</p>
+<h3 id="transmission-lines">Transmission Lines</h3>
+<ul>
+<li>
+<p><strong>NewLines.xlsx</strong> - Investment status of all candidate transmission lines</p>
+</li>
+<li>
+<p>Contains: Line connections, ranks, investment decisions</p>
+</li>
+<li>
+<p>Note: May be empty if no lines are built</p>
+</li>
+<li>
+<p><strong>NewLinesOnlyOneStatus.xlsx</strong> - Newly built transmission lines only (filtered to status = 1)</p>
+</li>
+<li>Contains: Only lines with NewInvestment == 1</li>
+</ul>
+<h3 id="generation-units">Generation Units</h3>
+<ul>
+<li>
+<p><strong>NewUnits.xlsx</strong> - Newly built generation units</p>
+</li>
+<li>
+<p>Contains: Generator names and investment status (NewInvestment == 1)</p>
+</li>
+<li>
+<p>Excludes: Existing generators</p>
+</li>
+<li>
+<p><strong>NewUnitsWithNodeInfo.xlsx</strong> - Newly built generation units with node location information</p>
+</li>
+<li>Contains: Same as NewUnits.xlsx but with node/location details</li>
+</ul>
+<h3 id="power-to-gas-to-power-p2g2p-systems">Power-to-Gas-to-Power (P2G2P) Systems</h3>
+<ul>
+<li><strong>NewUnits_P2G2P.xlsx</strong> - Newly built P2G2P units</li>
+<li>Contains: GenName, Pmax, Pmin, Emax_h2stor, Pmax_methdac, Technology, NewInvestment</li>
+<li>Filter: NewInvestment == 2 (P2G2P units)</li>
+<li>Note: May be empty if no P2G2P units are built</li>
+</ul>
+<hr />
+<h2 id="2-demand-files">2. Demand Files</h2>
+<h3 id="switzerland-ch">Switzerland (CH)</h3>
+<ul>
+<li><strong>Demand_tpRes_CH.xlsx</strong> / <strong>Demand_tpRes_CH.csv</strong> - Swiss hourly demand using representative days (test cases only) (Format: Timeseries by canton/bus)</li>
+<li><strong>Demand_hourly_CH.xlsx</strong> / <strong>Demand_hourly_CH.csv</strong> - Swiss hourly demand (full resolution) - Purpose: For energy market analysis</li>
+<li><strong>eMobilityDemand_tpRes_CH.csv</strong> - E-mobility demand using representative days (test cases only) - Contains: EV charging demand by bus/canton</li>
+<li><strong>eMobilityDemand_hourly_CH.xlsx</strong> - E-mobility demand (full hourly resolution)</li>
+<li><strong>baseDemand_hourly_CH.xlsx</strong> - Base electricity demand (without heat pumps, EVs, H2)</li>
+<li><strong>unflex_heatpumpDemand_hourly_CH.xlsx</strong> - Optimized heat pump demand</li>
+<li><strong>uncontrolled_heatpumpDemand_hourly_CH.xlsx</strong> - Reference uncontrolled heat pump demand</li>
+<li><strong>heatpumpDemand_hourly_CH.xlsx</strong> - Controlled heat pump demand (after optimization)</li>
+<li><strong>H2electrDemand_hourly_CH.xlsx</strong> - Hydrogen electrolyzer demand</li>
+</ul>
+<h3 id="neighboring-countries">Neighboring Countries</h3>
+<ul>
+<li><strong>Demand_hourly_FR.xlsx</strong> - France hourly demand</li>
+<li><strong>Demand_hourly_IT.xlsx</strong> - Italy hourly demand</li>
+<li><strong>Demand_hourly_AT.xlsx</strong> - Austria hourly demand</li>
+<li><strong>Demand_hourly_DE.xlsx</strong> - Germany hourly demand</li>
+</ul>
+<h3 id="all-regions">All Regions</h3>
+<ul>
+<li><strong>DemandOriginal_hourly_ALL.csv</strong> - Original demand before any adjustments (all nodes)</li>
+</ul>
+<h3 id="demand-shifting-flexibility">Demand Shifting &amp; Flexibility</h3>
+<ul>
+<li><strong>LoadEmob_BeforeShift_hourly_ALL_LP.csv</strong> - E-mobility load before demand shifting</li>
+<li><strong>LoadEmob_AfterShift_hourly_ALL_LP.csv</strong> - E-mobility load after demand shifting</li>
+<li><strong>LoadHeatPump_BeforeShift_hourly_ALL_LP.csv</strong> - Heat pump load before shifting</li>
+<li><strong>LoadHeatPump_BeforeShift_NonFlexiblePortion_hourly_ALL_LP.csv</strong> - Non-flexible portion of HP load</li>
+<li><strong>LoadHeatPump_BeforeShift_FlexiblePortion_hourly_ALL_LP.csv</strong> - Flexible portion of HP load (before shift)</li>
+<li><strong>LoadHeatPump_AfterShift_hourly_ALL_LP.csv</strong> - Heat pump load after shifting</li>
+<li><strong>LoadHeatPump_AfterShift_FlexiblePortion_hourly_ALL_LP.csv</strong> - Flexible portion after shifting</li>
+</ul>
+<h3 id="demand-shift-components">Demand Shift Components</h3>
+<ul>
+<li><strong>LoadShiftDSMUp_hourly_ALL_LP.xlsx</strong> - Demand-side management upward shifts</li>
+<li><strong>LoadShiftDSMDown_hourly_ALL_LP.xlsx</strong> - Demand-side management downward shifts</li>
+<li><strong>LoadShiftEmobUp_hourly_ALL_LP.xlsx</strong> - E-mobility upward shifts</li>
+<li><strong>LoadShiftEmobDown_hourly_ALL_LP.xlsx</strong> - E-mobility downward shifts</li>
+<li><strong>LoadShiftHpUp_hourly_ALL_LP.xlsx</strong> - Heat pump upward shifts</li>
+<li><strong>LoadShiftHpDown_hourly_ALL_LP.xlsx</strong> - Heat pump downward shifts</li>
+</ul>
+<h3 id="flexibility-constraints">Flexibility Constraints</h3>
+<ul>
+<li><strong>LoadEmob_PmaxLimit_hourly_ALL_LP.csv</strong> - Upper limit on EV charging power per node</li>
+<li><strong>LoadEmob_PminLimit_hourly_ALL_LP.csv</strong> - Lower limit on EV charging power per node</li>
+<li><strong>LoadHeatPump_EmaxCumulativeLimit_hourly_ALL_LP.csv</strong> - Upper limit on cumulative HP energy per day</li>
+<li><strong>LoadHeatPump_EminCumulativeLimit_hourly_ALL_LP.csv</strong> - Lower limit on cumulative HP energy per day</li>
+</ul>
+<h3 id="additional-demand-files">Additional Demand Files</h3>
+<ul>
+<li><strong>FlexLoadHeatPump_hourly_ALL_LP.xlsx</strong> - Flexible heat pump load</li>
+<li><strong>heatpumpDemand_hourly_ALL_LP.xlsx</strong> - Controlled heat pump demand (all nodes)</li>
+<li><strong>FinalLoadCascades_hourly_ALL_LP.xlsx</strong> - Final load including all cascading effects</li>
+</ul>
+<hr />
+<h2 id="4-generation-output-files">4. Generation Output Files</h2>
+<h3 id="all-generators-countries">All Generators &amp; Countries</h3>
+<ul>
+<li><strong>GenerationPerGen_hourly_ALL_LP.xlsx</strong> - Generation by each generator (all countries, hourly)- Dimensions: Generators × Hours - Contains: Country, Technology info</li>
+<li><strong>GenerationPerGenGasNet_hourly_ALL_LP.xlsx</strong> - Generation with gas network information - Additional info: Generator names for gas network analysis</li>
+<li><strong>GenerationPerGenCANTONS_hourly_ALL_LP.xlsx</strong> - Generation by generator with cantonal breakdown - For Switzerland: Includes canton information</li>
+<li><strong>ConsumptionPerGen_full_ALL_LP.xlsx</strong> - Consumption by each unit (e.g., pumped hydro, P2G2P) - Contains: Country, Technology</li>
+<li><strong>ConsumptionPerGenCANTONS_hourly_ALL_LP.xlsx</strong> - Consumption with cantonal breakdown</li>
+<li><strong>GenerationConsumptionPerGen_hourly_ALL_LP.xlsx</strong> - Net generation minus consumption per generator - Purpose: Net energy balance per unit</li>
+<li><strong>GenerationConsumptionPerGenGenNames_hourly_ALL_LP.xlsx</strong> - Same as above with generator names</li>
+<li><strong>CurtailmentPerGen_hourly_ALL_LP.xlsx</strong> - Curtailment by generator - Contains: Renewable curtailment by generator name</li>
+</ul>
+<h3 id="country-specific-generation-aggregation">Country-Specific Generation Aggregation</h3>
+<ul>
+<li><strong>GenerationPerGenType_hourly_CH_LP.csv</strong> - Switzerland generation aggregated by technology type</li>
+<li><strong>GenerationPerGenType_hourly_DE_LP.csv</strong> - Germany generation by technology type</li>
+<li><strong>GenerationPerGenType_hourly_IT_LP.csv</strong> - Italy generation by technology type</li>
+<li><strong>GenerationPerGenType_hourly_AT_LP.csv</strong> - Austria generation by technology type</li>
+<li><strong>GenerationPerGenType_hourly_FR_LP.csv</strong> - France generation by technology type</li>
+</ul>
+<h3 id="switzerland-monthlytotal-generation">Switzerland Monthly/Total Generation</h3>
+<ul>
+<li><strong>GenerationConsumption_monthly_CH_LP.xlsx</strong> - CH generation/consumption by technology (monthly) - Contains: Multiple sheets with detailed technology breakdowns (Dams, Pumped, RoR, Nuclear, Biomass, Gas, Solar, Wind, Oil, Batteries, P2G2P, DAC)</li>
+<li><strong>GenerationConsumption_total_CH_LP.xlsx</strong> - CH generation/consumption aggregated for CGE model - Contains: Total generation, pumping, investment costs, operational costs by technology</li>
+</ul>
+<h3 id="neighboring-countries-monthly-generation">Neighboring Countries Monthly Generation</h3>
+<ul>
+<li><strong>GenerationConsumption_monthly_DE_LP.xlsx</strong> - Germany monthly generation/pumping by technology</li>
+<li><strong>GenerationConsumption_monthly_AT_LP.xlsx</strong> - Austria monthly generation/pumping by technology</li>
+<li><strong>GenerationConsumption_monthly_FR_LP.xlsx</strong> - France monthly generation/pumping by technology</li>
+<li><strong>GenerationConsumption_monthly_IT_LP.xlsx</strong> - Italy monthly generation/pumping by technology</li>
+</ul>
+<h3 id="generation-costs">Generation Costs</h3>
+<ul>
+<li><strong>GenerationCostPerGen_hourly_ALL_LP.xlsx</strong> - Generation cost per generator per hour</li>
+<li>Contains: Country, Technology, Generator name</li>
+</ul>
+<hr />
+<h2 id="5-price-files">5. Price Files</h2>
+<h3 id="electricity-prices">Electricity Prices</h3>
+<ul>
+<li>
+<p><strong>ElPrice_tpRes_CH.xlsx</strong> - Electricity prices for Switzerland (representative days - test cases only) - Contains: Nodal dual variables (shadow prices) in CHF/MWh</p>
+</li>
+<li>
+<p><strong>ElPrice_tpRes_Neighbours.xlsx</strong> - Electricity prices for neighboring countries (representative days - test cases only)</p>
+</li>
+<li><strong>ElPrice_hourly_CH.xlsx</strong> - Hourly electricity prices for Switzerland</li>
+<li><strong>ElPrice_hourly_Neighbours.xlsx</strong> - Hourly electricity prices for neighboring countries</li>
+<li><strong>ElPrice_hourly_adjustedDistIvABM_CH.xlsx</strong> - CH electricity prices adjusted for distributed generation from ABM</li>
+<li><strong>ElPrice_tpRes_adjustedDistIvABM_CH.xlsx</strong> - CH prices (representative days - test cases only) adjusted for distributed generation</li>
+<li><strong>ElPrice_hourly_adjustedDistIvABM_Neighbours.xlsx</strong> - Neighbor prices adjusted for distributed generation</li>
+<li><strong>ElPrice_tpRes_adjustedDistIvABM_Neighbours.xlsx</strong> - Neighbor prices (representative days - test cases only) adjusted for distributed generation</li>
+</ul>
+<h3 id="reserve-prices">Reserve Prices</h3>
+<ul>
+<li><strong>FRRupPrice_tpRes_CH.xlsx</strong> - Frequency Restoration Reserve (upward) price</li>
+<li><strong>FRRdownPrice_tpRes_CH.xlsx</strong> - Frequency Restoration Reserve (downward) price</li>
+<li><strong>RRupPrice_tpRes_CH.xlsx</strong> - Replacement Reserve (upward) price</li>
+<li><strong>RRdownPrice_tpRes_CH.xlsx</strong> - Replacement Reserve (downward) price</li>
+</ul>
+<h3 id="res-premium-price">RES Premium Price</h3>
+<ul>
+<li><strong>RESpremiumPrice_CH.xlsx</strong> - Renewable Energy Source premium price</li>
+<li>Contains: Dual variable from RES target constraint</li>
+</ul>
+<hr />
+<h2 id="6-reserve-requirement-files">6. Reserve Requirement Files</h2>
+<ul>
+<li>
+<p><strong>AddReserve_Args.xlsx</strong> - Additional reserve arguments</p>
+</li>
+<li>
+<p>Contains: Technical characteristics for reserve provision (TCR), distributed investment (DistIv), centralized investment (CentIv) for Wind and Solar</p>
+</li>
+<li>
+<p>Columns: TCR_windUP, TCR_windDOWN, TCR_solarUP, TCR_solarDOWN, DistIv_Solar_MW, CentIv_Solar_MW, CentIv_Wind_MW</p>
+</li>
+<li>
+<p><strong>FRRSystemReserves_tpRes_CH.xlsx</strong> - System-wide secondary reserve requirements</p>
+</li>
+<li>
+<p>Contains: FRRdnReq, FRRupReq (MW)</p>
+</li>
+<li>
+<p><strong>ReserveContributionFRR_hourly_CH_LP.xlsx</strong> - FRR contributions by technology</p>
+</li>
+<li>
+<p>Sheets: FRRup/down from Dams, Pumps, Daily Pumps, Nuclear (existing &amp; new), Conventional</p>
+</li>
+<li>
+<p><strong>ReserveContributionRR_hourly_CH_LP.xlsx</strong> - RR contributions by technology</p>
+</li>
+<li>Sheets: RRup/down from Dams, Pumps, Daily Pumps, Nuclear (existing &amp; new), Conventional</li>
+</ul>
+<hr />
+<h2 id="7-storage-level-files">7. Storage Level Files</h2>
+<h3 id="dam-pumped-hydro-storage">Dam &amp; Pumped Hydro Storage</h3>
+<ul>
+<li><strong>Reservoirs_hourly_CH_LP.xlsx</strong> - Reservoir storage levels (hourly) - Sheets: DamLevel_hourly_CH, PumpLevel_hourly_CH, DailyPumpLevel_hourly_CH</li>
+<li><strong>CumulativeStorageLevels_monthly_CH_LP.xlsx</strong> - Monthly cumulative storage levels (all storage)</li>
+<li>
+<p><strong>DamStorageLevels_monthly_CH_LP.xlsx</strong> / <strong>DamStorageLevels_monthly_CH_LP.csv</strong> Monthly dam storage levels - Contains: Month names and storage levels in MWh</p>
+</li>
+<li>
+<p><strong>DamGeneration_hourly_CH_LP.xlsx</strong> - Dam generation (Switzerland)</p>
+</li>
+<li><strong>DamGeneration_hourly_Neighbours_LP.xlsx</strong> - Dam generation (Neighbors)</li>
+<li><strong>PumpGeneration_hourly_CH_LP.xlsx</strong> - Pumped hydro generation (Switzerland)</li>
+<li><strong>PumpConsumption_hourly_CH_LP.xlsx</strong> - Pumped hydro consumption (Switzerland)</li>
+<li><strong>PumpGeneration_hourly_Neighbours_LP.xlsx</strong> - Pumped hydro generation (Neighbors)</li>
+<li><strong>PumpConsumption_hourly_Neighbours_LP.xlsx</strong> - Pumped hydro consumption (Neighbors)</li>
+</ul>
+<h3 id="battery-storage">Battery Storage</h3>
+<ul>
+<li><strong>BattSoC_hourly_ALL_LP.xlsx</strong> - Battery state of charge (all batteries) - Sheets: BattSoC_hourly_existing, BattSoC_hourly_candidate</li>
+</ul>
+<h3 id="hydrogen-storage-p2g2p">Hydrogen Storage (P2G2P)</h3>
+<ul>
+<li><strong>P2G2P_H2SoC_hourly_ALL_LP.xlsx</strong> - Hydrogen storage state of charge - Sheets: H2SoC_hourly_all, H2SoC_hourly_built</li>
+</ul>
+<hr />
+<h2 id="8-cross-border-flow-files">8. Cross-Border Flow Files</h2>
+<h3 id="switzerland-importsexports">Switzerland Imports/Exports</h3>
+<ul>
+<li>
+<p><strong>ExportImport_total_CH_LP.xlsx</strong> - Total exports and imports for Switzerland (MWh) - Contains: Tot_Export_CH_MWh, Tot_Import_CH_MWh</p>
+</li>
+<li>
+<p><strong>ExportImport_total_ALL.xlsx</strong> - Bilateral flows between all countries - Sheets: CH_AT, CH_DE, CH_FR, CH_IT, DE_FR, DE_AT, FR_IT, IT_AT</p>
+</li>
+<li>
+<p><strong>CrossBorderBranchFlows_hourly_CH_LP.xlsx</strong> - Cross-border branch flows involving Switzerland</p>
+</li>
+<li><strong>CH_exports.csv</strong> - Swiss exports by hour and line (negative values)</li>
+<li><strong>CH_imports.csv</strong> - Swiss imports by hour and line (positive values, adjusted sign)</li>
+</ul>
+<h3 id="all-branch-flows">All Branch Flows</h3>
+<ul>
+<li><strong>BranchFlows_hourly_ALL_LP.xlsx</strong> - All transmission line flows (hourly) - Contains: Line ratings, line names</li>
+</ul>
+<hr />
+<h2 id="9-power-to-gas-to-power-p2g2p-files">9. Power-to-Gas-to-Power (P2G2P) Files</h2>
+<h3 id="market-interactions">Market Interactions</h3>
+<ul>
+<li><strong>P2G2P_CH4Market_hourly_CH_LP.xlsx</strong> - CH4 (methane) to/from market - Units: MWh_th</li>
+<li><strong>P2G2P_H2Market_hourly_CH_LP.xlsx</strong> - H2 (hydrogen) to/from market - Units: tonne_H2</li>
+<li><strong>P2G2P_CO2captured_hourly_CH_LP.xlsx</strong> - CO2 captured - Units: tonne_CO2</li>
+</ul>
+<h3 id="p2g2p-components">P2G2P Components</h3>
+<ul>
+<li><strong>P2G2P_ELconsumption_hourly_CH_LP.xlsx</strong> - Electrolyzer electricity consumption - Units: MWh</li>
+<li><strong>P2G2P_CH4DACconsumption_hourly_CH_LP.xlsx</strong> - CH4 consumption for DAC (Direct Air Capture) - Units: MWh</li>
+<li><strong>P2G2P_REgeneration_hourly_CH_LP.xlsx</strong> - Re-conversion generation (fuel cell / turbine output) - Units: MWh</li>
+</ul>
+<h3 id="p2g2p-economics">P2G2P Economics</h3>
+<ul>
+<li>
+<p><strong>P2G2P_ImportsCosts_hourly_ALL_LP.xlsx</strong> - Imports and costs - Sheets: H2import, H2importcost, CH4import, CH4importcost</p>
+</li>
+<li>
+<p><strong>P2G2P_RevenuesCarriers_hourly_ALL_LP.xlsx</strong> - Revenues from selling carriers - Sheets: H2revenue, CH4revenue, CO2revenue</p>
+</li>
+</ul>
+<h3 id="p2g2p-variables">P2G2P Variables</h3>
+<ul>
+<li><strong>P2G2P_H2vars_hourly_LP.xlsx</strong> - Hydrogen balance variables - Sheets: H2byEL_hourly_all, H2meth_hourly_all, H2market_hourly_all, H2recon_hourly_all</li>
+</ul>
+<hr />
+<h2 id="10-curtailment-load-shedding-files">10. Curtailment &amp; Load Shedding Files</h2>
+<ul>
+<li>
+<p><strong>REScurtailmentDistIv_hourly_ALL_LP.xlsx</strong> / <strong>REScurtailmentDistIv_hourly_ALL_LP.csv</strong></p>
+</li>
+<li>
+<p>Contains: Curtailment of distributed renewable generation by bus/node</p>
+</li>
+<li>Units: MW</li>
+<li>
+<p>Note: A warning message is printed if curtailment occurs</p>
+</li>
+<li>
+<p><strong>LoadShedding_hourly_ALL_LP.xlsx</strong> / <strong>LoadShedding_hourly_ALL_LP.csv</strong></p>
+</li>
+<li>Contains: Emergency load shedding by bus/node</li>
+<li>Units: MW</li>
+</ul>
+<hr />
+<h2 id="11-aggregate-scalar-files">11. Aggregate &amp; Scalar Files</h2>
+<h3 id="res-production">RES Production</h3>
+<ul>
+<li><strong>RESGeneration_total_CH.xlsx</strong> - Total RES generation in Switzerland - Contains: Tot_RES_Production_MWh</li>
+<li><strong>OriginalRESTarget_total_CH.xlsx</strong> - Original RES target for Switzerland - Contains: Original_RES_Target_TWh</li>
+</ul>
+<h3 id="demand-scalar">Demand Scalar</h3>
+<ul>
+<li><strong>Demand_Scalar.xlsx</strong> - Demand scaling factor - Contains: DemandScalar used to adjust load</li>
+</ul>
+<hr />
+<h2 id="12-generator-summary-files-for-external-models">12. Generator Summary Files (for External Models)</h2>
+<ul>
+<li><strong>Generators_EM.xlsx</strong> - Generator parameters for external energy model (EM) - Contains: Generator names, technologies, Pmax, Pmin</li>
+<li>
+<p><strong>Generators_EM_agg.csv</strong> - Aggregated generator data by technology - Contains: Technology-level aggregation of Pmax, Pmin</p>
+</li>
+<li>
+<p><strong>Investments_total_CH_LP.xlsx</strong> - Total investment summary- Contains: Fixed operational costs, investment costs, total generation by technology</p>
+</li>
+</ul>
+<hr />
+<h2 id="category-c-raw-model-internals">Category C: Raw Model Internals</h2>
+<h2 id="13-raw-model-internals-both-folders-direct-pyomo-exports">13. Raw Model Internals (Both Folders) - Direct Pyomo Exports</h2>
+<p><strong>Locations:</strong></p>
+<ul>
+<li><code>Results/&lt;scenario_name&gt;/InvestmentRun_&lt;RUNYEAR&gt;/</code> - First stage optimization with investment decisions</li>
+<li><code>Results/&lt;scenario_name&gt;/CentIv_&lt;RUNYEAR&gt;/</code> - Second stage optimization with fixed investments</li>
+</ul>
+<p><strong>Created by:</strong> <code>save_results_fcns.saveVarParDualsCsv(opt.model, results_folder)</code></p>
+<p>This function directly exports all Pyomo model components (variables, parameters, constraint duals) to CSV files without any post-processing.</p>
+<p><strong>Important Distinction:</strong> Unlike sections 0-12 which contain post-processed, human-readable files created through custom aggregation and remapping code, <strong>these are direct, unprocessed exports from the Pyomo optimization model</strong>. No manual remapping or aggregation is applied - these are the raw materials from the solver.</p>
+<p>All Pyomo model variables, parameters, and constraint duals are exported to CSV files in <strong>both folders</strong>. These files provide complete access to the optimization model's internal state for advanced analysis and debugging.</p>
+<p><strong>Key Difference Between Folders:</strong></p>
+<ul>
+<li><strong>InvestmentRun:</strong> Contains results where investment variables are free to optimize (investment costs included in objective)</li>
+<li><strong>CentIv:</strong> Contains results where investment decisions are fixed from stage 1 (only operational optimization, electricity prices reflect operating costs only)</li>
+</ul>
+<h3 id="variables-csv-files">Variables (CSV files)</h3>
+<p>All decision variables from the optimization model are exported with their optimal values. Examples include:</p>
+<ul>
+<li><strong>Generation variables:</strong> Power output by generator and time period</li>
+<li><strong>Storage variables:</strong> State of charge for batteries, hydro, hydrogen storage</li>
+<li><strong>Investment variables:</strong> Binary/continuous decisions for new capacity</li>
+<li><strong>Load shifting variables:</strong> Flexible demand adjustments</li>
+<li><strong>Flow variables:</strong> Power flows on transmission lines</li>
+<li><strong>Reserve variables:</strong> Reserve provision by generators</li>
+</ul>
+<p>Each variable file is named <code>&lt;variable_name&gt;.csv</code> and contains:</p>
+<ul>
+<li>Index columns identifying the variable indices (e.g., generator ID, time period, bus)</li>
+<li>Value column with the optimal solution value</li>
+</ul>
+<p><strong>Tip:</strong> To find where a variable is defined in the code, use the project-wide search (Ctrl+Shift+F in VS Code) and search for <code>&lt;variable_name&gt; =</code> (e.g., <code>MaxPowerInvNonDisp =</code>).</p>
+<h3 id="parameters-csv-files">Parameters (CSV files)</h3>
+<p>All model parameters (input data) are exported. Examples include:</p>
+<ul>
+<li><strong>Generator characteristics:</strong> Pmax, Pmin, efficiency, costs</li>
+<li><strong>Time series data:</strong> Demand profiles, renewable availability factors</li>
+<li><strong>Network parameters:</strong> Line capacities, reactances</li>
+<li><strong>Cost parameters:</strong> Fuel prices, investment costs, operational costs</li>
+</ul>
+<p>Each parameter file is named <code>&lt;parameter_name&gt;.csv</code> with the same structure as variables.</p>
+<p><strong>Tip:</strong> To find where a parameter is defined in the code, use the project-wide search (Ctrl+Shift+F in VS Code) and search for <code>&lt;parameter_name&gt; =</code>.</p>
+<h3 id="constraint-duals-csv-files-with-_dual-suffix">Constraint Duals (CSV files with <code>_dual</code> suffix)</h3>
+<p>Dual values (shadow prices) for key constraints are exported. These duals represent the marginal value of relaxing each constraint. Currently exported duals include:</p>
+<ul>
+<li><strong>NodalConstraint_dual.csv</strong> / <strong>NodalConstraint_one_CH_dual.csv</strong> - Nodal energy balance duals (electricity prices)</li>
+<li><strong>SoCHydroCon1_dual.csv</strong> - Hydro storage constraint duals</li>
+<li><strong>SoCHydroDamCon_dual.csv</strong> - Dam storage constraint duals</li>
+<li><strong>SoCBattCandCon_dual.csv</strong> / <strong>SoCBattCon_dual.csv</strong> / <strong>SoCCon_dual.csv</strong> - Battery storage constraint duals</li>
+<li><strong>SoCDSMCon_dual.csv</strong> - Demand-side management storage constraint duals</li>
+<li><strong>SoCHydrogenCandCon_dual.csv</strong> / <strong>SoCH2CandCon_dual.csv</strong> - Hydrogen storage constraint duals</li>
+<li><strong>SoCHydroDayCon1_dual.csv</strong> - Daily hydro storage constraint duals</li>
+</ul>
+<p>Each dual file contains:</p>
+<ul>
+<li>Index columns identifying the constraint instance</li>
+<li>Value column with the dual (shadow price) value</li>
+</ul>
+<h3 id="model-statistics">Model Statistics</h3>
+<ul>
+<li><strong>selected_stats.csv</strong> - Summary statistics including:</li>
+<li>Solver termination condition and status</li>
+<li>Objective function value (total system cost)</li>
+<li>Solve time</li>
+<li>Number of variables and constraints</li>
+<li>Duration log of different model building and solving phases</li>
+</ul>
+<h3 id="purpose">Purpose</h3>
+<p>These InvestmentRun files are primarily for:</p>
+<ul>
+<li><strong>Advanced debugging:</strong> Inspecting all model variables and parameters</li>
+<li><strong>Custom post-processing:</strong> Building analyses not covered by standard output files</li>
+<li><strong>Model validation:</strong> Verifying constraint satisfaction and solution quality</li>
+<li><strong>Research:</strong> Accessing detailed optimization results for academic studies</li>
+</ul>
+<p><strong>Note:</strong> These files can be very large (hundreds of MB) depending on model size. Production runs use full 8760 hourly resolution.</p>
+<hr />
+<h2 id="14-input-files-read-by-script">14. Input Files (Read by Script)</h2>
+<p>These files are <strong>read</strong> by the script (not written):</p>
+<ul>
+<li><strong>Hourly_Nodal_Residual_Demand.xlsx</strong> - Residual demand input</li>
+<li><strong>Residual_FRR_System_Reserves.xlsx</strong> - Reserve requirements input</li>
+<li><strong>GenerationDistIv_hourly_CH.xlsx</strong> - Distributed generation input (if ABM is not used)</li>
+<li><strong>priorityList.csv</strong> - Priority list for generators</li>
+<li><strong>expPlanTable.csv</strong> - Expansion plan table</li>
+</ul>
+<hr />
+<h2 id="file-naming-conventions">File Naming Conventions</h2>
+<h3 id="temporal-resolution-suffixes">Temporal Resolution Suffixes</h3>
+<ul>
+<li><strong><code>_tpRes_</code></strong> - Temporally aggregated resolution using representative days (test cases only). The model runs on selected days which are then copied to fill 8760 hours. <strong>Normal production runs do not use this - they run full 8760 hours.</strong></li>
+<li><strong><code>_hourly_</code></strong> - Full hourly resolution (8760 hours) - standard for production runs</li>
+<li><strong><code>_monthly_</code></strong> - Monthly aggregation</li>
+</ul>
+<h3 id="geographic-suffixes">Geographic Suffixes</h3>
+<ul>
+<li><strong><code>_CH</code></strong> - Switzerland only</li>
+<li><strong><code>_Neighbours</code></strong> - AT, DE, FR, IT (neighboring countries)</li>
+<li><strong><code>_ALL</code></strong> - All regions/nodes</li>
+<li><strong><code>_LP</code></strong> - Linear Programming optimization results (2nd stage runs)</li>
+</ul>
+<h3 id="technology-suffixes">Technology Suffixes</h3>
+<ul>
+<li><strong>DistIv</strong> - Distributed Investment (e.g., rooftop solar)</li>
+<li><strong>CentIv</strong> - Centralized Investment (e.g., utility-scale solar/wind)</li>
+<li><strong>P2G2P</strong> - Power-to-Gas-to-Power systems</li>
+<li><strong>EM</strong> - Energy Model (external CGE or equilibrium model)</li>
+</ul>
+<hr />
+<h2 id="categories-summary">Categories Summary</h2>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Number of Files</th>
+<th>File Type</th>
+<th>Location</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mapping Files</td>
+<td>50+</td>
+<td>.csv</td>
+<td>CentIv_YEAR/mappings/</td>
+</tr>
+<tr>
+<td>Investment Decisions</td>
+<td>5</td>
+<td>.xlsx</td>
+<td>CentIv_YEAR/</td>
+</tr>
+<tr>
+<td>Demand</td>
+<td>25+</td>
+<td>.xlsx, .csv</td>
+<td>CentIv_YEAR/</td>
+</tr>
+<tr>
+<td>Distributed Generation</td>
+<td>3</td>
+<td>.xlsx, .csv</td>
+<td>CentIv_YEAR/</td>
+</tr>
+<tr>
+<td>Generation Output</td>
+<td>20+</td>
+<td>.xlsx, .csv</td>
+<td>CentIv_YEAR/</td>
+</tr>
+<tr>
+<td>Prices</td>
+<td>10+</td>
+<td>.xlsx</td>
+<td>CentIv_YEAR/</td>
+</tr>
+<tr>
+<td>Reserve Requirements</td>
+<td>4</td>
+<td>.xlsx</td>
+<td>CentIv_YEAR/</td>
+</tr>
+<tr>
+<td>Storage Levels</td>
+<td>12+</td>
+<td>.xlsx, .csv</td>
+<td>CentIv_YEAR/</td>
+</tr>
+<tr>
+<td>Cross-Border Flows</td>
+<td>6</td>
+<td>.xlsx, .csv</td>
+<td>CentIv_YEAR/</td>
+</tr>
+<tr>
+<td>P2G2P Operations</td>
+<td>15+</td>
+<td>.xlsx</td>
+<td>CentIv_YEAR/</td>
+</tr>
+<tr>
+<td>Curtailment &amp; Load Shedding</td>
+<td>4</td>
+<td>.xlsx, .csv</td>
+<td>CentIv_YEAR/</td>
+</tr>
+<tr>
+<td>Aggregates &amp; Scalars</td>
+<td>3</td>
+<td>.xlsx</td>
+<td>CentIv_YEAR/</td>
+</tr>
+<tr>
+<td>Generator Summaries</td>
+<td>3</td>
+<td>.xlsx, .csv</td>
+<td>CentIv_YEAR/</td>
+</tr>
+<tr>
+<td>Model Internals</td>
+<td>200+ each</td>
+<td>.csv</td>
+<td>InvestmentRun_YEAR/ &amp; CentIv_YEAR/</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Total: Approximately 550+ output files</strong> (100-120 result files in CentIv, 50+ mapping files in CentIv, 200+ model internals in InvestmentRun, 200+ model internals in CentIv)</p>
+<hr />
+<h2 id="usage-notes">Usage Notes</h2>
+<ol>
+<li>
+<p><strong>Conditional Generation</strong>: Many files are only created if certain model features are enabled:</p>
+</li>
+<li>
+<p>P2G2P files require P2G2P units to be active</p>
+</li>
+<li>Reserve files require reserve modeling to be enabled</li>
+<li>
+<p>Distributed generation files depend on ABM integration</p>
+</li>
+<li>
+<p><strong>File Formats</strong>:</p>
+</li>
+<li>
+<p><code>.xlsx</code> files typically have multiple sheets and formatted data</p>
+</li>
+<li>
+<p><code>.csv</code> files are simpler, single-table format for easier programmatic access</p>
+</li>
+<li>
+<p><strong>Coordinate Systems</strong>:</p>
+</li>
+<li>
+<p>Most files use node/bus identifiers</p>
+</li>
+<li>Swiss files often include canton information</li>
+<li>
+<p>Generator files include technology and country info</p>
+</li>
+<li>
+<p><strong>Sign Conventions</strong>:</p>
+</li>
+<li>Exports: Negative values indicate power leaving a region</li>
+<li>Imports: Positive values indicate power entering a region</li>
+<li>Some files are adjusted for post-processing (e.g., <code>CH_exports.csv</code> has signs flipped)</li>
+</ol>
+<hr />
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+      <div class="md-progress" data-md-component="progress" role="progressbar"></div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.instant", "navigation.instant.prefetch", "navigation.instant.preview", "navigation.instant.progress", "navigation.path", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

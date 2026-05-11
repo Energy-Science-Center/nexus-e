@@ -396,7 +396,20 @@ function [ ] = FuncNexuse_Database_UpdateInvestments(wkspace,conn,CentIvToMySQL)
             ztemp = GenData_new_disp_fully{:,vars};
             ztemp(cellfun(@(ztemp) any(isnan(ztemp(:))), ztemp)) = java.lang.String('');
             GenData_new_disp_fully{:,vars} = ztemp; clear ztemp;
-            
+            % replace NaN in cascade vars with BLANKS (only if columns exist)
+            vars_cascade = {'WASTA','QT','QP','idResUp','idResLow','idCasc','HydroCHAgg','HydroCHCasc'};
+            vars_cascade_present = vars_cascade(ismember(vars_cascade, GenData_new_disp_fully.Properties.VariableNames));
+            if ~isempty(vars_cascade_present)
+                for v = vars_cascade_present
+                    if isnumeric(GenData_new_disp_fully.(v{1}))
+                        GenData_new_disp_fully.(v{1}) = num2cell(GenData_new_disp_fully.(v{1}));
+                    end
+                end
+                ztemp = GenData_new_disp_fully{:, vars_cascade_present};
+                ztemp(cellfun(@(x) isnumeric(x) && any(isnan(x(:))), ztemp)) = java.lang.String('');
+                GenData_new_disp_fully{:, vars_cascade_present} = ztemp; clear ztemp;
+            end
+
             % get the column names of the GenData table, needed to use
             % datainsert to put new data back into MySQL
             colNames = GenData_new_disp_fully.Properties.VariableNames;
@@ -550,7 +563,20 @@ function [ ] = FuncNexuse_Database_UpdateInvestments(wkspace,conn,CentIvToMySQL)
             ztemp = GenData_new_disp_partially{:,vars};
             ztemp(cellfun(@(ztemp) any(isnan(ztemp(:))), ztemp)) = java.lang.String('');
             GenData_new_disp_partially{:,vars} = ztemp; clear ztemp;
-            
+            % replace NaN in cascade vars with BLANKS (only if columns exist)
+            vars_cascade = {'WASTA','QT','QP','idResUp','idResLow','idCasc','HydroCHAgg','HydroCHCasc'};
+            vars_cascade_present = vars_cascade(ismember(vars_cascade, GenData_new_disp_partially.Properties.VariableNames));
+            if ~isempty(vars_cascade_present)
+                for v = vars_cascade_present
+                    if isnumeric(GenData_new_disp_partially.(v{1}))
+                        GenData_new_disp_partially.(v{1}) = num2cell(GenData_new_disp_partially.(v{1}));
+                    end
+                end
+                ztemp = GenData_new_disp_partially{:, vars_cascade_present};
+                ztemp(cellfun(@(x) isnumeric(x) && any(isnan(x(:))), ztemp)) = java.lang.String('');
+                GenData_new_disp_partially{:, vars_cascade_present} = ztemp; clear ztemp;
+            end
+
             % get the column names of the GenData table, needed to use
             % datainsert to put new data back into MySQL
             colNames = GenData_new_disp_partially.Properties.VariableNames;
@@ -616,7 +642,20 @@ function [ ] = FuncNexuse_Database_UpdateInvestments(wkspace,conn,CentIvToMySQL)
                     ztemp_recl = GenData_new_disp_reclassified{:,vars_recl};
                     ztemp_recl(cellfun(@(ztemp_recl) any(isnan(ztemp_recl(:))), ztemp_recl)) = java.lang.String('');
                     GenData_new_disp_reclassified{:,vars_recl} = ztemp_recl; clear ztemp_recl;
-                    
+                    % replace NaN in cascade vars with BLANKS (only if columns exist)
+                    vars_cascade = {'WASTA','QT','QP','idResUp','idResLow','idCasc','HydroCHAgg','HydroCHCasc'};
+                    vars_cascade_present = vars_cascade(ismember(vars_cascade, GenData_new_disp_reclassified.Properties.VariableNames));
+                    if ~isempty(vars_cascade_present)
+                        for v = vars_cascade_present
+                            if isnumeric(GenData_new_disp_reclassified.(v{1}))
+                                GenData_new_disp_reclassified.(v{1}) = num2cell(GenData_new_disp_reclassified.(v{1}));
+                            end
+                        end
+                        ztemp = GenData_new_disp_reclassified{:, vars_cascade_present};
+                        ztemp(cellfun(@(x) isnumeric(x) && any(isnan(x(:))), ztemp)) = java.lang.String('');
+                        GenData_new_disp_reclassified{:, vars_cascade_present} = ztemp; clear ztemp;
+                    end
+
                     colNames_recl = GenData_new_disp_reclassified.Properties.VariableNames;
                     datainsert(conn,'gendata',colNames_recl,GenData_new_disp_reclassified);
                     
@@ -715,26 +754,7 @@ function [ ] = FuncNexuse_Database_UpdateInvestments(wkspace,conn,CentIvToMySQL)
             % remove any genconfigs I shouldn't be updating
             GenConfigurationData_toupdate(~ismember(GenConfigurationData_toupdate.idGenConfig,ToUpdate_GenConfigs),:)=[];
 
-            % Step C1: edit main data for Inv portion
-            %>>>>>>>>>>>><<<<<<<<<<<<<<
-            % modify the idGen, GenName, CandidateUnit, Pmax, and Pmin for 
-            % all the genconfigs I need to update
-            % Note: I do need to edit Pmin, Emax, and Emin because BESS as
-            % candidate units
-            GenConfigurationData_new_disp_partially = GenConfigurationData_toupdate;
-            GenConfigurationData_new_disp_partially.idGen = repmat( GenData_new_disp_partially.idGen(idx_disp_partially_inv),length(ToUpdate_GenConfigs),1 );
-            GenConfigurationData_new_disp_partially.GenName = repmat( GenData_new_disp_partially.GenName(idx_disp_partially_inv),length(ToUpdate_GenConfigs),1 );
-            GenConfigurationData_new_disp_partially.CandidateUnit = repmat( zeros(length(genNames_disp_partially),1),length(ToUpdate_GenConfigs),1 );
-            GenConfigurationData_new_disp_partially.Pmax = repmat( Pmax_inv_disp,length(ToUpdate_GenConfigs),1 );
-            GenConfigurationData_new_disp_partially.Pmin = repmat( Pmin_inv_disp2,length(ToUpdate_GenConfigs),1 );
-            GenConfigurationData_new_disp_partially.Emax = repmat( Emax_inv_disp2,length(ToUpdate_GenConfigs),1 );
-            GenConfigurationData_new_disp_partially.Emin = repmat( Emin_inv_disp2,length(ToUpdate_GenConfigs),1 );
-            
-            % get the correct InvestCost to set for these built gens based
-            % on the year it was built (get InvCost for current
-            % idGenConfig, and repeat for all GenConfigs that need to be 
-            % updated)
-            GenConfigurationData_new_disp_partially.InvCost = repmat( GenConfigurationData_toupdate.InvCost(find(GenConfigurationData_toupdate.idGenConfig == idGenConfig)) ,length(ToUpdate_GenConfigs),1 );
+            % Step C1: (Inv table built row-by-row in Step C3 to avoid row-order mismatch)
             %>>>>>>>>>>>><<<<<<<<<<<<<<
             
             % Step C2: calculate and create a new profile for the Inv and
@@ -860,11 +880,7 @@ function [ ] = FuncNexuse_Database_UpdateInvestments(wkspace,conn,CentIvToMySQL)
                         disp(['    Added Partial Candidate   to profiledata: idProfile = ',num2str(ProfileData_new_cand.idProfile(d1)),', Pblt/Pmax ratio = ',num2str(Pmax_cd_disp(d1)/Pmax_orig_disp(d1)), ', Pbuilt = ',num2str(Pmax_cd_disp(d1)), ' MW out of Pmax = ',num2str(Pmax_orig_disp(d1)),' MW, ',genNames_disp_partially_editprofiles_cand{d1}])
                     end
                     
-                    % modify the idProfile associated with only the Inv
-                    % portion gen for all the genconfigs I need to update
-                    for d1=1:length(disp_partially_editprofiles_idProfile)
-                        GenConfigurationData_new_disp_partially.idProfile( find(strcmp(GenConfigurationData_new_disp_partially.GenName,genNames_disp_partially_editprofiles_inv{d1,1})) ) = ProfileData_new_inv.idProfile(d1);
-                    end
+                    % (idProfile for Inv portion applied per-generator in Step C3 loop below)
                     
                 else
                     % no edits to profiles needed, none of the profiles is in
@@ -876,11 +892,46 @@ function [ ] = FuncNexuse_Database_UpdateInvestments(wkspace,conn,CentIvToMySQL)
                 % use a profile
             end
             %>>>>>>>>>>>><<<<<<<<<<<<<<
-            
-            % Step C3: remove NaNs and insert new entries for Inv portion 
-            % to genconfigurations
+
+            % Step C3: build Inv portion rows explicitly and insert to genconfiguration
             %>>>>>>>>>>>><<<<<<<<<<<<<<
-            
+
+            % Build each Inv row by looking up the correct candidate row for
+            % that specific generator and genconfig. Fields not explicitly
+            % overridden (VOM_Cost, FOM_Cost, TotVarCost, FuelType, HedgeRatio,
+            % CO2Type, etc.) are correctly inherited from the candidate row.
+            % This avoids the row-order mismatch that occurs with repmat when
+            % multiple generators are partially built simultaneously.
+
+            % pre-compute build-year InvCost for each gen (locked to idGenConfig)
+            InvCost_buildyear_inv = zeros(length(genNames_disp_partially), 1);
+            for g1 = 1:length(genNames_disp_partially)
+                build_year_mask = strcmp(GenConfigurationData_toupdate.GenName, genNames_disp_partially{g1}) & ...
+                                  (GenConfigurationData_toupdate.idGenConfig == idGenConfig);
+                InvCost_buildyear_inv(g1) = GenConfigurationData_toupdate.InvCost(build_year_mask);
+            end
+
+            % build the table row-by-row
+            GenConfigurationData_new_disp_partially = GenConfigurationData_toupdate([], :);
+            for c1 = 1:length(ToUpdate_GenConfigs)
+                for g1 = 1:length(genNames_disp_partially)
+                    row_mask = strcmp(GenConfigurationData_toupdate.GenName, genNames_disp_partially{g1}) & ...
+                               (GenConfigurationData_toupdate.idGenConfig == ToUpdate_GenConfigs(c1));
+                    inv_row = GenConfigurationData_toupdate(row_mask, :);
+                    inv_row.idGen         = idGen_new_disp_partially_inv(g1);
+                    inv_row.GenName       = Str_name_Inv(g1);
+                    inv_row.CandidateUnit = 0;
+                    inv_row.Pmax          = Pmax_inv_disp(g1);
+                    inv_row.Pmin          = Pmin_inv_disp2(g1);
+                    inv_row.Emax          = Emax_inv_disp2(g1);
+                    inv_row.Emin          = Emin_inv_disp2(g1);
+                    inv_row.InvCost       = InvCost_buildyear_inv(g1);
+                    inv_row.idProfile     = disp_partially_idProfile_new_inv(g1);
+                    % E_ini inherited from candidate row (correct for storage; NaN for gas)
+                    GenConfigurationData_new_disp_partially = [GenConfigurationData_new_disp_partially; inv_row];
+                end
+            end
+
             % replace NaN in Emin,Emax,E_ini,HedgeRatio with BLANKS
             vars = {'idProfile','Emin','Emax','E_ini','HedgeRatio'};
             GenConfigurationData_new_disp_partially.idProfile = num2cell(GenConfigurationData_new_disp_partially.idProfile);  	% for some reason I needed to convert these columns to cell arrays of double instead of just double
@@ -1132,7 +1183,20 @@ function [ ] = FuncNexuse_Database_UpdateInvestments(wkspace,conn,CentIvToMySQL)
             ztemp = GenData_new_nondisp_fully{:,vars};
             ztemp(cellfun(@(ztemp) any(isnan(ztemp(:))), ztemp)) = java.lang.String('');
             GenData_new_nondisp_fully{:,vars} = ztemp; clear ztemp;
-            
+            % replace NaN in cascade vars with BLANKS (only if columns exist)
+            vars_cascade = {'WASTA','QT','QP','idResUp','idResLow','idCasc','HydroCHAgg','HydroCHCasc'};
+            vars_cascade_present = vars_cascade(ismember(vars_cascade, GenData_new_nondisp_fully.Properties.VariableNames));
+            if ~isempty(vars_cascade_present)
+                for v = vars_cascade_present
+                    if isnumeric(GenData_new_nondisp_fully.(v{1}))
+                        GenData_new_nondisp_fully.(v{1}) = num2cell(GenData_new_nondisp_fully.(v{1}));
+                    end
+                end
+                ztemp = GenData_new_nondisp_fully{:, vars_cascade_present};
+                ztemp(cellfun(@(x) isnumeric(x) && any(isnan(x(:))), ztemp)) = java.lang.String('');
+                GenData_new_nondisp_fully{:, vars_cascade_present} = ztemp; clear ztemp;
+            end
+
             % get the column names of the GenData table, needed to use
             % datainsert to put new data back into MySQL
             colNames = GenData_new_nondisp_fully.Properties.VariableNames;
@@ -1284,7 +1348,20 @@ function [ ] = FuncNexuse_Database_UpdateInvestments(wkspace,conn,CentIvToMySQL)
             ztemp = GenData_new_nondisp_partially{:,vars};
             ztemp(cellfun(@(ztemp) any(isnan(ztemp(:))), ztemp)) = java.lang.String('');
             GenData_new_nondisp_partially{:,vars} = ztemp; clear ztemp;
-            
+            % replace NaN in cascade vars with BLANKS (only if columns exist)
+            vars_cascade = {'WASTA','QT','QP','idResUp','idResLow','idCasc','HydroCHAgg','HydroCHCasc'};
+            vars_cascade_present = vars_cascade(ismember(vars_cascade, GenData_new_nondisp_partially.Properties.VariableNames));
+            if ~isempty(vars_cascade_present)
+                for v = vars_cascade_present
+                    if isnumeric(GenData_new_nondisp_partially.(v{1}))
+                        GenData_new_nondisp_partially.(v{1}) = num2cell(GenData_new_nondisp_partially.(v{1}));
+                    end
+                end
+                ztemp = GenData_new_nondisp_partially{:, vars_cascade_present};
+                ztemp(cellfun(@(x) isnumeric(x) && any(isnan(x(:))), ztemp)) = java.lang.String('');
+                GenData_new_nondisp_partially{:, vars_cascade_present} = ztemp; clear ztemp;
+            end
+
             % get the column names of the GenData table, needed to use
             % datainsert to put new data back into MySQL
             colNames = GenData_new_nondisp_partially.Properties.VariableNames;
@@ -1341,7 +1418,20 @@ function [ ] = FuncNexuse_Database_UpdateInvestments(wkspace,conn,CentIvToMySQL)
                     ztemp_recl_nd = GenData_new_nondisp_reclassified{:,vars_recl_nd};
                     ztemp_recl_nd(cellfun(@(ztemp_recl_nd) any(isnan(ztemp_recl_nd(:))), ztemp_recl_nd)) = java.lang.String('');
                     GenData_new_nondisp_reclassified{:,vars_recl_nd} = ztemp_recl_nd; clear ztemp_recl_nd;
-                    
+                    % replace NaN in cascade vars with BLANKS (only if columns exist)
+                    vars_cascade = {'WASTA','QT','QP','idResUp','idResLow','idCasc','HydroCHAgg','HydroCHCasc'};
+                    vars_cascade_present = vars_cascade(ismember(vars_cascade, GenData_new_nondisp_reclassified.Properties.VariableNames));
+                    if ~isempty(vars_cascade_present)
+                        for v = vars_cascade_present
+                            if isnumeric(GenData_new_nondisp_reclassified.(v{1}))
+                                GenData_new_nondisp_reclassified.(v{1}) = num2cell(GenData_new_nondisp_reclassified.(v{1}));
+                            end
+                        end
+                        ztemp = GenData_new_nondisp_reclassified{:, vars_cascade_present};
+                        ztemp(cellfun(@(x) isnumeric(x) && any(isnan(x(:))), ztemp)) = java.lang.String('');
+                        GenData_new_nondisp_reclassified{:, vars_cascade_present} = ztemp; clear ztemp;
+                    end
+
                     colNames_recl_nd = GenData_new_nondisp_reclassified.Properties.VariableNames;
                     datainsert(conn,'gendata',colNames_recl_nd,GenData_new_nondisp_reclassified);
                     
@@ -1451,7 +1541,7 @@ function [ ] = FuncNexuse_Database_UpdateInvestments(wkspace,conn,CentIvToMySQL)
             
             % Step C1: edit main data for Inv portion
             %>>>>>>>>>>>><<<<<<<<<<<<<<
-            % modify the idGen, GenName, CandidateUnit, Pmax, and Pmin for 
+            % modify the idGen, GenName, CandidateUnit, Pmax, and Pmin for
             % all the genconfigs I need to update
             % Note: I edit Pmin just incase but should generally be =0
             % Note: I also edit Emax, Emin in case such units are
@@ -1585,11 +1675,11 @@ function [ ] = FuncNexuse_Database_UpdateInvestments(wkspace,conn,CentIvToMySQL)
                 % gens use a profile
             end
             %>>>>>>>>>>>><<<<<<<<<<<<<<
-            
-            % Step C3: remove NaNs and insert new entries for Inv portion 
+
+            % Step C3: remove NaNs and insert new entries for Inv portion
             % to genconfigurations
             %>>>>>>>>>>>><<<<<<<<<<<<<<
-            
+
             % replace NaN in Emin,Emax,E_ini,HedgeRatio with BLANKS
             vars = {'idProfile','Emin','Emax','E_ini','HedgeRatio'};
             GenConfigurationData_new_nondisp_partially.idProfile = num2cell(GenConfigurationData_new_nondisp_partially.idProfile);  	% for some reason I needed to convert these columns to cell arrays of double instead of just double

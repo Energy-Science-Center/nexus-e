@@ -1,12 +1,24 @@
 import os
+from pathlib import Path
+import shutil
+import pytest
 import tomli
 import src.nexus_e.config as config
 
+TEST_DATA_FOLDER = Path() / "tests" / "tmp"
+"""Everything in this folder is deleted after running the tests"""
+
+@pytest.fixture(scope="function", autouse=True)
+def cleanup(request: pytest.FixtureRequest):
+    os.makedirs(TEST_DATA_FOLDER, exist_ok=True)
+    def remove_test_directory():
+        shutil.rmtree(TEST_DATA_FOLDER)
+    request.addfinalizer(remove_test_directory)
 
 class TestConfig:
     def test_load_dict_from_toml_file(self):
         # Arrange
-        test_file_name = "test_to_delete.toml"
+        test_file_name = TEST_DATA_FOLDER / "test_to_delete.toml"
         with open(test_file_name, "w") as fid:
             fid.writelines(
                 [
@@ -24,12 +36,7 @@ class TestConfig:
         sut = config.TomlFile(file_path=test_file_name)
 
         # Act
-        try:
-            result = sut.load()
-        except Exception as e:
-            raise e
-        finally:
-            os.remove(test_file_name)
+        result = sut.load()
 
         # Assert
         assert result == expected_result
@@ -42,7 +49,7 @@ class TestConfig:
                 "another_key": "another_value",
             }
         }
-        test_file_name = "test_to_delete.toml"
+        test_file_name = TEST_DATA_FOLDER / "test_to_delete.toml"
         sut = config.TomlFile(file_path=test_file_name)
         expected_result = [
             "[any_dict]\n",
@@ -51,21 +58,16 @@ class TestConfig:
         ]
 
         # Act
-        try:
-            sut.write(config=any_config)
-            with open(test_file_name, "r") as fid:
-                result = fid.readlines()
-        except Exception as e:
-            raise e
-        finally:
-            os.remove(test_file_name)
+        sut.write(config=any_config)
+        with open(test_file_name, "r") as fid:
+            result = fid.readlines()
 
         # Assert
         assert result == expected_result
 
     def test_load_config_from_toml_file(self):
         # Arrange
-        test_file_name = "test_to_delete.toml"
+        test_file_name = TEST_DATA_FOLDER / "test_to_delete.toml"
         with open(test_file_name, "w") as fid:
             fid.writelines(
                 [
@@ -83,12 +85,7 @@ class TestConfig:
         )
 
         # Act
-        try:
-            result = config.load(config_file)
-        except Exception as e:
-            raise e
-        finally:
-            os.remove(test_file_name)
+        result = config.load(config_file)
 
         # Assert
         assert result == expected_result
@@ -98,17 +95,12 @@ class TestConfig:
         any_config = config.Config()
         any_config.logging.filename = "any filename"
         any_config.logging.format = "any format"
-        test_file_name = "test_to_delete.toml"
+        test_file_name = TEST_DATA_FOLDER / "test_to_delete.toml"
 
         # Act
-        try:
-            config.write(any_config, config.TomlFile(test_file_name))
-            with open(test_file_name, "rb") as fid:
-                result = tomli.load(fid)
-        except Exception as e:
-            raise e
-        finally:
-            os.remove(test_file_name)
+        config.write(any_config, config.TomlFile(test_file_name))
+        with open(test_file_name, "rb") as fid:
+            result = tomli.load(fid)
 
         # Assert
         assert result["logging"]["filename"] == any_config.logging.filename
@@ -121,16 +113,11 @@ class TestConfig:
             "any_parameter": "any_value",
             "another_parameter": "another_value",
         }
-        test_file_name = "test_to_delete.toml"
+        test_file_name = TEST_DATA_FOLDER / "test_to_delete.toml"
 
         # Act
-        try:
-            config.write(any_config, config.TomlFile(test_file_name))
-            result = config.load(config.TomlFile(test_file_name))
-        except Exception as e:
-            raise e
-        finally:
-            os.remove(test_file_name)
+        config.write(any_config, config.TomlFile(test_file_name))
+        result = config.load(config.TomlFile(test_file_name))
 
         # Assert
         assert result.modules.commons["any_parameter"] == "any_value"

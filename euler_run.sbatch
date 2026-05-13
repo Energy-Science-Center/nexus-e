@@ -77,12 +77,11 @@
 #   3. Each job:
 #      - Creates scratch directory: /cluster/scratch/$USER/run_${SLURM_JOB_ID}/
 #      - Copies from repository path (default: ~/repos/nexus-e-framework/):
-#          * Folders: CentIv, nexus_e, Shared, modules_playlists
-#          * All top-level files (including config.toml)
+#          * The whole folder except any .git folder 
 #      - Patches config.toml to set:
-#          * database name in [scenario].original_name
+#          * database name in [data_context].name
 #          * playlist name in [modules].playlist_name
-#      - Runs: uv run nexus_e
+#      - Runs: nexus-e --run
 #      - Results stored in: scratch/nexus-e-framework/Results/run_${DATABASE}_${PLAYLIST_NAME}/
 #      - Records absolute path to results in manifest file
 #
@@ -271,7 +270,7 @@ cd "$REPO_PATH" || { echo "Repo not found at $REPO_PATH"; exit 1; }
 
 
 
-cp -r CentIv nexus_e Shared modules_playlists "$SCRATCH_DIR/nexus-e-framework"
+rsync -a ./ $SCRATCH_DIR/nexus-e-framework --exclude .git
 find . -maxdepth 1 -type f -exec cp {} "$SCRATCH_DIR/nexus-e-framework" \;
 
 
@@ -286,97 +285,22 @@ cd "$SCRATCH_DIR/nexus-e-framework" || exit 1
 CONFIG="config.toml"
 if [[ ! -f "$CONFIG" ]]; then
   echo "ERROR: config.toml not found" >&2
+  echo "Create one by running: uv run config.toml --setup" >&2
   exit 3
 fi
 
+uv run nexus-e config --file $CONFIG --data_context name $DATABASE
+uv run nexus-e config --file $CONFIG --modules-commons output_name $OUTPUT_NAME
+uv run nexus-e config --file $CONFIG --modules-commons results_path $SIM__FOLDER
 
-
-sed -i -E "0,/^[[:space:]]*output_name[[:space:]]*=.*/s//output_name = \"${OUTPUT_NAME}\"/" "$CONFIG"
-sed -i -E "0,/^[[:space:]]*simulation_folder[[:space:]]*=.*/s//simulation_folder = \"${SIM_FOLDER}\"/" "$CONFIG"
-
-# Patch playlist_name in [modules] section
-sed -i -E "/^\[modules\]/,/^\[/ s/^[[:space:]]*playlist_name[[:space:]]*=.*/playlist_name = \"${PLAYLIST_NAME}\"/" "$CONFIG"
-
-
-
-# Check if create_a_copy is true or false to determine which field(s) to patch
-CREATE_A_COPY=$(grep -E "^[[:space:]]*create_a_copy[[:space:]]*=" "$CONFIG" | sed -E 's/.*=[[:space:]]*(true|false).*/\1/')
-
-if [[ "$CREATE_A_COPY" == "true" ]]; then
-  # If create_a_copy = true, patch only original_name
-  awk -v db="$DATABASE" '
-    BEGIN { in_scen=0; found=0 }
-    /^\[[^]]+\]/ {
-      if (in_scen && !found) {
-        print "original_name = \"" db "\""
-      }
-      in_scen = ($0 ~ /^\[scenario\]/) ? 1 : 0
-      found = 0
-      print
-      next
-    }
-    {
-      if (in_scen && $0 ~ "^[[:space:]]*original_name[[:space:]]*=") {
-        print "original_name = \"" db "\""
-        found = 1
-        next
-      }
-      print
-    }
-    END {
-      if (in_scen && !found) {
-        print "original_name = \"" db "\""
-      }
-    }
-  ' "$CONFIG" > "$CONFIG.tmp" && mv "$CONFIG.tmp" "$CONFIG"
-
-  FIELDS_PATCHED="original_name"
-else
-  # If create_a_copy = false, patch both original_name AND copy_name
-  awk -v db="$DATABASE" '
-    BEGIN { in_scen=0; found_orig=0; found_copy=0 }
-    /^\[[^]]+\]/ {
-      if (in_scen) {
-        if (!found_orig) print "original_name = \"" db "\""
-        if (!found_copy) print "copy_name = \"" db "\""
-      }
-      in_scen = ($0 ~ /^\[scenario\]/) ? 1 : 0
-      found_orig = 0
-      found_copy = 0
-      print
-      next
-    }
-    {
-      if (in_scen && $0 ~ "^[[:space:]]*original_name[[:space:]]*=") {
-        print "original_name = \"" db "\""
-        found_orig = 1
-        next
-      }
-      if (in_scen && $0 ~ "^[[:space:]]*copy_name[[:space:]]*=") {
-        print "copy_name = \"" db "\""
-        found_copy = 1
-        next
-      }
-      print
-    }
-    END {
-      if (in_scen) {
-        if (!found_orig) print "original_name = \"" db "\""
-        if (!found_copy) print "copy_name = \"" db "\""
-      }
-    }
-  ' "$CONFIG" > "$CONFIG.tmp" && mv "$CONFIG.tmp" "$CONFIG"
-
-  FIELDS_PATCHED="original_name and copy_name"
-fi
 
 
 
 echo "Patched ${CONFIG}:"
-echo "  output_name       = ${OUTPUT_NAME}"
-echo "  simulation_folder = ${SIM_FOLDER}"
-echo "  [scenario].${FIELDS_PATCHED} = ${DATABASE}"
-echo "  [modules].playlist_name  = ${PLAYLIST_NAME}"
+echo "  [data_context].name            = ${DATABASE}"
+echo "  [modules].playlist_name        = ${PLAYLIST_NAME}"
+echo "  [modules.commons].output_name  = ${OUTPUT_NAME}"
+echo "  [modules.commons].results_path = ${SIM_FOLDER}"
 
 
 

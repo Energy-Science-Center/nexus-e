@@ -29,6 +29,7 @@ from pathlib import Path
 from typing import Any, List, Literal
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, asdict, field
+from nexus_e.execution_mode import ExecutionMode
 import tomli
 import tomli_w
 
@@ -42,7 +43,7 @@ class ConfigFile(ABC):
     """Interface for loading from and writing in a config file."""
 
     @abstractmethod
-    def __init__(self, file_path: str):
+    def __init__(self, file_path: str | Path):
         """Store the file path in an object's attribute."""
         pass
 
@@ -60,7 +61,7 @@ class ConfigFile(ABC):
 class TomlFile(ConfigFile):
     """Implement the ConfigFile interface for .toml files."""
 
-    def __init__(self, file_path: str):
+    def __init__(self, file_path: str | Path):
         self.__config_file_path = file_path
 
     def load(self) -> dict:
@@ -213,3 +214,109 @@ def write_default_config_file(
     default_config.data_context.password = input("  password: ")
     default_config.data_context.name = input("  database: ")
     write(default_config, config_file)
+
+
+class Cli(ExecutionMode):
+    command: str = "config"
+    help: str = (
+        "Modify config parameters. "
+        "Use the following format '--table parameter value'. "
+        "See the available TOML tables with 'uv run nexus-e config --help'"
+    )
+
+    @classmethod
+    def add_arguments(cls):
+
+        cls.parser.add_argument(
+            "--file",
+            help="The name of the config file to modify.",
+        )
+        cls.parser.add_argument(
+            "--logging",
+            help=(
+                "Modify parameters in [logging]. "
+                "e.g. 'uv run nexus-e config --logging filemode a'"
+            ),
+            action="append",
+            nargs=2
+        )
+        cls.parser.add_argument(
+            "--results",
+            help=(
+                "Modify parameters in [results]. "
+                "e.g. 'uv run nexus-e config --results base_folder project_x'"
+            ),
+            action="append",
+            nargs=2
+        )
+        cls.parser.add_argument(
+            "--data_context",
+            help=(
+                "Modify parameters in [data_context]. "
+                "e.g. 'uv run nexus-e config --data_context name new_name'"
+            ),
+            action="append",
+            nargs=2
+        )
+        cls.parser.add_argument(
+            "--modules",
+            help=(
+                "Modify parameters in [modules]. "
+                "e.g. 'uv run nexus-e config --modules playlist_name new_name'"
+            ),
+            action="append",
+            nargs=2
+        )
+        cls.parser.add_argument(
+            "--modules-commons",
+            help=(
+                "Modify parameters in [modules.commons]. "
+                "e.g. 'uv run nexus-e config --modules-commons resolution_in_days 1'"
+            ),
+            action="append",
+            nargs=2
+        )
+
+    @classmethod
+    def start(cls, args: dict):
+        if args["file"] is not None:
+            config_file_path = args.pop("file")
+        else:
+            config_file_path = CONFIG_FILE_NAME
+        config_file = TomlFile(config_file_path)
+
+        def is_valid_float(string: str) -> bool:
+            return (
+                "." in string
+                and string.count(".") == 1
+                and all([part.isdigit() for part in string.split(".")])
+            )
+        
+        settings = load(config_file)
+        new_settings = asdict(settings)
+
+        for arg_name, arg_values in args.items():
+            if arg_name in [
+                cls.command,
+                "start_execution_mode",
+            ]:
+                continue
+            if arg_values is None:
+                continue
+
+            for key, value in arg_values:
+                if value.lower() in ["true", "false"]:
+                    value = eval(value.capitalize())
+                elif value.isdigit():
+                    value = int(value)
+                elif is_valid_float(value):
+                    value = float(value)
+                if arg_name == "modules_commons":
+                    new_settings["modules"]["commons"][key] = value
+                else:
+                    new_settings[arg_name][key] = value
+
+        settings.parse(**new_settings)
+        write(settings, config_file)
+            
+

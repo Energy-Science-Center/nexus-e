@@ -389,13 +389,26 @@ function [ ] = FuncNexuse_Database_UpdateInvestments(wkspace,conn,CentIvToMySQL)
             GenData_new_disp_fully.EndYr = repmat(2100,[length(idGen_new),1]);
             % overwrite the GenNames with the new Invested ones
             GenData_new_disp_fully.GenName = Str_name;
-            % replace NaN in eta_dis,eta_ch with BLANKS
+            % replace NaN in eta_dis,eta_ch, 'WASTA', 'QT', 'QP', 'idResUp', 'idResLow', 'idCasc', 'HydroCHAgg', 'HydroCHCasc' with BLANKS
             vars = {'eta_dis','eta_ch'};
-            GenData_new_disp_fully.eta_dis = num2cell(GenData_new_disp_fully.eta_dis);    % for some reason I needed to convert these columns to cell arrays of double instead of just double
-            GenData_new_disp_fully.eta_ch = num2cell(GenData_new_disp_fully.eta_ch);      % for some reason I needed to convert these columns to cell arrays of double instead of just double
+            vars_null = {'WASTA', 'QT', 'QP', 'idResUp', 'idResLow', 'idCasc', 'HydroCHAgg', 'HydroCHCasc'};
+            all_vars = [vars, vars_null];
+
+            for i = 1:length(all_vars)
+                GenData_new_disp_fully.(all_vars{i}) = num2cell(GenData_new_disp_partially.(all_vars{i}));
+            end
+            % GenData_new_disp_fully.eta_dis = num2cell(GenData_new_disp_fully.eta_dis);    % for some reason I needed to convert these columns to cell arrays of double instead of just double
+            % GenData_new_disp_fully.eta_ch = num2cell(GenData_new_disp_fully.eta_ch);      % for some reason I needed to convert these columns to cell arrays of double instead of just double
             ztemp = GenData_new_disp_fully{:,vars};
             ztemp(cellfun(@(ztemp) any(isnan(ztemp(:))), ztemp)) = java.lang.String('');
             GenData_new_disp_fully{:,vars} = ztemp; clear ztemp;
+            
+            for i = 1:length(vars_null)
+                col = vars_null{i};
+                if ismember(col, GenData_new_disp_fully.Properties.VariableNames)
+                    GenData_new_disp_fully.(col)(:) = {[]};
+                end
+            end
             
             % get the column names of the GenData table, needed to use
             % datainsert to put new data back into MySQL
@@ -544,13 +557,26 @@ function [ ] = FuncNexuse_Database_UpdateInvestments(wkspace,conn,CentIvToMySQL)
             % overwrite the GenNames with the new Invested ones
             GenData_new_disp_partially.GenName = Str_name_InvCd;
             % replace NaN in eta_dis,eta_ch with BLANKS
-            vars = {'eta_dis','eta_ch'};
-            GenData_new_disp_partially.eta_dis = num2cell(GenData_new_disp_partially.eta_dis);    % for some reason I needed to convert these columns to cell arrays of double instead of just double
-            GenData_new_disp_partially.eta_ch = num2cell(GenData_new_disp_partially.eta_ch);      % for some reason I needed to convert these columns to cell arrays of double instead of just double
+            vars = {'eta_dis','eta_ch'}; 
+            vars_null = {'WASTA', 'QT', 'QP', 'idResUp', 'idResLow', 'idCasc', 'HydroCHAgg', 'HydroCHCasc'};
+            all_vars = [vars, vars_null];
+
+            for i = 1:length(all_vars)
+                GenData_new_disp_partially.(all_vars{i}) = num2cell(GenData_new_disp_partially.(all_vars{i}));
+            end
+            % GenData_new_disp_partially.eta_dis = num2cell(GenData_new_disp_partially.eta_dis);    % for some reason I needed to convert these columns to cell arrays of double instead of just double
+            % GenData_new_disp_partially.eta_ch = num2cell(GenData_new_disp_partially.eta_ch);      % for some reason I needed to convert these columns to cell arrays of double instead of just double
             ztemp = GenData_new_disp_partially{:,vars};
-            ztemp(cellfun(@(ztemp) any(isnan(ztemp(:))), ztemp)) = java.lang.String('');
+            ztemp(cellfun(@(ztemp) any(isnan(ztemp(:))), ztemp)) = {java.lang.String('')};
             GenData_new_disp_partially{:,vars} = ztemp; clear ztemp;
             
+            for i = 1:length(vars_null)
+                col = vars_null{i};
+                if ismember(col, GenData_new_disp_partially.Properties.VariableNames)
+                    GenData_new_disp_partially.(col)(:) = {[]};
+                end
+            end
+
             % get the column names of the GenData table, needed to use
             % datainsert to put new data back into MySQL
             colNames = GenData_new_disp_partially.Properties.VariableNames;
@@ -1127,12 +1153,23 @@ function [ ] = FuncNexuse_Database_UpdateInvestments(wkspace,conn,CentIvToMySQL)
             GenData_new_nondisp_fully.GenName = Str_name;
             % replace NaN in eta_dis,eta_ch with BLANKS
             vars = {'eta_dis','eta_ch'};
-            GenData_new_nondisp_fully.eta_dis = num2cell(GenData_new_nondisp_fully.eta_dis);    % for some reason I needed to convert these columns to cell arrays of double instead of just double
-            GenData_new_nondisp_fully.eta_ch = num2cell(GenData_new_nondisp_fully.eta_ch);      % for some reason I needed to convert these columns to cell arrays of double instead of just double
+            vars_null = {'WASTA', 'QT', 'QP', 'idResUp', 'idResLow', 'idCasc', 'HydroCHAgg', 'HydroCHCasc'};
+            all_vars = [vars, vars_null];
+
+            for i = 1:length(all_vars)
+                GenData_new_nondisp_fully.(all_vars{i}) = num2cell(GenData_new_nondisp_fully.(all_vars{i}));
+            end
+        
             ztemp = GenData_new_nondisp_fully{:,vars};
             ztemp(cellfun(@(ztemp) any(isnan(ztemp(:))), ztemp)) = java.lang.String('');
             GenData_new_nondisp_fully{:,vars} = ztemp; clear ztemp;
-            
+
+            for i = 1:length(vars_null)
+                col = vars_null{i};
+                if ismember(col, GenData_new_nondisp_fully.Properties.VariableNames)
+                    GenData_new_nondisp_fully.(col)(:) = {[]};
+                end
+            end            
             % get the column names of the GenData table, needed to use
             % datainsert to put new data back into MySQL
             colNames = GenData_new_nondisp_fully.Properties.VariableNames;
@@ -1262,9 +1299,7 @@ function [ ] = FuncNexuse_Database_UpdateInvestments(wkspace,conn,CentIvToMySQL)
             GenData_new_nondisp_partially.EndYr = repmat(2100,[length(idGen_new),1]);
             % also adjust the name of the built generator (change from Cd
             % to Inv)
-            Str_beg_Inv = extractBefore(genNames_nondisp_partially,"Cd");       % get the gen name string before the 'Cd' (will use this exactly in the new name for both invested and candidate)
-            Str_end_Inv = extractAfter(genNames_nondisp_partially,"Cd");        % get the gen name string after the 'Cd' (will use this exactly in the new name for the invested)
-            Str_name_Inv = strcat(Str_beg_Inv,'Inv',Str_end_Inv,"_PtInv");      % create new name for the new Invested generator
+            Str_name_Inv = strcat(strrep(genNames_nondisp_partially, 'Cd', 'Inv'), '_PtInv');
             Str_beg_Cd = genNames_nondisp_partially;                            % use the full original name  
             Str_name_Cd = strcat(Str_beg_Cd,'_PtCd');                           % add a '_PtCd' for each time a portion remains as a candidate
             % need to get names in correct order
@@ -1279,12 +1314,24 @@ function [ ] = FuncNexuse_Database_UpdateInvestments(wkspace,conn,CentIvToMySQL)
             GenData_new_nondisp_partially.GenName = Str_name_InvCd2;
             % replace NaN in eta_dis,eta_ch with BLANKS
             vars = {'eta_dis','eta_ch'};
-            GenData_new_nondisp_partially.eta_dis = num2cell(GenData_new_nondisp_partially.eta_dis);    % for some reason I needed to convert these columns to cell arrays of double instead of just double
-            GenData_new_nondisp_partially.eta_ch = num2cell(GenData_new_nondisp_partially.eta_ch);      % for some reason I needed to convert these columns to cell arrays of double instead of just double
+            vars_null = {'WASTA', 'QT', 'QP', 'idResUp', 'idResLow', 'idCasc', 'HydroCHAgg', 'HydroCHCasc'};
+            all_vars = [vars, vars_null];
+
+            for i = 1:length(all_vars)
+                GenData_new_nondisp_partially.(all_vars{i}) = num2cell(GenData_new_nondisp_partially.(all_vars{i}));
+            end
+            % GenData_new_nondisp_partially.eta_dis = num2cell(GenData_new_nondisp_partially.eta_dis);    % for some reason I needed to convert these columns to cell arrays of double instead of just double
+            % GenData_new_nondisp_partially.eta_ch = num2cell(GenData_new_nondisp_partially.eta_ch);      % for some reason I needed to convert these columns to cell arrays of double instead of just double
             ztemp = GenData_new_nondisp_partially{:,vars};
             ztemp(cellfun(@(ztemp) any(isnan(ztemp(:))), ztemp)) = java.lang.String('');
             GenData_new_nondisp_partially{:,vars} = ztemp; clear ztemp;
             
+            for i = 1:length(vars_null)
+                col = vars_null{i};
+                if ismember(col, GenData_new_nondisp_partially.Properties.VariableNames)
+                    GenData_new_nondisp_partially.(col)(:) = {[]};
+                end
+            end
             % get the column names of the GenData table, needed to use
             % datainsert to put new data back into MySQL
             colNames = GenData_new_nondisp_partially.Properties.VariableNames;
@@ -1604,6 +1651,7 @@ function [ ] = FuncNexuse_Database_UpdateInvestments(wkspace,conn,CentIvToMySQL)
             % push new generator (invested) data to add to the 
             % genconfiguration MySQl table (push all configurations at
             % once)
+            GenConfigurationData_new_nondisp_partially{:, 18} = 0;
             datainsert(conn,'genconfiguration',colNames2,GenConfigurationData_new_nondisp_partially);
             
             % display info genconfig update for newly created gens

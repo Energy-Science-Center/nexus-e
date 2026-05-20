@@ -1454,7 +1454,7 @@ class DataImport(object):
                     ts = extend_hourly_timeseries(json.loads(row['timeSeries']), self.timeperiods)
                     renewables_timeseries.update({Id:{k:round(ts[k],2) for k in range(self.timeperiods)}})
                 elif row['timeSeries'] and row['type'] == 'Water':
-                    ts = extend_hourly_timeseries(json.loads(row['timeSeries']), self.timeperiods, True)
+                    ts = extend_hourly_timeseries(json.loads(row['timeSeries']), self.timeperiods)
                     renewables_timeseries.update({Id:{k:ts[k] for k in range(self.timeperiods)}})
                 elif row['timeSeries'] and row['type'] == 'Gen':
                     ts = extend_hourly_timeseries(json.loads(row['timeSeries']), self.timeperiods)

@@ -1,4 +1,6 @@
+import logging
 import os
+import json
 from pathlib import Path
 import pandas as pd
 import pymysql
@@ -40,13 +42,37 @@ class DatabaseSchema:
         result = self.__execute_query(query)
         return len(result) > 0
 
+    def extend_timeseries(self, year, timeseries):
+        ts_list = json.loads(timeseries)
+        num_hours = len(ts_list)
+        try:
+            demand_file = pd.read_csv(os.path.join(f"CentIv_{year}", "Demand_hourly_CH.csv"), usecols=[0])
+            num_hours = demand_file.iloc[-1, 0] + 1
+        except FileNotFoundError:
+            logging.warning(f"Extend_timeseries: File not found for year {year}")
+        except Exception as e:
+            logging.error(f"Extend_timeseries: An error occurred for year {year}: {e}")
+
+        if len(ts_list) < num_hours:
+            return json.dumps(ts_list * (num_hours // 8760))
+
+        return timeseries
+
     def get_load_profiles(self, year: int):
         query = f"SELECT * FROM load_profiles WHERE year = {year}"
-        return self.__execute_query(query)
+        df =  self.__execute_query(query)
+
+        if 'timeSeries' in df.columns:
+            df['timeSeries'] = df['timeSeries'].apply(lambda ts: self.extend_timeseries(year, ts))
+        return df
 
     def get_demand(self, year: int):
         query = f'call {self.__database}.getLoadData_v2({year_dic[year]})'
-        return self.__execute_query(query)
+        df =  self.__execute_query(query)
+
+        if 'timeSeries' in df.columns:
+            df['timeSeries'] = df['timeSeries'].apply(lambda ts: self.extend_timeseries(year, ts))
+        return df
 
     def get_profiles(self):
         query = "SELECT * FROM profiledata"
@@ -114,7 +140,7 @@ def main(database: str, host: str, user: str, password: str):
             hourly_demand_profiles.to_csv(os.path.join(output_path, filename))
 
             hourly_demand_profile_time = pd.DataFrame({
-                'DateTime': pd.date_range(start='2024-01-01', end='2024-12-31', freq='H'),
+                'DateTime': pd.date_range(start='2024-01-01', periods=len(hourly_demand_profiles), freq='H'),
             })
             monthly_demand_profiles = pd.concat([hourly_demand_profile_time, hourly_demand_profiles], axis=1)
             monthly_demand_profiles.set_index('DateTime', inplace=True)
@@ -131,7 +157,7 @@ def main(database: str, host: str, user: str, password: str):
             df_name = f'demand_annual_c_{country_lower}_{year}'
             # Remove the first column that contains the timestamp
             yearly_data_sum_without_timestamp = yearly_data_sum.iloc[:, 1:]
-            yearly_data_sum_without_timestamp = yearly_data_sum_without_timestamp.T
+            yearly_data_sum_without_timestamp = yearly_data_sum_without_timestamp.sum(axis=0).to_frame() #makes sure multi years are added up together
             yearly_data_sum_without_timestamp.columns = [year]
             df_container[df_name] = yearly_data_sum_without_timestamp
 

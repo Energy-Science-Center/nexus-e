@@ -2,7 +2,7 @@
 [[modules]]
 name = "copy_database"
 [modules.parameters]
-user_initials = "XX"
+user_initials = "js"
 
 
 # Run CentIv for year 2050

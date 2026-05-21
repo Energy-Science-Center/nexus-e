@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=change_me
-#SBATCH --account=change_me
+#SBATCH --account=es_sansa
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem-per-cpu=62500
@@ -222,6 +222,7 @@ trap record_failure ERR
 
 
 SIM_FOLDER="run_${DATABASE}_${PLAYLIST_NAME}"
+OUTPUT_NAME="${DATABASE}_${PLAYLIST_NAME}"
 
 
 
@@ -300,12 +301,23 @@ fi
 sed -i -E "/^\[modules\]/,/^\[/ s/^[[:space:]]*playlist_name[[:space:]]*=.*/playlist_name = \"${PLAYLIST_NAME}\"/" "$CONFIG"
 # Patch name in [data_context] section
 sed -i -E "/^\[data_context\]/,/^\[/ s/^[[:space:]]*name[[:space:]]*=.*/name = \"${DATABASE}\"/" "$CONFIG"
+# Patch output_name in [scenario] section (prevents parallel runs from overwriting each other in webviewer)
+if grep -qE "^\[scenario\]" "$CONFIG"; then
+  if grep -qE "^[[:space:]]*output_name[[:space:]]*=" "$CONFIG"; then
+    sed -i -E "/^\[scenario\]/,/^\[/ s/^[[:space:]]*output_name[[:space:]]*=.*/output_name = \"${OUTPUT_NAME}\"/" "$CONFIG"
+  else
+    sed -i "/^\[scenario\]/a output_name = \"${OUTPUT_NAME}\"" "$CONFIG"
+  fi
+else
+  printf '\n[scenario]\noutput_name = "%s"\n' "${OUTPUT_NAME}" >> "$CONFIG"
+fi
 
 
 
 echo "Patched ${CONFIG}:"
 echo "  [data_context].name      = ${DATABASE}"
 echo "  [modules].playlist_name  = ${PLAYLIST_NAME}"
+echo "  [scenario].output_name   = ${OUTPUT_NAME}"
 
 
 

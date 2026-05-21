@@ -2282,9 +2282,10 @@ class DataImport(object):
         #12.3...Set up dispatchable hydro (dams and pumps) constraints
         all_hydro_list = sorted(hydro_Dam + hydro_Pumped)
         hydro = HydroGenerators(opt, all_hydro_list)
-        
+        hydro_CH = [item for item in hydro if item not in non_swiss_gens]
+        hydro_not_ch = [item for item in hydro if item in non_swiss_gens]
         #12.3.1...Set up hydro dam constraints
-        hydro.set_hydro_power_dam(hydro_Dam,
+        hydro_CH.set_hydro_power_dam(hydro_Dam,
             {k:0 for k in hydro_Dam}, #Emin is 0
             {k:self.generators[k]['Emax']/baseMVA for k in hydro_Dam},
             {k:self.generators[k]['Pmax']/baseMVA for k in hydro_Dam},
@@ -2293,6 +2294,18 @@ class DataImport(object):
             {k:renewables_timeseries[k] for k in hydro_Dam},
             {k:self.generators[k]['eta_dis'] for k in hydro_Dam},
             config.resolution_in_days)
+
+        hydro_not_ch.set_hydro_power_Pumped(hydro_Pumped_notCH,
+                {k:0 for k in hydro_Pumped_notCH}, #Emin is 0 in database
+                {k:self.generators[k]['Emax']/baseMVA for k in hydro_Pumped_notCH},
+                {k:self.generators[k]['Pmax']/baseMVA for k in hydro_Pumped_notCH},
+                {k:-self.generators[k]['Pmin']/baseMVA for k in hydro_Pumped_notCH},#we need the (-) because in the database Pmin is negative and the notation for maximum pump power HERE is positive
+                {k:self.generators[k]['E_ini'] for k in hydro_Pumped_notCH}, # E_ini [-] so no need to divide by baseMVA
+                {k: np.zeros_like(renewables_timeseries[k]) for k in hydro_Pumped_notCH},
+                {k:self.generators[k]['eta_ch'] for k in hydro_Pumped_notCH},
+                {k:self.generators[k]['eta_dis'] for k in hydro_Pumped_notCH},
+                config.tpResolution)
+ 
 
         #12.3.2...Set up hydro pumped constraints (for all pumped storages in CH and abroad except daily storages)
         hydro.set_hydro_power_Pumped(hydro_Pumped_notdaily,

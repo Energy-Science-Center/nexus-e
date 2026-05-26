@@ -1,10 +1,10 @@
 #!/bin/bash
-#SBATCH --job-name=change_me
-#SBATCH --account=change_me
+#SBATCH --job-name=LL
+#SBATCH --account=es_sansa
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
-#SBATCH --mem-per-cpu=62500
-#SBATCH --time=100:00:00
+#SBATCH --mem-per-cpu=250000
+#SBATCH --time=120:00:00
 #SBATCH --output=/cluster/home/%u/Euler_logs/output_%j.log
 #SBATCH --error=/cluster/home/%u/Euler_logs/error_%j.log
 
@@ -308,6 +308,11 @@ echo "  [modules].playlist_name        = ${PLAYLIST_NAME}"
 echo "  [modules.commons].output_name  = ${OUTPUT_NAME}"
 echo "  [modules.commons].results_path = ${SIM_FOLDER}"
 
+echo "  output_name       = ${OUTPUT_NAME}"
+echo "  simulation_folder = ${SIM_FOLDER}"
+echo "  [scenario].${FIELDS_PATCHED} = ${DATABASE}"
+echo "  [modules].playlist_name  = ${PLAYLIST_NAME}"
+echo "  [modules.commons].input_data_name = ${DATABASE}"
 
 
 # -------------------

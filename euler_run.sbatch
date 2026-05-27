@@ -3,8 +3,8 @@
 #SBATCH --account=es_sansa
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
-#SBATCH --mem-per-cpu=250000
-#SBATCH --time=120:00:00
+#SBATCH --mem-per-cpu=125000
+#SBATCH --time=24:00:00
 #SBATCH --output=/cluster/home/%u/Euler_logs/output_%j.log
 #SBATCH --error=/cluster/home/%u/Euler_logs/error_%j.log
 
@@ -272,7 +272,8 @@ cd "$REPO_PATH" || { echo "Repo not found at $REPO_PATH"; exit 1; }
 
 
 # cp -r ./ "$SCRATCH_DIR/nexus-e-framework"
-rsync -a ./ $SCRATCH_DIR/nexus-e-framework --exclude .git
+# rsync -a ./ $SCRATCH_DIR/nexus-e-framework --exclude .git
+rsync -a --exclude='.git' src modules_playlists .venv "$SCRATCH_DIR/nexus-e-framework/"
 find . -maxdepth 1 -type f -exec cp {} "$SCRATCH_DIR/nexus-e-framework" \;
 
 
@@ -310,7 +311,6 @@ echo "  [modules.commons].results_path = ${SIM_FOLDER}"
 
 echo "  output_name       = ${OUTPUT_NAME}"
 echo "  simulation_folder = ${SIM_FOLDER}"
-echo "  [scenario].${FIELDS_PATCHED} = ${DATABASE}"
 echo "  [modules].playlist_name  = ${PLAYLIST_NAME}"
 echo "  [modules.commons].input_data_name = ${DATABASE}"
 
@@ -321,6 +321,7 @@ echo "  [modules.commons].input_data_name = ${DATABASE}"
 export PYTHONUNBUFFERED=1
 echo "Running model..."
 uv run nexus-e run
+#./.venv/bin/python -m nexus_e.app
 APP_EXIT_CODE=$?
 
 echo "App finished with exit code: $APP_EXIT_CODE"
